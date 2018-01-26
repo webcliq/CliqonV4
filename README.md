@@ -23,5 +23,3 @@ You will be downloading and installing Cliqon V4 when there is still much to do 
 - Export and Import
 - Test and validate Access Control
 - Language Management - 
-
->>>>>>> origin/master
