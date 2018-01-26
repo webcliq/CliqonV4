@@ -1,0 +1,71 @@
+
+<style>
+	.btn {padding:4px; background-color: #003366; color: #fff; border-color: #003366; margin-right: 10px;}
+	.btn:hover {background-color: #16A085; border-color: #16A085;}
+	.inpt {padding: 6px; margin-right: 20px;}
+</style>
+
+<input type="button" onclick="start_task();"  value="Update Files" class="btn"  />
+<input type="button" onclick="clear_screen();"  value="Clear Screen" class="btn"  />
+<br />
+<br />	         
+{$update} 
+<br /><br />
+<div id="results" style="border:1px solid #000; padding:10px; width:500px; height:400px; overflow:auto; background:#eee;"></div>
+<br />
+<div style="border:1px solid #ccc; width:520px; height:20px; overflow:auto; background:#eee;">
+    <div id="progressor" style="background:#07c; width:0%; height:100%;"></div>
+</div>
+<div class="clear clearfix">&nbsp;</div>
+
+{$updatejs}
+
+<script type="text/javascript">
+<!--//
+var source = 'THE SOURCE';
+ 
+function start_task() {
+    source = new EventSource('{$rootpath}admin/includes/files.php?action=updatefiles');
+     
+    //a message is received
+    source.addEventListener('message' , function(e) {
+        var result = JSON.parse( e.data );
+         
+        add_log(result.message);
+         
+        document.getElementById('progressor').style.width = result.progress + "%";
+         
+        if(e.data.search('TERMINATE') != -1)  {
+            add_log('Received TERMINATE closing');
+            source.close();
+        }
+    });
+    
+    source.addEventListener('error' , function(e) {
+        add_log('Error occured');
+         
+        //kill the object ?
+        source.close();
+    });
+}
+ 
+function stop_task() {
+    source.close();
+    add_log('Interrupted');
+}
+
+function clear_screen() {
+    var r = document.getElementById('results');
+    r.innerHTML = '';
+    var v = document.getElementById('progressor');
+    v.innerHTML = '';
+}
+ 
+function add_log(message)  {
+    var r = document.getElementById('results');
+    r.innerHTML += message + '<br>';
+    r.scrollTop = r.scrollHeight;
+}
+
+//-->
+</script>

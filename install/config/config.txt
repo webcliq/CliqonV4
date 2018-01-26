@@ -1,0 +1,100 @@
+﻿; Config.Cfg
+
+; Database Configuration
+; type = mysql, pgsql, sqlite
+; database = name of database or name of file e.g. data/cliq.sqlite
+
+[database]
+type = '{type}'
+server = '{server}'
+dbname = '{dbname}'
+username = '{username}'
+password = '{password}'
+port = '{portno}'
+charset = 'utf8'
+
+; dsn = ''
+; type = 'sqlite'
+; file = 'data/clq.sqlite'
+
+; Standard site configuration settings that will be overwritten if required from database
+
+[site]
+debug = 'development' ; development / production
+status = 'development' ; development / production
+defaultidiom = 'en'
+timezone = 'Europe/Madrid'
+dateformat = 'd-M-Y'
+numberformat = '2|,|.'
+currencyformat = '2|,|.|| €'
+currency = 'EUR'
+currencysymbol = '€'
+name = '{name}'
+description = '{description}'
+keywords = 'internet'
+logo = 'logo.png'
+favicon = 'favicon.ico'
+email = '{adminemail}'
+telephone = ''
+address = ''
+viewpath = 'views/'
+adminpath = 'admin/'
+cfgpath = 'config/'
+copyrightmessage = 'Your Company 2017'
+website = 'http://{siteurl}/'
+defaultroute = 'DefaultController'
+modeldbformat = 'toml' ; toml or json
+toemail = '{adminemail}' 
+toname = 'You'
+bingkey = 'XxXxXxXxXxXx' 
+gmapsapi = 'XxXxXxXxXx' ; Static Maps API Key
+cmtcomapi = 'XxXxXxXxXx' ; CM Telecom Product Token
+secret = 'XxXxXxXxX'
+
+[site:idioms] 
+{idiom_array}
+	
+[site:idiomflags]
+{idiom_flags}
+
+; Delete this section for security reasons
+[site:users]
+[site:users:0]
+    c_group = 'admin'
+    c_username = 'adminuser'
+    c_password = 'adminpassword'
+    c_level  = '90'
+    c_status = 'active'
+    d_firstname = 'Temporary'
+    d_midname = 'Admin'
+    d_lastname = 'User'
+    d_langcd  = 'en'
+    c_email = '{adminemail}'
+
+; Optional
+[mail]
+hostname = 'smtp.elasticemail.com'
+smtpauth = 'true'
+authtype = 'LOGIN'
+username = ''
+password = ''
+security = 'tls'
+port = '2525'
+mailfrom = 'info@cliqon.com'
+mailfromname = 'Cliqon'
+mailreplyto = 'info@cliqon.com'
+mailreplytoname = 'Cliqon'
+altmailto = ''
+altmailtoname = ''
+
+
+; SMTP Server: smtp.elasticemail.com
+; SMTP Port: 2525
+; Username: 
+; Password: 
+
+; SMTP Server: srss.reachmail.net
+; SMTP Port: 587
+; Username: company\user
+; Password: 
+

@@ -1,0 +1,19 @@
+# disable directory browsing
+Options All -Indexes
+
+Options +FollowSymlinks
+RewriteEngine on
+
+RewriteRule ^(.*)\.htm$ $1.php [NC]
+
+RewriteCond %{REQUEST_FILENAME} !-f 
+RewriteCond %{REQUEST_FILENAME} !-d 
+RewriteCond $1 !^(index\.php) 
+RewriteRule ^(.*)$ /index.php/$1 [L]
+
+php_value log_errors 1
+php_value error_log /log/php-error.log
+
+FallbackResource /index.php
+
+# RewriteRule ^subdirectory/(.*)$ /$1 [R=301,NC,L]
