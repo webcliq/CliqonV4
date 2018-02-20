@@ -10,7 +10,6 @@
 			useCaching: true,
 			langcd: jlcd,
 			data: {}, app: {},
-			sitepath: "http://"+document.location.hostname+"/",
 			spinner: new Spinner(),
 			formset: {},
 			subdir: 'tmp/',

@@ -35,21 +35,29 @@ class View extends HTML
 		self::$idioms = $cfg['site']['idioms'];
 	}
 
-	/***************************************  View Record  *********************************************/
+	/** All the View Functions
+	 *
+	 * viewContent()
+	 * - columnView()
+	 * - popupView()
+	 * helpContent()
+	 * displayHelp()
+	 *
+	 **************************************  View Record  *********************************************/
 
-		/**
-		 * Generate a Record view for the ID
+		/** Generate a Record view for the ID
 		 * @param - string - Language code
 		 * @param - string - Table Name
 		 * @param - string - Table Type
 		 * @param - array - Request Variables
 		 * @return - array of data, including Flag (Ok or NotOk) and HTML
 		 **/
-		static function viewContent($vars)
-		{
+		 static function viewContent($vars)
+		 {
+		    $method = self::THISCLASS.'->'.__FUNCTION__.'()';
 		    try {
 
-		    	$method = "formContent()";
+		    	
 		    	self::$rq = $vars['rq'];
 		    	self::$viewtype = self::$rq['viewtype'];
 				self::$lcd = $vars['idiom'];
@@ -91,7 +99,7 @@ class View extends HTML
 				}
 				
 				$test = [
-					'method' => self::THISCLASS.'->'.$method,
+					'method' => $method,
 					'model' => $vcfg,
 					'row' => $row,
 					'html' => $html,
@@ -100,13 +108,14 @@ class View extends HTML
 
 				return [
 					'flag' => "Ok",
+					'model' => $vcfg,
 					'html' => $html,
 				];
 
 			} catch (Exception $e) {
 				$err = [
 					'errmsg' => $e->getMessage(),
-					'method' => self::THISCLASS.'->'.$method,
+					'method' => $method,
 					'model' => $vcfg,
 				];
 				L::cLog($err);
@@ -115,18 +124,17 @@ class View extends HTML
 					'html' => $err, 
 				]; 
 			}	
-		}
+		 }
 
-		/**
-		 * Creates the Table HTML for a Column View
+		/** Creates the Table HTML for a Column View
 		 * @param - array - The array of view fields
 		 * @param - array - Recordset Row
 		 * @param - string - Tablename
 		 * @param - string(int) - Record number
 		 * @return - string - Table HTML
 		 **/
-		protected static function columnView($ordered, $row, $table, $recid)
-		{
+		 protected static function columnView($ordered, $row, $table, $recid)
+		 {
 			global $clq; $tbody = "";
 			// Step through ordered form fields
 			foreach($ordered as $fid => $prop) {
@@ -155,18 +163,18 @@ class View extends HTML
 					)
 				)
 			);
-		}
+		 }
 
-		/**
-		 * Creates the Table HTML for a Column View
+		/** Creates the Table HTML for a Popup View   
+		 *
 		 * @param - array - The array of view fields
 		 * @param - array - Recordset Row
 		 * @param - string - Tablename
 		 * @param - string(int) - Record number
 		 * @return - string - Table HTML
 		 **/
-		protected static function popupView($ordered, $row, $table, $recid)
-		{
+		 protected static function popupView($ordered, $row, $table, $recid)
+		 {
 			global $clq; $tbody = "";
 			// Step through ordered form fields
 			foreach($ordered as $fid => $prop) {
@@ -188,18 +196,18 @@ class View extends HTML
 				),
 				H::tbody(['class' => ''], $tbody)
 			);
-		}
+		 }
 
-        /**
-         * Get Help content for a Collection Type and Reference
+        /** Get Help content for a Collection Type and Reference  
+         * 
 		 * @param - string - Language code
 		 * @param - string - Table Name
 		 * @param - string - Table Type
 		 * @param - array - Request Variables
          * @return - string - Text
          **/
-        static function helpContent($idiom, $table, $tabletype, $rq)
-        {
+         static function helpContent($idiom, $table, $tabletype, $rq)
+         {
             try {
             	$method = "helpContent()";
                 $sql = "SELECT c_document FROM dbcollection WHERE c_type = ? AND c_reference = ?";
@@ -235,16 +243,15 @@ class View extends HTML
 					'html' => $err, 
 				]; 
 			}
-        }
+         }
 
-        /**
-         * Textual content for the Help system
+        /** Textual content for the Help system
          *
          * @param - array - array of variables
          * @return - String HTML 
          **/
-        public static function displayHelp($vars)
-        {
+         public static function displayHelp($vars)
+         {
 	        try {
 
 	        	global $clq;
@@ -282,7 +289,7 @@ class View extends HTML
 					'html' => $e->getMessage() 
 				]; 
 			}	
-        }
+         }
 
 } // View Class Ends
 

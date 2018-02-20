@@ -26,11 +26,12 @@ class DefaultController
 		$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."views"), $clq->get('basedir')."cache/".$this->idiom);		
 		$template = $this->page.'.tpl';
 		$vars = [
+			'protocol' => $clq->get('protocol'),
 			'rootpath' => $clq->get('rootpath'),
 			'basedir' => $clq->get('basedir'),
 			'viewpath' => $clq->get('rootpath').'views/',
 			'includepath' => $clq->get('rootpath').'includes/',
-			'languageoptions' => $cms->idiomOptions($idiom),
+			'languageoptions' => $cms->idiomOptions($this->idiom),
 			'page' => $this->page,
 			'cfg' => $this->cfg,
 			'idiom' => $this->idiom,

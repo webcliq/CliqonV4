@@ -30,7 +30,7 @@
 	                                <th scope="col"></th>
 	                                <th scope="col" v-for="(col, colid) in cols">
 	                                	<div v-if="col.searchable == true" class="input-group input-group-sm col">
-      										<input type="text" class="form-control"  placeholder="@(Q::cStr('9999:Search for')) ..." aria-label="@(Q::cStr('239:Search for')) ..." v-bind:data-name="colid">
+      										<input type="text" class="form-control"  placeholder="@(Q::cStr('149:Search for')) ..." aria-label="@(Q::cStr('239:Search for')) ..." v-bind:data-name="colid">
       										<span class="input-group-btn">
         										<button class="btn btn-secondary" v-on:click="searchbutton($event)" type="button" v-bind:data-id="colid"><i class="fa fa-search"></i></button>
         										<button class="btn btn-secondary" v-on:click="clearbutton($event)" type="button" v-bind:data-id="colid"><i class="fa fa-refresh"></i></button>

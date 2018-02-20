@@ -72,7 +72,7 @@
             <div class="pure-g">
                 <div class="l-box-lrg pure-u-1 pure-u-md-2-5">
                     <h4>@(Q::uStr('17:Ask a quick question'))</h4>
-                    <form method="POST" action="https://formspree.io/info@cliqon.com" name="sendmessage" id="sendmessage" class="pure-form pure-form-stacked">
+                    <form method="POST" action="https://formspree.io/info@@cliqon.com" name="sendmessage" id="sendmessage" class="pure-form pure-form-stacked">
                         <fieldset>
 
                             <label for="name">@(Q::uStr('18:Your Name'))</label>

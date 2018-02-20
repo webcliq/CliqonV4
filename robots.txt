@@ -1,11 +1,4 @@
-<<<<<<< HEAD
 # robots.txt
 
 User-agent: *
 Disallow: /admin
-=======
-# robots.txt
-
-User-agent: *
-Disallow: /admin
->>>>>>> origin/master

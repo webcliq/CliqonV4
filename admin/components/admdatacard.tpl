@@ -16,7 +16,7 @@
 		
 		<div class="row">
 
-			<div class="col-3 left">
+			<div class="col-3 left" v-if="admfooter != ''">
 				<div class="card">	
 					<div class="card-block">				
 						<div class="card-text">

@@ -35,7 +35,7 @@ $istr[59] = 'If this is a multi-lingual system, please create entries for the tw
 
 $istr[60] = 'Cliqon uses the Redbean ORM for all Database activities. This ensures that the system can support a number of Server types, is very secure and is very easy to work with when design new modules. Please visit <a href="http://RedbeanPHP.Com/" target="_blank">RedbeanPHP.Com</a> for more information.';
 
-$istr[61] = 'There are many advantages to using an ORM and one of them is the ease by which the Tables are created and Data imported. Cliqon has a data dictionary file - <strong>\models\tablecreate.cfg</strong> in which the tables and fields are defined. Initial data is held as SQL files in the \data subdirectory. Press the button below and the tables will be created and data imported into these tables or error information will be displayed.';
+$istr[61] = 'There are many advantages to using an ORM and one of them is the ease by which the Tables are created and Data imported. Cliqon has a data dictionary file - <strong>\models\model.cfg</strong> in which the tables and fields are defined. Initial data is held as SQL files in the \data subdirectory. Press the button below and the tables will be created and data imported into these tables or error information will be displayed.';
 
 $istr[62] = 'Create administrator';
 

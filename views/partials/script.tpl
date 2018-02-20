@@ -1,5 +1,5 @@
 <script>
-var sitepath = "http://"+document.location.hostname+"/"; 
+var sitepath = "@raw($protocol)"+document.location.hostname+"/"; 
 var jspath = sitepath+"includes/js/";
 var viewpath = sitepath+"views/"; 
 var jlcd = '@($idiom)', lstr = [], str = [];
@@ -18,7 +18,8 @@ basket
     lstr = str[jlcd];
     // Dropzone.autoDiscover = false;
     var sessid = Cookies.get('PHPSESSID');
-    
+    // Quark
+    for(t=document.querySelectorAll`*`,i=t.length;i--;)for(s=t[i].classList,c=s.length;c--;)z=s[c].split`-`,u=z[1],t[i].style[z[0]]=~~u?u+'px':u;
 
 }, function (error) {
     // There was an error fetching the script

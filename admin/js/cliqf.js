@@ -92,8 +92,8 @@
 				            		var opts = {
 					                    content: '<div class="col mr10 pad">'+response.html+'</div>',
 					                    contentSize: {
-					                        width: 780,
-					                        height: 640
+					                        width: response.model.width,
+					                        height: response.model.height
 					                    },
 					                    paneltype: 'modal',
 					                    headerTitle: '<span class="">'+title+': '+cfg.tabletype+'</span>'
@@ -177,9 +177,20 @@
 	                    removeImage: function (e) {        
 	                        e.stopImmediatePropagation();
 	                        this.d_image = '';
-	                    }
+	                    },
 
                         // More here
+
+                        modelChange: function(e) {
+                        	var table = e.target.value;
+                        	var tabletypes = [];
+                        	$("select[data-name='tabletype'] option").each(function() {
+    							if(stristr($(this).data('table'), table) === false) {
+    								$(this).remove();
+    							};
+							});
+                        }
+
                     },
                     mounted: function() {
                         formMounted(cfg);
@@ -380,7 +391,7 @@
 						var d = $('#day_'+id).val();
 						var m = $('#month_'+id).val();
 						var y = $('#year_'+id).val();
-						Vue.set(Df, 'd_'+id, d+'-'+m+'-'+y);
+						Vue.set(cfg.df, 'd_'+id, d+'-'+m+'-'+y);
 					});
 					
 					$('.datepicker').each(function(e) {
@@ -390,9 +401,6 @@
 							uiLibrary: 'bootstrap4',
          					iconsLibrary: 'fontawesome',
          					locale: jlcd+'-'+jlcd		
-						}).on('change', function(e) {
-							var date = moment( $('#'+fldid).datepicker.value() ).format('DD-MM-YYYY');
-							Vue.set(cfg.df, fldid, date);
 						});
 					})
 	
@@ -482,7 +490,7 @@
                                         if(lcdcode != jlcd) {
                                             textfrom = cfg.df.$data[fldid+'_'+jlcd]; 
                                             $.ajax({
-                                                url: "http://api.microsofttranslator.com/V2/Ajax.svc/Translate",
+                                                url: "https://api.microsofttranslator.com/V2/Ajax.svc/Translate",
                                                 dataType: "jsonp", jsonp: "oncomplete", crossDomain: true,
                                                 data: {appId: cfg.bingkey, from: jlcd, to: lcdcode, contentType: "text/plain", text: textfrom},
                                                 success: function(data, status){
@@ -520,7 +528,7 @@
 							if(lcdcode != jlcd) {
 								textfrom = cfg.df.$data[fldid+'_'+jlcd];
 								$.ajax({
-									url: "http://api.microsofttranslator.com/V2/Ajax.svc/Translate",
+									url: "https://api.microsofttranslator.com/V2/Ajax.svc/Translate",
 									dataType: "jsonp", jsonp: "oncomplete",	crossDomain: true,
 									data: {appId: cfg.bingkey, from: jlcd, to: lcdcode, contentType: "text/plain", text: textfrom},
 									success: function(data, status) {
@@ -536,7 +544,7 @@
 					})
 
 				// Miscellaneous
-			    	$('.currency').maskMoney();		
+			    	// $('.currency').maskMoney();		
 
                     $('.form-inline').each(function(e) {
                         var fldid = $(this).attr('id');
@@ -569,16 +577,12 @@
              **/
 	         var frmBtn = function(evt, action)
 	         {	            
+	            
 	            switch(action) {
 	                case "submitbutton": 
                         // Make sure button is type = button, not type = submit !!
 						evt.preventDefault();
-                        if(array_key_exists('tabletype', cfg) && cfg.tabletype != '') {
-                            var urlstr = '/ajax/'+cfg.langcd+'/postform/'+cfg.table+'/'+cfg.tabletype+'/';
-                        } else {
-                            var urlstr = '/ajax/'+cfg.langcd+'/postform/'+cfg.table+'/';
-                        }
-						
+						var urlstr = $(cfg.data.el).attr('action');						
 						var frmData = getFormData(false);
 						$.ajax({
 							url: urlstr, data: frmData,
@@ -604,6 +608,11 @@
 		                                <td class=\"text-right orangec e30\">`+pair[0]+`</td>
 		                                <td class=\"text-left bluec e70\"><img src=\"`+rawurldecode(pair[1])+`\" class=\"h120\" /></td>
 		                            </tr>`;
+                            	break;
+
+                            	// Exclude fields
+                            	case "token": case "c_level":
+                            		$tbl += "";
                             	break;
 
                             	default:
@@ -664,10 +673,88 @@
 	                break;
 	                
 	                // More here
+
+	                // Transfer a value from a Select to an associated Input field
+	                case "transferval":
+	                	var fldid = $(evt).data('id');
+	                	var newval = $('select[data-id="'+fldid+'"]').getValue();
+	                	Vue.set(cfg.df, fldid, newval);
+	                break;
+
+	                case "maintainval": return addOption(evt); break;
+
 	                default: Cliq.success(action); break;
+
 	            }
 	         }			        
 			
+	        /** Add a new value to an Options or Categories list
+			 *
+			 *
+			 **/
+			 var addOption = function(evt)
+			 {
+	            var fldid = $(evt).data('id');
+	            var listname = $(evt).data('listname');
+	            cfg = Cliq.config();
+	            var tpl = `
+				<form name="subpopupform" id="subpopupform" action="#" method="POST" class="pad">
+					<h5>`+lstr[15]+`</h5>
+					<input type="hidden" name="fldid" value="`+fldid+`" />
+					<input type="hidden" name="listname" value="`+listname+`" />
+					<div class="form-group row">
+						<label for="x_value" class="col-sm-3 col-form-label text-right">`+lstr[100]+`</label>
+						<div class="col-sm-9">
+						<input type="text" class="form-control " name="x_value" id="x_value" placeholder="value">
+						</div>
+					</div>`;
+
+				  $.each(cfg.idioms, function(lcdcode, lcdname){
+				  	tpl += `
+					<div class="form-group row">
+			    		<label for="x_label_`+lcdcode+`" class="col-sm-3 col-form-label text-right">`+lcdname+`</label>
+			    		<div class="col-sm-9">
+			    		<input type="text" class="form-control" id="x_label_`+lcdcode+`" name="x_label_`+lcdcode+`" placeholder="">
+			    		</div>
+			  		</div>
+				  	`;
+				  });
+
+				tpl += `</form>`;
+	            return Cliq.msg({
+	                buttons:  [
+	                    {addClass: 'm10 mt10 btn btn-danger btn-sm', text: lstr[30], onClick: function($noty) {    
+	                        $noty.close(); 
+	                    }},
+	                    {addClass: 'm10 mt10 btn btn-primary btn-sm', text: lstr[16], onClick: function($noty) { 
+	                        
+	                        var frmData = $('#subpopupform').formHash();    
+	                        var urlstr = '/ajax/'+jlcd+'/addnewoption/dbcollection/list/';
+	                        aja().method('POST').url(urlstr).cache(false).timeout(2500).type('json').data(frmData)
+				            .on('40x', function(response) {Cliq.error('Page not Found - '+urlstr+':'+response);})
+				            .on('500', function(response) {Cliq.error('Server Error - '+urlstr+':'+response);})
+				            .on('timeout', function(response) {Cliq.error('Timeout - '+urlstr+':'+response);})
+				            .on('success', function(response) {
+
+	                            if(typeof response == 'object') {
+	                                // Test NotOK - value already exists
+	                                var match = /NotOk/.test(response.flag);
+	                                if(!match == true) {  
+	                                	Vue.set(cfg.df, fldid, response.newval); 
+	                                	$noty.close();                            
+			                        } else { Cliq.error('Ajax function returned error NotOk - '+urlstr+':'+JSON.stringify(response)); };
+			                    } else { Cliq.error('Response was not JSON object - '+urlstr+':'+response.msg); };
+			                }).go();                             
+	                    }}                                              
+	                ],
+	                timeout: false,
+	                type: 'success',
+	                closeWith: ['button'],
+	                text: '',
+	                template: tpl     
+	            }); 		 	
+			 }
+
             /** Delete button - invoked from Grid or List row
              * 
              * @param - string - record ID to be deleted
@@ -740,6 +827,7 @@
 	                    }}                                              
 	                ],
 	                timeout: false,
+	                closeWith: ['button'],
 	                type: 'warning',
 	                text: params.msg      
 	            }); 
@@ -816,7 +904,7 @@
 	         var creatorButton = function(recid, action) 
 	         {            
 	            cfg = Cliq.config(); cfg.recid = recid; cfg.action = action;
-        		var urlstr = '/ajax/'+jlcd+'/getcreatorform/'+cfg.table+'//';
+        		var urlstr = '/ajax/'+jlcd+'/getcreatorform/'+cfg.table+'/';
 	            aja().method('GET').url(urlstr).cache(false).timeout(2500).type('json')
 	            .data({action: action, recid: recid, table: cfg.table})
 	            .on('40x', function(response) {Cliq.error('Page not Found - '+urlstr+':'+response);})
@@ -1030,7 +1118,7 @@
                                                         if(lcdcode != jlcd) {
                                                             
                                                             $.ajax({
-                                                                url: "http://api.microsofttranslator.com/V2/Ajax.svc/Translate",
+                                                                url: "https://api.microsofttranslator.com/V2/Ajax.svc/Translate",
                                                                 dataType: "jsonp", jsonp: "oncomplete", crossDomain: true,
                                                                 data: {appId: data.bingkey, from: jlcd, to: lcdcode, contentType: "text/plain", text: textfrom},
                                                                 success: function(ttxt, status){
@@ -1516,73 +1604,84 @@
          		// cfg contains:  displaytype, table and tabletype, langcd  		
          		
          		// Define the Form ID
-         		var id = 'dataform'; var thisform = $('#'+id);
+         			var id = 'dataform'; var thisform = $('#'+id);
 
          		// Start a Spinner
-         		var target = document.getElementById(cfg.formid); cfg.spinner.spin(target);	
+         			var target = document.getElementById(cfg.formid); cfg.spinner.spin(target);	
 
 				// Get any tinymce Editors if exist and update the Vue instance with Tiny editor content
-				var tinyeditors = tinymce.EditorManager.editors;
-				if(count(tinyeditors) > 0) {
-					$.each(tinyeditors, function(i, teditor) {
-						var name = trim(teditor.id, '_te'); // works fine
-						var val = tinymce.get(teditor.id).getContent();
-						Vue.set(cfg.df, teditor.id, val);
-					});	
-				};
+					var tinyeditors = tinymce.EditorManager.editors;
+					if(count(tinyeditors) > 0) {
+						$.each(tinyeditors, function(i, teditor) {
+							var name = trim(teditor.id, '_te'); // works fine
+							var val = tinymce.get(teditor.id).getContent();
+							Vue.set(cfg.df, teditor.id, val);
+						});	
+					};
 
 				// If Trumbowyg editor is being used
-				$('#'+id+' textarea.texteditor').each(function() {
-	           		var fldid = $(this).attr('id');
-	           		// var te = $('.trumbowyg-editor').trumbowyg('html');
-	           		var te = $(this).trumbowyg('html');
-	           		Vue.set(cfg.df, fldid, te);	
-	           	});	
+					$('#'+id+' textarea.texteditor').each(function() {
+		           		var fldid = $(this).attr('id');
+		           		// var te = $('.trumbowyg-editor').trumbowyg('html');
+		           		var te = $(this).trumbowyg('html');
+		           		Vue.set(cfg.df, fldid, te);	
+		           	});	
 
-				$('.tagit').each(function() {
-					var fldid = $(this).attr('id');
-					var tags = $("#"+fldid).tagit("assignedTags");
-					Vue.set(cfg.df, fldid, tags);
-				});
+				// If Tagit
+					$('.tagit').each(function() {
+						var fldid = $(this).attr('id');
+						var tags = $("#"+fldid).tagit("assignedTags");
+						Vue.set(cfg.df, fldid, tags);
+					});
 	           	
 				// JSONeditors if exist - only one JSON Editor if exist and update the Vue instance with Jsoneditor content
-				$('#'+id+' div[data-type=jsoneditor]').each(function() {
-					fcfg.jeditor = findJSONEditor('#'+fcfg.jeditid);
-					var jeditdata = fcfg.jeditor.get();
-					jeditdata = JSON.stringify(jeditdata);
-					Vue.set(cfg.df, fcfg.jeditid, jeditdata);
-				});	
+					$('#'+id+' div[data-type=jsoneditor]').each(function() {
+						fcfg.jeditor = findJSONEditor('#'+fcfg.jeditid);
+						var jeditdata = fcfg.jeditor.get();
+						jeditdata = JSON.stringify(jeditdata);
+						Vue.set(cfg.df, fcfg.jeditid, jeditdata);
+					});	
 
                 // If Codeeditor is being used
-                $('#'+id+' textarea.toml').each(function() {
-                    var fldid = $(this).attr('id');
-                    var tomlcontent = fcfg.ceditor.getDoc().getValue();
-                    Vue.set(cfg.df, fldid, rawurlencode(tomlcontent));  
-                });                 
+	                $('.toml').each(function() {
+	                    var fldid = $(this).attr('id');
+	                    var tomlcontent = fcfg.ceditor.getValue();                   
+	                    Vue.set(cfg.df, fldid, tomlcontent);  
+	                });  
+
+	            // If currency and maskMoney is being used
+	            $('.currency').each(function() {
+	            	var fldid = $(this).attr('id');
+	            	var cur = $(this).getValue();
+	            	Vue.set(cfg.df, fldid, cur);
+	            })             
 	           	
          		// validation here	if required
 
 				// Now get Data from the Vue Instance
-				var postData = cfg.df.$data;	
+					var postData = cfg.df.$data;	
+				
 				// Test Form Content
-				// console.log(postData);	           				
+					// console.log(postData);	           				
 
 				// Now convert Postdata to FormData
-				var frmData = new FormData();
-				$.each(postData, function(fld, val) {
-					frmData.set(fld, val);
-				});
+					var frmData = new FormData();
+					$.each(postData, function(fld, val) {
+						frmData.set(fld, val);
+					});
+
+					frmData.append('token', jwt);
 				
 				// Add any AJAX Form upload for a single file
-				if( $('#'+id+' :input').hasClass('form-control-file') ) {
-					var file = $('input[type=file]', thisform)[0].files[0];		
-					if(addfilename) {
-						frmData.append(addfilename, file.name);	
-					} else {
-						frmData.append('filename', file.name);	
-					}											
-					frmData.append(file.name, file, file.filename);	
-				}
+					if( $('#'+id+' :input').hasClass('form-control-file') ) {
+						var file = $('input[type=file]', thisform)[0].files[0];		
+						if(addfilename) {
+							frmData.append(addfilename, file.name);	
+						} else {
+							frmData.append('filename', file.name);	
+						}											
+						frmData.append(file.name, file, file.filename);	
+					}
 
 				// New image handling will get image contents anyway
 	
@@ -1609,7 +1708,7 @@
 						if(cfg.formtype == 'popupform') {
 							jsPanel.closeChildpanels('body');
 						} else if(cfg.formtype == 'columnform') {
-							$('#columnform').empty().html(txt);
+							$('#columnform').empty().html(response.data);
 						} else if(cfg.formtype == 'pageform') {
 							// Introduce history
 							exit;
@@ -1620,8 +1719,9 @@
 
 							case "recordcreator": 
 							case "datagrid":
+								var tbl = prettyPrint(response.data.row);
+								$('#columnform').empty().html(tbl);
 								Cliq.success(txt);
-								$('#columnform').empty();
 								cfg.dg.reload();
 							break;
 
@@ -1653,7 +1753,6 @@
                             case "datatable":
                             	// Cliq.loadTableData();
                             	// Cliq.success(txt);
-                            	
 								var urlstr = "/admindesktop/"+jlcd+"/"+cfg.displaytype+"/"+table+"/"+tabletype+"/";
                 				uLoad(urlstr);
                             break;
@@ -1661,9 +1760,17 @@
                             case "lostpassword": rrd(response.msg); break;
                             case "changestatus": changeStatus(response.msg); break;
 
+                            case "datatablesnet":
+                            	Cliq.success(response.data.msg);
+								// var urlstr = "/plugin/"+jlcd+"/"+cfg.displaytype+"/"+table+"/"+tabletype+"/";
+                				// uLoad(urlstr); 
+                				cfg.dt = $('#datatable').DataTable();                         	
+                            	cfg.dt.ajax.reload();
+                            break;
+
 							default:
 								var urlstr = "/admindesktop/"+jlcd+"/"+cfg.displaytype+"/"+table+"/"+tabletype+"/";
-                				uLoad(urlstr);
+                				// uLoad(urlstr);
 							break;
 						}
 
@@ -2020,7 +2127,7 @@
 		    		Cliq.topButton(this);
 		    	});	
 
-				var tree = $('#tree').tree({
+				var tree = $('#tree').gjtree({
 					iconsLibrary: 'fontawesome',
 					primaryKey: 'id',
 					width: 460,

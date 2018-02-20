@@ -154,5 +154,9 @@ str['en'] = [
 'Snippet has been copied',
 'Email address',
 'The email address you entered is not valid!',
-'Records per page'
+'Records per page',
+'We recommend taking a backup of your database before performing this action.',
+'Please confirm the deletion of',
+'Paid',
+'Unpaid'
 ];

@@ -38,13 +38,13 @@ class Form extends HTML
 		self::$idioms = $cfg['site']['idioms'];
 	}
 
-	/** Process content of Form configuration file
+	/** Process content of Form configuration file 
 	 * publishForm()
 	 * - setFormData()
 	 *
 	 ********************************************************************************************************/
 
-		/**
+		/** Publish form  
 		 * This a pure PHP implementation of the Cliqon form where the HTML is written to the browser component
 		 * for use by the Template or as content for a popup Window.
 		 * For the version that processes the Config file to be used as a config for the JS, see FormJSON()
@@ -55,8 +55,8 @@ class Form extends HTML
 		 * 	buttons
 		 * the HTML for each field is added o $formhtml and the javascript is added to $formscript
 		 **/
-		static function publishForm($vars)
-		{
+		 static function publishForm($vars)
+		 {
 		
 		    try {
 
@@ -84,6 +84,11 @@ class Form extends HTML
 				if(array_key_exists('labelwidth', $frmcfg)) {
 					self::$lw = $frmcfg['labelwidth'];
 					self::$cw = $frmcfg['formwidth'];					
+				};
+
+				if(!array_key_exists('width', $frmcfg)) {
+					$frmcfg['width'] = 580;
+					$frmcfg['height'] = 640;					
 				};
 
 				// Existing record
@@ -171,6 +176,7 @@ class Form extends HTML
 					'flag' => "Ok",
 					'html' => H::form($frmcfg['formheader'], self::getForm()),
 					'script' => object_encode(self::$vue),
+					'model' => $frmcfg,
 					'action' => $action
 				];
 		
@@ -187,18 +193,18 @@ class Form extends HTML
 					'scripts' => ''
 				]; 
 			}			
-		}
+		 }
 
-		/**
-		* This function allows for the reduction and normalisation of the set formdata process
-		* @param - string - action, currently 'c' or 'u'
-		* @param - string - field ID
-		* @param - array - Field parameters
-		* @param - array (optional) - the record data
-		* @internal - sets formdata for the field(s)
-		**/
-		protected static function setFormData($action, $fid, $fld, $row = null)
-		{
+		/** Set form data  
+		 * This function allows for the reduction and normalisation of the set formdata process
+		 * @param - string - action, currently 'c' or 'u'
+		 * @param - string - field ID
+		 * @param - array - Field parameters
+		 * @param - array (optional) - the record data
+		 * @internal - sets formdata for the field(s)
+		 **/
+		 protected static function setFormData($action, $fid, $fld, $row = null)
+		 {
 
 			$idioms = self::$idioms;
 			if($action == 'c') { // Insert
@@ -207,11 +213,7 @@ class Form extends HTML
 
 					// Complex Field - also cannot be multi-lingual (true??)
 					foreach(self::barSplit($fld['realflds']) as $q => $subfldname) {
-						if(array_key_exists('defval', $fld)) {
-							self::$formdata[$subfldname] = self::barSplit($fld['defval'])[$q];	
-						} else {
-							self::$formdata[$subfldname] = '';
-						}
+						is_set('defval', $fld) == true ? self::$formdata[$subfldname] = self::barSplit($fld['defval'])[$q] : self::$formdata[$subfldname] = '';
 					}
 
 				} else {
@@ -219,13 +221,7 @@ class Form extends HTML
 					// Handles idiomtext fields
 					if($fld['type'] == 'idiomtext') {
 						foreach($idioms as $lcdcode => $lcdname) {
-							 
-							if(array_key_exists('defval', $fld)) {
-							 	self::$formdata[$fid.'_'.$lcdcode] = $fld['defval'][$lcdcode];
-							} else {
-								self::$formdata[$fid.'_'.$lcdcode] = '';
-							}
-
+							is_set('defval', $fld) == true ? self::$formdata[$fid.'_'.$lcdcode] = $fld['defval'][$lcdcode] : self::$formdata[$fid.'_'.$lcdcode] = '';
 						}
 					} else {
 
@@ -266,12 +262,11 @@ class Form extends HTML
 
 						}
 
-
 					} else {
 
 						// Complex Field
 						foreach(self::barSplit($fld['realflds']) as $q => $subfldname) {
-							self::$formdata[$subfldname] = $row[$subfldname];
+							is_set($subfldname, $row) == true ? self::$formdata[$subfldname] = $row[$subfldname] : self::$formdata[$subfldname] = "" ;
 						}
 					}		
 
@@ -280,13 +275,13 @@ class Form extends HTML
 					// Handles idiomtext fields
 					if($fld['type'] == 'idiomtext') {
 						foreach($idioms as $lcdcode => $lcdname) {	
-							array_key_exists($fid, $row) ? $val = $row[$fid][$lcdcode] : $val = '';
+							is_set($fid, $row) == true ? $val = $row[$fid][$lcdcode] : $val = '';
 							self::$formdata[$fid.'_'.$lcdcode] = $val;
 						}
 
 					} else {
 						// Simple single Field
-						array_key_exists($fid, $row) ? $val = $row[$fid] : $val = '';
+						is_set($fid, $row) == true ? $val = $row[$fid] : $val = '';
 						self::$formdata[$fid] = $val;
 					}
 				}; 
@@ -294,7 +289,7 @@ class Form extends HTML
 			} 
 
 			return;
-		}
+		 }
 
 	/** Form Field Types made up of Tags and conforming to Bootstrap4 Form structure protocol
 	 * frm_hidden()
@@ -428,8 +423,8 @@ class Form extends HTML
 		**/
 		static function frm_radio($fld)
 		{
-
-           	$fld['inline'] == 'true' ? $divclass = ' form-check-inline' : $divclass = '' ;
+           	
+           	is_true('inline', $fld) == true ? $divclass = ' form-check-inline' : $divclass = '' ;
 
            	$options = '';
 			foreach(self::setOptions($fld) as $val => $label) {
@@ -454,7 +449,7 @@ class Form extends HTML
 		**/
 		static function frm_checkbox($fld)
 		{
-           	$fld['inline'] == 'true' ? $divclass = ' form-check-inline checkbox' : $divclass = '' ;
+           	is_true('inline', $fld) == true ? $divclass = ' form-check-inline checkbox' : $divclass = '' ;
 
            	$options = '';
            	$q = 0;
@@ -610,14 +605,14 @@ class Form extends HTML
 	 *
 	 ********************************************************************************************************/		
 
-		/**
-		*
-		* @param - array -
-		* @return - adds Form HTML to self::form
-		* @todo - 
-		**/
-		static function frm_level($fld)
-		{
+		/** Read, Write and Delete Level
+		 *
+		 * @param - array -
+		 * @return - adds Form HTML to self::form
+		 * @todo - 
+		 **/
+		 static function frm_level($fld)
+		 {
            	
 			$id = $fld['id'];
 
@@ -640,7 +635,7 @@ class Form extends HTML
            				H::span(['class' => 'c1', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => Q::cStr('104:Delete')], substr(Q::cStr('104:Delete'),0,1)),
            				H::input(['type' => 'number', 'id' => $id.'_d', 'class' => 'spinboxes form-control', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => Q::cStr('104:Delete'), 'min' => '10', 'max' => '100', 'step' => '10', 'style' => $spinbox]),
 
-						H::input(['type' => 'text', 'readonly' => 'true', 'id' => $id.'_val', 'v-model' => $fld['v-model'], 'class' => 'form-control ml5', 'style' => 'width: 80px'])
+						H::input(['type' => 'text', 'readonly' => 'true', 'id' => $id.'_val', 'v-model' => $fld['v-model'], 'class' => 'form-control ml5', 'style' => 'width: 120px'])
 
 	           		),
 	           		self::addHelp($fld)	  		
@@ -651,16 +646,64 @@ class Form extends HTML
            	";  
            	self::setFormScript($js); 
 			return true; 
-		}
+		 }
 
-		/**
-		*
-		* @param - array -
-		* @return - adds Form HTML to self::form
-		* @todo - 
-		**/
-		static function frm_password($fld)
-		{
+		/** Suggestion box
+		 * Display a readonly text field where the value is created by selecting an option from a linked select.
+		 * Extra values can be added to the linked select
+		 * @param - array - field
+		 * @return - adds Form HTML to self::form
+		 * @todo - 
+		 **/
+		 static function frm_suggestion($fld)
+		 {
+           	/*
+				listtype = 'dynamic'
+				inline = 'true'
+				options = 'routes'
+				defval = 'admindesktop'
+           	*/
+
+			array_key_exists('class', $fld) ? $fld['class'] = 'form-control '.$fld['class'] : $fld['class'] = 'form-control custom-select' ;  
+			array_key_exists('optionclass', $fld) ? $fld['optionclass'] = 'custom-control '.$fld['optionclass'] : $fld['optionclass'] = 'custom-control' ; 	
+           	$options = '';
+
+			foreach(self::setOptions($fld) as $val => $label) {
+				$options .= H::option(['class' => $fld['optionclass'], 'value' => $val], $label);
+			}	
+
+           	is_set('class', $fld) ? $fld['class'] = 'form-control suggestion '.$fld['class'] : $fld['class'] = 'form-control suggestion' ;
+           	$frmfld = H::div(['class' => 'form-group row'], self::setLabel($fld), 
+           		H::div(['class' => self::$cw], 
+           			H::div(['class' => 'form-inline'],
+           				
+           				// The field - readonly
+           				H::input(self::setFldProps($fld)),
+
+           				// Transfer value
+           				H::i(['class' => 'fa fa-fw pointer bluec fa-border vpad10 lightgray fa-lg fa-arrow-left', 'v-on:click' => 'clickicon', 'data-action' => 'transferval', 'data-id' => $fld['id']]),
+
+           				// Options for the field
+           				H::select(['class' => 'custom-select ml5', 'data-id' => $fld['id']], $options),
+
+           				// Maintain the options
+           				H::i(['class' => 'fa fa-fw pointer bluec fa-border vpad10 lightgray fa-lg fa-external-link-square', 'v-on:click' => 'clickicon', 'data-action' => 'maintainval', 'data-listname' => $fld['options'], 'data-id' => $fld['id']])
+           			),
+           			self::addHelp($fld)
+           		)
+           	); self::setForm($frmfld);    
+           	$js = "";  self::setFormScript($js);  
+			return true;  
+		 }
+
+		/** Password with confirmation
+		 *
+		 * @param - array -
+		 * @return - adds Form HTML to self::form
+		 * @todo - 
+		 **/
+		 static function frm_password($fld)
+		 {
 			array_key_exists('class', $fld) ? $fld['class'] = 'form-control '.$fld['class'] : $fld['class'] = 'form-control' ;
 
 			$first = [
@@ -690,16 +733,16 @@ class Form extends HTML
            	self::setForm($frmfld);    
            	$js = "";  self::setFormScript($js);  
 			return true;  
-		}
+		 }
 
-		/**
-		*
-		* @param - array -
-		* @return - adds Form HTML to self::form
-		* @todo - 
-		**/
-		static function frm_date($fld)
-		{
+		/** Day, month and year pcker using spin box dropdowns
+		 *
+		 * @param - array -
+		 * @return - adds Form HTML to self::form
+		 * @todo - 
+		 **/
+		 static function frm_date($fld)
+		 {
            	
 			$dopt = "";
 			for($d = 1; $d <= 31; $d++) {
@@ -733,7 +776,7 @@ class Form extends HTML
            	$js = "";  
            	self::setFormScript($js); 
 			return true;
-		}
+		 }
 
 		/**
 		*
@@ -1417,20 +1460,21 @@ class Form extends HTML
            	foreach($dd['tabletypes'] as $p => $param) {
            		$tts[$q]['typename'] = $param['tabletype'];
            		$tts[$q]['label'] = Q::cStr($param['title']);
+           		$tts[$q]['table'] = $param['table'];
            		$q++;
            	}
            	$ttlist = Q::array_orderby($tts, 'label', SORT_ASC);
 			$tabletypes = H::option(['class' => 'pad3', 'value' => ''], Q::cStr('164:Select an option'));
         	foreach($ttlist as $t => $tt) {
-        		$tabletypes .= H::option(['class' => 'pad3', 'value' => $tt['typename']], $tt['label']);
+        		$tabletypes .= H::option(['class' => 'pad3', 'data-label' => $tt['label'], 'data-table' => $tt['table'], 'value' => $tt['typename']], $tt['label']);
         	}
 
            	$frmfld = H::div(['class' => 'form-group row'], 
            		self::setLabel($fld), 
            		H::div(['class' => self::$cw],     			
            			H::div(['class' => 'form-inline watch', 'id' => 'model'],
-           				H::select(['class' => 'form-control col-md-5 mr5', 'v-model' => 'c_parent', 'data-id' => 'c_parent'], $tables),
-           				H::select(['class' => 'form-control col-md-6', 'v-model' => 'c_category', 'data-id' => 'c_category'], $tabletypes)
+           				H::select(['class' => 'form-control col-md-5 mr5', 'v-model' => 'c_parent', 'data-id' => 'c_parent', 'data-name' => 'table', 'v-on:change' => 'modelChange'], $tables),
+           				H::select(['class' => 'form-control col-md-6', 'v-model' => 'c_category', 'data-id' => 'c_category', 'data-name' => 'tabletype'], $tabletypes)
 	           		),
 	           		self::addHelp($fld),
 	           		H::input(['type' => 'hidden', 'v-model' => $fld['v-model'], 'data-id' => $fld['id']])  		
@@ -1670,7 +1714,19 @@ class Form extends HTML
 				case "v-validate";
 					return [$key => $key];
 				break;
-				
+
+				case "style":
+					// Style needs to be array, introduced V4.1.1
+					if(is_array($val)) {
+						$stylestring = "";
+						foreach($val as $st => $sv) {
+							$stylestring .= $st.':'.$sv.';';
+						}
+						return [$key => $stylestring];
+					} else {
+						return false;
+					}
+				break;
 				case "v-modellazy":
 				case "v-model":
 					if($lcdcode) {
@@ -1866,7 +1922,7 @@ class Form extends HTML
 						'name' => 'dataform',
 						'id' => 'dataform',
 						'method' => 'POST',
-						'action' => '/ajax//postcreatorform/',
+						'action' => '/ajax/'.self::$lcd.'/postcreatorform/',
 					],
 					'labelwidth' => 'col-2',
 					'formwidth' => 'col-10',
@@ -1911,7 +1967,7 @@ class Form extends HTML
 					// Get data from record
 					$db = $clq->resolve('Db');
 					$sql = "SELECT * FROM ".self::$table." WHERE id = ?";
-					$row = D::extractAndMergeRow(R::getRow($sql, [self::$recid]));	
+					$row = D::extractAndMergeRow(R::getRow($sql, [self::$recid]));
 					$formdata = C::cfgWriteString($row);
 				};	
 

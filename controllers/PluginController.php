@@ -38,6 +38,7 @@ class PluginController extends Controller
 			$this->rq = $_REQUEST;
 
 			$vars = [
+				'protocol' => $clq->get('protocol'),
 				'rootpath' => $clq->get('rootpath'),
 				'basedir' => $clq->get('basedir'),
 				'includepath' => $clq->get('rootpath').'includes/',
@@ -82,12 +83,15 @@ class PluginController extends Controller
 	                'reference' => 'admin',        // If database, value of c_reference
 	                'key' => ''
 	            );
-	            $admcfg = C::cfgRead($vars2);	
+	            $admcfg = C::cfgRead($vars2);
+	            $array = $plugin->$method($args); 
+	            // also $array['callBack']
 				$vars = array_replace($vars, [
 					'viewpath' => $clq->get('rootdir').'admin/',
+					'pluginpath' => $clq->get('basedir').'plugin/',
 					'jwt' => F::encode($token, $this->cfg['site']['secret']),
 					'page' => $this->page,
-					'admincontent' => $plugin->$method($args),
+					'admincontent' => $array['content'],
 					'scripts' => $clq->get('js'),
 					'admcfg' => $admcfg,
 					'navbrand' => $mnu->pubMenu(['type' => 'bootstrap4', 'subtype' => 'navbrand', 'view' => 'admin']),

@@ -59,7 +59,7 @@
 <!-- End.Tpl -->
 <script>
 var jlcd = '@($idiom)', lstr = [], str = [];
-var sitepath = "http://"+document.location.hostname+"/";
+var sitepath = "@raw($protocol)"+document.location.hostname+"/";
 var jspath = sitepath+"includes/js/";
 var viewpath = sitepath+"admin/"; 
 var ctrlDown = false, ctrlKey = 17, cmdKey = 91, vKey = 86, cKey = 67;
@@ -100,41 +100,39 @@ basket
     // There was an error fetching the script
     console.log(error);
 }); 
-    
-function loginUser(e) {
-  
+
+/** Login User  
+ * @@param - object - click event
+ * @@return - redirect to admin page or display error message
+ **/  
+ function loginUser(e) 
+ {
     // Login used the default language for the browser but is changed by the user at this point
     var urlstr = "/ajax/"+jlcd+"/login/dbuser/";
-    aja().method('POST').url(urlstr).cache(false).timeout(2500).type('json')
+    return aja().method('POST').url(urlstr).cache(false).timeout(2500).type('json')
     .data({
         username: $('input[name="username"]').fieldValue(),
         password: $('input[name="password"]').fieldValue(),
         langcd: $('select[name="langcd"]').fieldValue()
     })
-    .on('40x', function(response) {
-        Cliq.msg({type: 'warning', buttons: false, text: 'Page not Found - '+urlstr+':'+response})
-    }).on('500', function(response) {
-        Cliq.msg({type: 'warning', buttons: false, text: 'Server Error - '+urlstr+':'+response})
-    }).on('timeout', function(response) {
-        Cliq.msg({type: 'warning', buttons: false, text: 'Timeout - '+urlstr+':'+response})
-    }).on('success', function(response) {
-
-        if(typeof response == 'object')
-        {
+    .on('40x', function(response) {Cliq.error('Page not Found - '+urlstr+':'+response)})
+    .on('500', function(response) {Cliq.error('Server Error - '+urlstr+':'+response)})
+    .on('timeout', function(response) {Cliq.error('Timeout - '+urlstr+':'+response)})
+    .on('success', function(response) {
+        if(typeof response == 'object') {
+            
             // Test NotOK - value already exists
             var match = /NotOk/.test(response.flag);
             if(!match == true) {
                 uLoad("/admindesktop/"+jlcd+"/dashboard/");
-            } else { // Error
-                Cliq.msg({type: 'warning', buttons: false, text: 'Ajax function returned error NotOk - '+urlstr+':'+JSON.stringify(response)})
+            } else {
+                Cliq.error("@(Q::cStr('531:Your username and password were not accepted, Please try again'))");
             }; 
 
-        } else {
-            Cliq.msg({type: 'warning', buttons: false, text: 'Response was not JSON object - '+urlstr+':'+response.msg})
-        }
-
+        } else { Cliq.error('Response was not JSON object - '+urlstr+':'+response.msg); }
     }).go();      
-}  
+ };  
+
 </script>
 </body>
 </html>

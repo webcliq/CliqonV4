@@ -37,6 +37,7 @@ class PageController extends Controller
 		$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."views"), $clq->get('basedir')."cache/".$idiom);		
 		$template = $this->screen.'.tpl';
 		$vars = [
+			'protocol' => $clq->get('protocol'),
 			'rootpath' => $clq->get('rootpath'),
 			'basedir' => $clq->get('basedir'),
 			'viewpath' => $clq->get('rootpath').'views/',

@@ -1,5 +1,5 @@
 <!-- Admin Gallery Layout -->
-
+<link href="@($viewpath)css/galleria.classic.css" rel="stylesheet">
 <!-- Breadcrumb -->
 <ol class="breadcrumb">
 

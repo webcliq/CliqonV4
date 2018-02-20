@@ -26,6 +26,7 @@ class AdminController
 		$this->rq = $_REQUEST;
 
 		$vars = [
+			'protocol' => $clq->get('protocol'),
 			'rootpath' => $clq->get('rootpath'),
 			'basedir' => $clq->get('basedir'),
 			'includepath' => $clq->get('rootpath').'includes/',

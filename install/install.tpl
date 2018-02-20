@@ -255,7 +255,7 @@
 </table>
 </div>  
 <script>
-var sitepath = "http://"+document.location.hostname+"/"; 
+var sitepath = "@raw($protocol)"+document.location.hostname+"/"; 
 var jspath = sitepath+"install/js/"; 
 var includepath = sitepath+"includes/js/"; 
 var jlcd = '@raw($lcd)', str = [], url = '/install/@raw($lcd)/';
@@ -357,7 +357,7 @@ basket
       $.ajax({
           url: url+'deleteinstaller/', type: 'POST',
           success: function(data) {
-              uLoad('http://' + document.location.hostname + '/admindesktop/'+jlcd+'/dashboard/');
+              uLoad('@raw($protocol)' + document.location.hostname + '/admindesktop/'+jlcd+'/dashboard/');
           },
           failure: function(data) {
               return error(data[0]);

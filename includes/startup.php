@@ -16,8 +16,9 @@ loadFile('framework/Registry.php');
 $clq = Registry::singleton();
 
 // Set System variables here
-$clq->set('rootpath', $rootpath);
-$clq->set('basedir', $basedir);
+$clq->set('protocol', $protocol); // http:// or https://
+$clq->set('rootpath', $rootpath); // protocol + domain.com/
+$clq->set('basedir', $basedir); // d:\wwwroot\sitedir\ or /var/www/sitedir/
 $clq->set('rootdir', "/");
 
 // Get Site Config(s) 

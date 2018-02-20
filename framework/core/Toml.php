@@ -440,7 +440,6 @@ class Toml
         return $normalized;
     }
 
-
     /**
      * Parses TOML table names and returns the hierarchy array of table names.
      *

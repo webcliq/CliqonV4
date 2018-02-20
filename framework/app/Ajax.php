@@ -26,7 +26,7 @@ class Ajax
 	 * Callable Ajax Functions
 	 * 
 	 *
-	 **************************************** Internal API Functions ***********************************************/
+	 **************************************** Internal AJAX derived API Functions *********************************/
 
 		function ajaxdefault($vars)
 		{
@@ -58,22 +58,6 @@ class Ajax
 			$auth = $clq->resolve('Auth');
 			return [
 				'content' => $auth->logout(),
-				'callBack' => ""
-			];	
-		}
-
-		/**
-		 * Either does a test of the convert or does a live convert
-		 *
-		 * @param - array - Variables from Construct
-		 * @return - string - Message
-		 **/	
-		function dolcdimport($vars)
-		{
-			global $clq;
-			$adm = $clq->resolve('Admin');
-			return [
-				'content' => $adm->doIdiomImport($vars),
 				'callBack' => ""
 			];	
 		}
@@ -126,6 +110,53 @@ class Ajax
 				'callBack' => ""
 			];
 		}
+
+		/**
+		 * Either does a test of the convert or does a live convert
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - Message
+		 **/	
+		function dolcdimport($vars)
+		{
+			global $clq;
+			$adm = $clq->resolve('Admin');
+			return [
+				'content' => $adm->doIdiomImport($vars),
+				'callBack' => ""
+			];	
+		}		
+
+		/** Add a new option on the fly, to dropdown list
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - Message
+		 **/	
+		function addnewoption($vars)
+		{
+			global $clq;
+			$db = $clq->resolve('Db');
+			return [
+				'content' => $db->addNewOption($vars),
+				'callBack' => ""
+			];	
+		}	
+
+		/**
+		 * Add new language to whole site
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - Message
+		 **/	
+		function addnewidiom($vars)
+		{
+			global $clq;
+			$adm = $clq->resolve('Admin');
+			return [
+				'content' => $adm->addIdiom($vars),
+				'callBack' => ""
+			];	
+		}		
 
 		/**
 		 * Delete existing language

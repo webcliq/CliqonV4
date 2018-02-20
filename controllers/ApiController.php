@@ -41,6 +41,7 @@ final class ApiController extends Controller
 			$vars = [
 				'idiom' => $idiom,
 				'table' => $table,
+				'action' => $action,
 				'tabletype' => $tabletype,
 				'rq' => $rq,
 			];

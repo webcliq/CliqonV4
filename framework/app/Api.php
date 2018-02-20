@@ -22,7 +22,6 @@ class Api
 	private static $thisclass = "Api";
 
 	/** Callable API Functions
-	 * apidefault()
 	 * getnewuserform()
 	 * getpasswordresetform()
 	 * valueexists()
@@ -33,14 +32,6 @@ class Api
 	 *
 	 *
 	 **************************************** API Functions ******************************************************/
-
-		function apidefault($vars)
-		{
-			return [
-				'content' => "",
-				'callBack' => ""
-			];				
-		}
 
 		/** Display a simple user signup form
 		 * @param - array of variables
@@ -141,5 +132,62 @@ class Api
 				'callBack' => ""
 			];
 		}
+
+	/** RESTful API services support
+	 *
+	 * apidefault()
+	 * apilogin()
+	 * apilogout()
+	 *
+	 **************************************** API Service Functions *********************************************/
+
+		/** Default or generic call to Apiservices Class
+		 * saves the bother of having to write lots of methods in this Class
+		 * @param - array - all the arguments, including the REQUEST
+		 * @return - array - which the controller encodes as JSONP
+		 * @todo - work out the Callback
+		 **/
+		 function apidefault($vars)
+		 {
+			global $clq;
+			$api = $clq->resolve('Apiservices');
+			$method = $vars['action'];
+			return [
+				'content' => $api->$method($vars),
+				'callBack' => ""
+			];				
+		 }
+
+		/** Login  
+		 * 
+		 * @param - Request string
+		 * @return - string - JSON data - Ok or NotOk with message
+		 **/
+		 function apilogin($vars)
+		 {
+			// table == dbuser, tabletype == "", $rq == username, password
+			global $clq;
+			$api = $clq->resolve('Apiservices');
+			return [
+				'content' => $api->apilogin($vars['rq']),
+				'callBack' => ""
+			];				
+		 }
+
+		/** Logout  
+		 * 
+		 * @param - Request string
+		 * @return - string - JSON data - clears everything down
+		 **/
+		 function apilogout($vars)
+		 {
+			global $clq;
+			$api = $clq->resolve('Apiservices');
+			return [
+				'content' => $api->apilogout(),
+				'callBack' => ""
+			];	
+		 }
+
 
 }

@@ -619,9 +619,11 @@ class Menu extends HTML
 				d_icon = 'dashboard'
 				d_css = ''
 				d_submenu = 'false'
+
+
 			*/
-			if(array_key_exists('d_text', $entry) and $entry['d_text'] != "") {
-				$row = explode(',', $entry['d_text']);
+			if(array_key_exists('c_options', $entry) and $entry['c_options'] != "") {
+				$row = explode(',', $entry['c_options']);
 				foreach($row as $i => $pr) {
 					$p = explode('|', $pr);
 					$itm[$p[0]] = $p[1];

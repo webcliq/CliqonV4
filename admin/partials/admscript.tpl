@@ -1,16 +1,18 @@
 <!-- AdmScript.Tpl  -->
 <script>
 var jlcd = '@($idiom)', lstr = [], str = [];
-var sitepath = "http://"+document.location.hostname+"/";
+var sitepath = "@raw($protocol)"+document.location.hostname+"/";
 var jspath = sitepath+"includes/js/";
 var viewpath = sitepath+"admin/"; var jwt = "@raw($jwt)";
 var ctrlDown = false, ctrlKey = 17, cmdKey = 91, vKey = 86, cKey = 67;
 var jwt = "@raw($jwt)"; // This is now essential
 
 // basket.clear(true);
-basket.require(
+basket
+.remove('cliqf') // "php","" comma separated list
+.require(
 
-	// Libraries
+	// Libraries that need to loaded in various places, therefore cannot JIT script load
     {url: jspath+"library.js"},
     {url: viewpath+"js/adminlibrary.js"},
     {url: jspath+"vue.min.js"},
@@ -23,9 +25,7 @@ basket.require(
 	{url: jspath+"codemirror/lib/codemirror.js"},
 	{url: jspath+"codemirror/addon/display/panel.js"},
 	{url: jspath+"tinymce/tinymce.min.js"},
-	{url: jspath+"dhtmlxscheduler.js"},
-	{url: jspath+"galleria.js"},
-	{url: jspath+"grapes.min.js"},
+	{url: jspath+"tinymce/jquery.tinymce.min.js"},
 	{url: viewpath+"js/app.js"},
 
 	// Cliqon Javascript language file - other JS translations could be included
@@ -38,8 +38,7 @@ basket.require(
 	{url: viewpath+"js/cliqv.js"},
 	{url: viewpath+"js/cliqr.js"},
 	{url: viewpath+"js/cliqm.js"},
-	{url: viewpath+"js/cliqf.js"},
-	{url: viewpath+"plugins/cliqp.js"}
+	{url: viewpath+"js/cliqf.js", key: "cliqf", skipCache: true}
 
 ).then(function(msg) {
 
@@ -55,6 +54,9 @@ basket.require(
     lstr = str[jlcd];
 	Dropzone.autoDiscover = false;
 	var sessid = Cookies.get('PHPSESSID');
+
+    // Quark
+    for(t=document.querySelectorAll`*`,i=t.length;i--;)for(s=t[i].classList,c=s.length;c--;)z=s[c].split`-`,u=z[1],t[i].style[z[0]]=~~u?u+'px':u;
 
     /* ---------- Place Bootstrap 4 loaders here ---------- */
 

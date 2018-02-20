@@ -34,6 +34,7 @@ final class InstallController extends Controller
 			$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."install"), $clq->get('basedir')."install/cache");
 
 			$vars = [
+				'protocol' => $clq->get('protocol'),
 				'rootpath' => $clq->get('rootpath'),
 				'basedir' => $clq->get('basedir'),
 				'viewpath' => $clq->get('rootpath').'install/',
@@ -415,9 +416,11 @@ final class InstallController extends Controller
 	    $ren = Y::renameFile($oldname, $newname);
 	    $controller = "controllers/InstallController.php";
 	    $del1 = Y::deleteFile($controller);
+	    $install = "includes/install.php";
+	    $del2 = Y::deleteFile($install);
 	    $installdir = "install";
-	    $del2 = Y::deleteDirectory($installdir);
-	    $result = $ren.$del1.$del2;
+	    $del3 = Y::deleteDirectory($installdir);
+	    $result = $ren.$del1.$del2.$del3;
         if($result) {
         	echo json_encode(['Install successful']);
         } else {

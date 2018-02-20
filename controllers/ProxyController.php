@@ -16,6 +16,7 @@ class ProxyController extends Controller
 	{
 		
 		global $clq; 
+		$protocol = $clq->get('protocol');
 		$rq = $this->inputs();
 		header("Access-Control-Allow-Origin: *");
 		// File Name: proxy.php
@@ -23,7 +24,7 @@ class ProxyController extends Controller
 		    die(); // Don't do anything if we don't have a URL to work with
 		}
 		// $url = urldecode($rq['url']);
-		$url = 'http://' . str_replace('http://', '', $url); // Avoid accessing the file system
+		$url = $protocol.str_replace($protocol, '', $url); // Avoid accessing the file system
 		return file_get_contents($url); // You should probably use cURL. The concept is the same though
 
 	}

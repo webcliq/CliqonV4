@@ -1,5 +1,5 @@
 <!-- Admin Calendar Layout -->
-
+<link href="@($viewpath)css/dhtmlxscheduler_flat.css" rel="stylesheet">
 <!-- Breadcrumb -->
 <ol class="breadcrumb">
 

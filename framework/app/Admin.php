@@ -274,11 +274,15 @@ class Admin
 			        Cliq.set('lcd', '".$idiom."');
 			        Cliq.set('idioms', ".object_encode(self::$idioms).");
 
-					var editor = grapesjs.init({
-				      	container : '#sitedesigner',
-				      	height: '95%',
-				      	components: '<div class=\"container-fluid\"><div class=\"card\"><h1 class=\"pad\">Header</h1></div></div>',
-				  	});
+					\$script(['/includes/js/grapes.min.js'], 'dtbundle');
+					\$script.ready('dtbundle', function() {
+						var editor = grapesjs.init({
+					      	container : '#sitedesigner',
+					      	height: '95%',
+					      	components: '<div class=\"container-fluid\"><div class=\"card\"><h1 class=\"pad\">Header</h1></div></div>',
+					  	});
+					});
+
 				";
 			    $clq->set('js', $js);
 			
@@ -343,10 +347,10 @@ class Admin
 					),
 					'notFoundText' => '144:No records for this table available',
 					'columns' => [
-						['field' => 'id', 'order' => 'a', 'title' => '9999:Id', 'width' => '60', 'align' => 'right', 'cssClass' => 'bold', 'filterable' => false, 'sortable' => false],
-						['field' => 'c_type', 'order' => 'b', 'title' => '128:Type', 'width' => '', 'align' => '', 'cssClass' => '', 'filterable' => true, 'sortable' => true],
-						['field' => 'c_reference', 'order' => 'c', 'title' => '5:Reference', 'width' => '', 'align' => '', 'cssClass' => '', 'filterable' => true, 'sortable' => true],
-						['field' => 'c_common', 'order' => 'z', 'title' => '6:Common', 'width' => '200', 'align' => '', 'cssClass' => '', 'filterable' => false, 'sortable' => false]
+						['field' => 'id', 'order' => 'a', 'title' => '9999:Id', 'width' => 45, 'align' => 'right', 'cssClass' => 'bold', 'filterable' => false, 'sortable' => false],
+						['field' => 'c_type', 'order' => 'b', 'title' => '128:Type', 'width' => 120, 'align' => '', 'cssClass' => '', 'filterable' => true, 'sortable' => true],
+						['field' => 'c_reference', 'order' => 'c', 'title' => '5:Reference', 'width' => 120, 'align' => '', 'cssClass' => '', 'filterable' => true, 'sortable' => true],
+						['field' => 'c_common', 'order' => 'z', 'title' => '6:Common', 'align' => '', 'cssClass' => '', 'filterable' => false, 'sortable' => false]
 					],
 					'rowicons' => [
 						'editrecordce' => [
@@ -392,7 +396,7 @@ class Admin
 				unset($dgcfg['rowicons']);
 				$numcols = count($dgcfg['columns']);
 				$dgcfg['columns'][$numcols] = [
-					'width' => 80,
+					'width' => 50,
 					'align' => 'right',
 					'filterable' => 'false',
 					'tmpl' => $rowmnu,
@@ -1058,7 +1062,11 @@ class Admin
 					Cliq.set('gmapsapi', '".$clq->get('gmapsapi')."');
 					Cliq.set('bingkey', '".$clq->get('bingkey')."');
 
-			    	Cliq.gallery(".F::jsonEncode($opts).");
+					\$script(['/includes/js/galleria.js'], 'dtbundle');
+					\$script.ready('dtbundle', function() {
+						Cliq.gallery(".F::jsonEncode($opts).");
+					});
+
 			    ";
 			    $clq->set('js', $js);
 
@@ -1190,7 +1198,11 @@ class Admin
 					Cliq.set('gmapsapi', '".$clq->get('gmapsapi')."');
 					Cliq.set('bingkey', '".$clq->get('bingkey')."');
 
-			    	Cliq.calendar(".F::jsonEncode($ccfg).");
+					\$script(['/includes/js/dhtmlxscheduler.js'], 'dtbundle');
+					\$script.ready('dtbundle', function() {
+						Cliq.calendar(".F::jsonEncode($ccfg).");
+					});
+			    	
 			    ";
 			    $clq->set('js', $js);
 
@@ -1916,7 +1928,125 @@ class Admin
 					return ['flag' => 'NotOk', 'msg' => $err]; 
 				}								
 			}
-		
+
+		/** Add New Language
+		 * Adds a new language to the system by adding code to the config file, then walking through all the 
+		 * records of the system and adding new JSON field - could be time consuming
+		 * @param - array - arguments, especially RQ containing new language code and name
+		 * @return - If successful, will reload page
+		 **/
+		 function addIdiom(array $vars)
+		 {
+			$method = self::THISCLASS.'->'.__FUNCTION__.'()';
+			try {
+				set_time_limit(240);
+				global $clq;
+				$rq = $vars['rq'];
+				$lcdcode = $rq['lcdcode'];
+				$lcdname = $rq['lcdname'];
+				$result = []; $tableset = []; $rowset = [];
+
+				// Update Config in the system first	
+				$cfg = $clq->get('cfg');
+				$idms = $cfg['site']['idioms'];
+				$idms[$lcdcode] = $rq['lcdname'];
+				$cfg['site']['idioms'] = $idms;
+				$clq->set('cfg', $cfg);
+
+				// Update the Config File
+				$configarray = C::cfgReadFile('config/config.cfg');
+				$configarray['idioms'] = $idms;
+				$writecfgfile = C::cfgWrite('config/config.cfg', $configarray);
+
+				// Then walk through record in system, adding another pair to each JSON record found
+				// Need to read model.cfg, to get tables and find out which tables and tabletypes have JSON			
+				$cfgarray = C::cfgReadFile('models/model.cfg');
+				$tables = $cfgarray['tables'];
+				$tablearray = [];
+				foreach($tables as $table => $fieldlist) {
+					if(stristr($fieldlist, 'c_document') != false) {
+						$tablearray[] = $table;
+					}
+				};
+
+				// We have a subset of tables that contain the field c_document
+				foreach($tablearray as $t => $table) {
+					$sql = "SELECT id, c_document, c_type FROM ".$table;
+					$docs = R::getAll($sql);
+					// Now we have a large recordset containing all the c_documents by id
+					for($d = 0; $d < count($docs); $d++) {
+						$id = $docs[$d]['id'];
+						$type = $docs[$d]['c_type'];
+						$doc = $docs[$d]['c_document'];
+						// If $doc has some string content and that content is parseable JSON
+						if( $doc != '' and json_decode($doc)) {
+							// Turn it into an array
+							$doca = json_decode($doc, true);
+
+							// Does the array contain (at a deep level) any key / value pairs where the value is an array and contains a key equal to the default idiom
+
+							// We need to operate at two levels 
+							foreach($doca as $fld => $val) {
+								if(is_array($val)) {
+									// This is a straight d_text, d_title or d_description
+									if(array_key_exists($cfg['site']['defaultidiom'], $val)) {
+										// $fld = "d_text"
+										// $val = array of keys = languages and values = language string 
+										// This is a language array and we need to add a key at this level
+										$val[$lcdcode] = $val[$cfg['site']['defaultidiom']];
+										$newdoca = $val;
+									} else {
+										// $fld = "d_text"
+										// $val = array of keys = options and arrays 
+										$newopt = [];
+										foreach($val as $opt => $langarray) {
+											if(array_key_exists($cfg['site']['defaultidiom'], $langarray)) {
+												// $opt = list item key
+												// langarray = array of keys = languages and values = language string 
+												// This is a language array and we need to add a key at this level
+												$langarray[$lcdcode] = $langarray[$cfg['site']['defaultidiom']];
+												$newopt[$opt] = $langarray;
+											}
+										};
+										$newdoca = $newopt;
+									}
+									$rowset[$fld] = $newdoca;
+								} else {
+									// Field / Value are straight key / value pair, in which case
+									$rowset[$fld] = $val;
+								}
+							
+							}
+
+							// Write the info back here
+							$updb = R::load($table, $id);
+							$updb->c_document = json_encode($rowset);
+							$updb->c_lastmodified = Q::lastMod();
+							$updb->c_whomodified = Q::whoMod();
+							$res = R::store($updb);
+
+							if($res == $id) {
+								$tableset[$id] = $rowset;
+							} else {
+								$tableset[$id] = ['error' => 'Problem Writing'];
+							}							
+						}
+					}
+					$result[$table] = $tableset;
+				}
+
+				return ['flag' => 'Ok', 'data' => $result];
+
+			} catch (Exception $e) {
+				$err = [
+					'errmsg' => $e->getMessage(),
+					'method' => $method
+				];
+				// L::cLog($err);
+				return ['flag' => 'NotOk', 'msg' => $err]; 
+			}
+		 }
+	
 		/** Maintain Idiom
 		 * Provides template, variables and data for Maintain Idiom
 		 * @param - array - required parameters as array
@@ -1928,8 +2058,14 @@ class Admin
 			try {
 				
 				// Config file if needed
-				// $dcfg = C::cfgReadFile('admin/config/admmaintainidiom.cfg');	
-				
+	            $args = array(
+	                'filename' => 'admmaintainidiom',   // If file, name of file without extension (.cfg)
+	                'subdir' => 'admin/config/',    	// If file, name of subdirectory
+	                'type' => 'service',            	// If database, value of c_type
+	                'reference' => 'admmaintainidiom',  // If database, value of c_reference
+	                'key' => ''
+	            );
+	            $fileslist = C::cfgRead($args);	
 				// inputNode.value = fileInput.value.replace("C:\\fakepath\\", "");		
 				global $clq;
 			    $rq = $vars['rq'];
@@ -1950,8 +2086,7 @@ class Admin
 	        }
 		 }		
 		
-			/**
-			 * The actual import
+			/** The actual language import 
 			 * 
 			 * tbd - Access control
 			 * Confirm upload and write input file to disk
@@ -1969,8 +2104,8 @@ class Admin
 			 * @param - array - request variables
 			 * @return - JSON array - for use by template including error messages or results HTML
 			 * */
-			function doIdiomImport(array $vars)
-			{
+			 function doIdiomImport(array $vars)
+			 {
 				$method = self::THISCLASS.'->'.__FUNCTION__.'()';
 				try {
 
@@ -2143,15 +2278,15 @@ class Admin
 					L::cLog($err);
 					return ['flag' => 'NotOk', 'msg' => $err]; 
 				}	
-			}
+			 }
 
-			/**
-			 * Generates a Language template in the Default language of the system
+			/** Generates a Language template in the Default language of the system
+			 *
 			 * @param - array -
 			 * @return - JSON
 			 **/
-			function doIdiomTemplateDownload(array $vars)
-			{
+			 function doIdiomTemplateDownload(array $vars)
+			 {
 				$method = self::THISCLASS.'->'.__FUNCTION__.'()';
 				try {
 
@@ -2202,13 +2337,14 @@ class Admin
 					// L::cLog($err);
 					return ['flag' => 'NotOk', 'msg' => $err]; 
 				}						
-			}
+			 }
 	
 		/** Delete Idiom 
 		 * Language delete mechanism 
 		 * Not yet tested
 		 * will be achieved by unset a Language column from the array of languages
-		 *
+		 * @param - array - arguments, especially RQ containing new language code
+		 * @return - If successful, will reload page
 		 **/
 		 function deleteIdiom(array $vars)
 		 {
@@ -2217,62 +2353,108 @@ class Admin
 
 				// Insert ACL here	
 
+				set_time_limit(240);
 				global $clq;
 				$rq = $vars['rq'];
-				$delidmcode = $rq['deleteidiom'];
+				$lcdcode = $rq['lcdcode'];
+				$lcdname = $rq['lcdname'];
+				$result = []; $tableset = []; $rowset = [];
 
-				// Which tables > tabletypes contain language records ?? - Datadictionary will contain the instructions
-				$sqla = "SELECT id, c_document FROM dbcollection";
-				$tableset['dbcollection'] = R::getAll($sqla);
+				// Update Config in the system first	
+				$cfg = $clq->get('cfg');
+				$idms = $cfg['site']['idioms'];
+				unset($idms[$delidmcode]);
+				$cfg['site']['idioms'] = $idms;
+				$clq->set('cfg', $cfg);
 
-				$sqlb = "SELECT id, c_document FROM dbitem";
-				$tableset['dbitem'] = R::getAll($sqlb);
+				// Update the Config File
+				$configarray = C::cfgReadFile('config/config.cfg');
+				$configarray['idioms'] = $idms;
+				$writecfgfile = C::cfgWrite('config/config.cfg', $configarray);
 
-				// More if required
+				// Then walk through record in system, adding another pair to each JSON record found
+				// Need to read model.cfg, to get tables and find out which tables and tabletypes have JSON			
+				$cfgarray = C::cfgReadFile('models/model.cfg');
+				$tables = $cfgarray['tables'];
+				$tablearray = [];
+				foreach($tables as $table => $fieldlist) {
+					if(stristr($fieldlist, 'c_document') != false) {
+						$tablearray[] = $table;
+					}
+				};
 
-				foreach($tableset as $table => $rs) {
-					for($r = 0; $r < count($rs); $r++) {
-						$doc = json_decode($rs[$r]['c_document'], true);
-						foreach($doc as $d_field => $row) {
-							// If Row contains an Idiom based array
-							if(is_array($row)) {
-								// If the idiom to be deleted in the row, it should .....
-								if(array_key_exists($delidmcode, $row)) {
-									// Delete the key/value pair
-									unset($row[$delidmcode]);
-									// Regenerate the row
-									$doc[$d_field] = $row;
+				// We have a subset of tables that contain the field c_document
+				foreach($tablearray as $t => $table) {
+					$sql = "SELECT id, c_document, c_type FROM ".$table;
+					$docs = R::getAll($sql);
+					// Now we have a large recordset containing all the c_documents by id
+					for($d = 0; $d < count($docs); $d++) {
+						$id = $docs[$d]['id'];
+						$type = $docs[$d]['c_type'];
+						$doc = $docs[$d]['c_document'];
+						// If $doc has some string content and that content is parseable JSON
+						if( $doc != '' and json_decode($doc)) {
+							// Turn it into an array
+							$doca = json_decode($doc, true);
+
+							// Does the array contain (at a deep level) any key / value pairs where the value is an array and contains a key equal to the default idiom
+
+							// We need to operate at two levels 
+							foreach($doca as $fld => $val) {
+								if(is_array($val)) {
+									// This is a straight d_text, d_title or d_description
+									if(array_key_exists($lcdcode, $val)) {
+										// $fld = "d_text"
+										// $val = array of keys = languages and values = language string 
+										// This is a language array and we need to add a key at this level
+										unset($val[$lcdcode]);
+										$newdoca = $val;
+									} else {
+										// $fld = "d_text"
+										// $val = array of keys = options and arrays 
+										$newopt = [];
+										foreach($val as $opt => $langarray) {
+											if(array_key_exists($lcdcode, $langarray)) {
+												// $opt = list item key
+												// langarray = array of keys = languages and values = language string 
+												// This is a language array and we need to add a key at this level
+												unset($langarray[$lcdcode]);
+												$newopt[$opt] = $langarray;
+											}
+										};
+										$newdoca = $newopt;
+									}
+									$rowset[$fld] = $newdoca;
+								} else {
+									// Field / Value are straight key / value pair, in which case
+									$rowset[$fld] = $val;
 								}
+							
 							}
-						}
-						// Write the changed row back to the database for that Id
-						$updb = R::load($table, $rs[$r]['id']);
-						$updb->c_document = json_encode($doc);
-						$result = R::store($updb);
-					}					
-				}
-	
-				// Test
-				$check = [
-					'method' => $method,
-					'request' => $rq,
-					'defaultidiom' => $defaultidiom,
-					'filename' => $filename,
-					'content' => $content
-				];
+							
+							// Write the info back here
+							$updb = R::load($table, $id);
+							$updb->c_document = json_encode($rowset);
+							$updb->c_lastmodified = Q::lastMod();
+							$updb->c_whomodified = Q::whoMod();
+							$res = R::store($updb);
 
-				// Set to comment when completed
-				L::cLog($check);  
-				
-				// If not returned already 
-				return ['flag' => 'Ok', 'content' => $content, 'filename' => $filename];                
+							if($res == $id) {
+								$tableset[$id] = $rowset;
+							} else {
+								$tableset[$id] = ['error' => 'Problem Writing'];
+							}							
+						}
+					}
+					$result[$table] = $tableset;
+				}  
+
+				return ['flag' => 'Ok', 'data' => $result];
 
 			} catch (Exception $e) {
 				$err = [
 					'errmsg' => $e->getMessage(),
-					'method' => $method,
-					'defaultidiom' => $defaultidiom,
-					'filename' => $filename,
+					'method' => $method
 				];
 				// L::cLog($err);
 				return ['flag' => 'NotOk', 'msg' => $err]; 
@@ -2642,8 +2824,9 @@ class Admin
 	                'key' => ''
 	            );
 	            $sucfg = C::cfgRead($args);
+
 				$ftp->login();		
-				// $ftp->attach($sucfg['ftpuser'], $sucfg['ftppassword'], $sucfg['ftpserver'], $sucfg['ftpport']);
+				$ftp->attach($sucfg['ftpuser'], $sucfg['ftppassword'], $sucfg['ftpserver'], $sucfg['ftpport']);
 				$fi = $clq->resolve('Files');
 
 				$result = [];

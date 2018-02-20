@@ -30,7 +30,7 @@ class Db
      * deleteRecord()
      * removeRecord()
      * createTable()
-     * setFormat() - probably redundant
+     * setFormat()
      * dbEntry() - needs review
      * treeNodeDrop() - supports Gijgo Tree
      * saveContent()
@@ -79,12 +79,11 @@ class Db
 				
 				// Walk through all the values in $rq
 				foreach($rq as $key => $value) {	
-					$chk = strtolower(substr($key, 0, 1));	
+					$chk = strtolower(substr($key, 0, 2));	
 					switch($chk) {
-						case "c": $rqc[$key] = $value; break;
-						case "d": $rqd[$key] = $value; break;	
-						case "a": case "i": case "x": false; break;	// throws ajaxbuster, id and x away
-						default: throw new Exception("Request key had no usable starting letter! - ".$chk." - ".$key);
+						case "c_": $rqc[$key] = $value; break;
+						case "d_": $rqd[$key] = $value; break;	
+						default: false; break;	// throws anything else in the REQUEST away
 					}
 				};		
 				
@@ -284,7 +283,7 @@ class Db
 				// Test
 				$test = [
 					'method' => $method,
-					'recordid' => $id,
+					'recordid' => $recid,
 					'result' => $result
 				];
 
@@ -312,7 +311,7 @@ class Db
 				$err = [
 					'method' => $method,
 					'errmsg' => $e->getMessage(),
-					'id' => $id
+					'id' => $recid
 				];
 				L::cLog($err);
 				$msg = [
@@ -464,7 +463,7 @@ class Db
     	 }
 
         /** Data saver formatting and helper function - first - by field name 
-         *
+         * - when a REQUEST is being cycled through, the method is invoked to format the value, suitable for the database
          * @param - String - Action equals (i)nsert, (u)pdate
          * @param - String - Field Name
          * @param - Array - Model properties for this field
@@ -479,10 +478,12 @@ class Db
 				
 				switch($fld) {
 					
+					case "c_dateentered":
 					case "c_lastmodified":
 						$result = Q::lastMod();
 					break;
 					
+					case "c_whoentered":
 					case "c_whomodified":
 						$result = Q::whoMod();
 					break;
@@ -872,30 +873,51 @@ class Db
 				$recid != 0 ? $updb = R::load($table, $recid) : $updb = R::dispense($table) ;
 				$txt = urldecode($rq['text']);
 				// $filtered = preg_replace("/\r\n/", "\n", $txt);
-				$escaped = str_replace('""', '"', $txt);
-				$request = C::cfgReadString($escaped); $doc = [];
+
+				$toml = $clq->resolve('Toml');
+				$request = Toml::parse($txt); 
+				$doc = [];
 
 	        	// Walk through all the fields and values in the request
 	        	foreach($request as $fld => $val) {	        		
 	        		$chk = strtolower(substr($fld, 0, 2));	
 					switch($chk) {
 						case "c_": 
-							$updb->$fld = $val;
+							if(isset($val)) {
+								$updb->$fld = $val;
+							} else {
+								$updb->$fld = "";
+							}
 						break;
 						case "d_": 
-							if($val != '') {
-								// $val = str_replace('^', '\"', $val);
-								$doc[$fld] = $val; 
+							if(isset($val)) {
+								$pts = explode('.', $fld);
+								switch(count($pts)) {
+									case 1:
+										$doc[$pts[0]] = $val;
+									break;
+
+									case 2:
+										$doc[$pts[0]][$pts[1]] = $val;
+									break;
+
+									case 3:
+										$doc[$pts[0]][$pts[1]][[2]] = $val;
+									break;
+								}
+							} else {
+								$doc[$fld] = "";
 							}
 						break;	
 						default: false; 
 					}	
 	        	};
-
-	        	$updb->c_document = F::jsonEncode($doc);
+	        	$jdoc = F::jsonEncode($doc);
+	        	$updb->c_document = $jdoc;
 	        	$updb->c_whomodified = Q::whoMod();
 	        	$updb->c_lastmodified = Q::lastMod();
 
+	        	$result = (int)$recid;
 	        	$result = R::store($updb);
 	        	if(is_int($result) && (int)$result > 0) {
 					$sql = "SELECT * FROM ".$table." WHERE id = ?";
@@ -907,7 +929,7 @@ class Db
 	        	} else { 
 					return [
 						'flag' => "NotOk",
-						'data' => ['msg' => $result]
+						'data' => ['msg' => [$row, $jdoc]]  // $result
 					];	        		
 	        	}
 	        		
@@ -974,6 +996,50 @@ class Db
 					'msg' => $e->getMessage() 
 				]; 
 			}
+		 }
+
+		/** Add a new list item 
+		 *
+		 * @param- array - usual arguments
+		 * @return - flagg
+		 **/
+		 static function addNewOption($vars)
+		 {
+	        try {
+
+	        	global $clq;
+			    $rq = $vars['rq'];
+				$sql = "SELECT c_document FROM dbcollection WHERE c_type = ? AND c_reference = ?";
+				$cell = R::getCell($sql, ['list', $rq['listname']]);
+				$olddoc = json_decode($cell, true);			    
+				$updb = R::findOne('dbcollection', 'WHERE c_type = ? AND c_reference = ?', ['list', $rq['listname']]);
+				$doc = []; $idms = $clq->get('idioms');
+				foreach($idms as $lcdcode => $lcdname) {
+					$doc[$rq['x_value']][$lcdcode] = $rq['x_label_'.$lcdcode];
+				};
+				$newdoc['d_text'] = array_merge($olddoc['d_text'], $doc);
+				$updb->c_document = json_encode($newdoc);
+	        	$updb->c_whomodified = Q::whoMod();
+	        	$updb->c_lastmodified = Q::lastMod();
+	        	$result = R::store($updb);
+	        	if(is_int($result) && (int)$result > 0) {
+					return [
+						'flag' => "Ok",
+						'newval' => $rq['x_value']
+					];
+	        	} else { 
+					return [
+						'flag' => "NotOk",
+						'msg' => $result
+					];	        		
+	        	}
+	        		
+			} catch (Exception $e) {
+				return [
+					'flag' => "NotOk",
+					'msg' => $e->getMessage() 
+				]; 
+			}	    		 	
 		 }
 
     /** Data Retrieval
@@ -1757,8 +1823,8 @@ class Db
 				$dcfg = [
 					'columns' => [
 						['field' => 'id', 'order' => 'a'],
-						['field' => 'c_reference', 'order' => 'b'],
-						['field' => 'c_type', 'order' => 'c'],
+						['field' => 'c_type', 'order' => 'b'],						
+						['field' => 'c_reference', 'order' => 'c'],
 						['field' => 'c_common', 'order' => 'z']
 					],
 					'orderby' => 'c_reference ASC'
@@ -1883,7 +1949,7 @@ class Db
 					'query' => $sql,	
 					'dbrowset' => $rawrs,				
 					'rows' => $rows,
-					// 'tabledefinition' => $dtcfg
+					'tabledefinition' => $dtcfg
 				];
 				L::cLog($err);
 				return [
@@ -2664,7 +2730,7 @@ class Db
 	 * getNextNumber() - review
 	 * isUnique()
 	 * getAutoCompleteData()
-	 * 
+	 * getValueFromLabel()
 	 *
 	 ****************************************************************************************************************/
 
@@ -3097,7 +3163,7 @@ class Db
 			} 				
 		 }
 
-        /** Auto complete data
+        /** Auto complete data 
          * Get data for an autocomplete function
          *
          * @param - array - array of variables
@@ -3134,7 +3200,7 @@ class Db
         	return false;
          }
 
-        /** Get Collection
+        /** Get Collection 
          * Get all records for a given tabletype or collection
          * @param - string - name of table
          * @param - string - (optional) name of tabletype
@@ -3189,6 +3255,29 @@ class Db
                 return false;
             }        
     	 }
+
+    	/** Get value from label
+    	 * Some of the datatypes are lists and radios, we need the base selector, not the translation
+    	 * @param - string - name of the list
+    	 * @param - string - label to reference
+    	 * @param - string(optional) - table name in which to search
+    	 * @return - string - base value
+    	 **/
+    	public static function getValueFromLabel($listname, $searchstr, $table = 'dbcollection')
+    	{
+    		global $clq; $idm = $clq->get('idiom');
+    		$sql = "SELECT c_document FROM ".$table." WHERE c_type = ? AND c_reference = ? LIMIT 1";
+    		$doc = R::getCell($sql, ['list', $listname]);
+    		$ar = json_decode($doc, true);
+    		foreach($ar['d_text'] as $base => $lbls) {
+    			if($lbls[$idm] == $searchstr) {
+    				return $base;
+    			}
+    		};
+    		return "NotFound";
+    	}
+
+
 
    	/** SQL Import
    	 *
@@ -3367,9 +3456,6 @@ class Db
 	        $dbconn = self::pdoConn($dbcfg);
             $dbconn->exec($sql); 
 	     }
-     
-
-
 
 } // Ends Class
 

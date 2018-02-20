@@ -4,17 +4,17 @@ spl_autoload_register(function ($class)
 {
     //class directories
     $dirs = array(
+        'models/',
+        'controllers/',
+        'plugins/',
         'framework/core/',
         'framework/app/',
         'framework/filter/',
-        'framework/plugins/',
         'framework/template/',
         'framework/fluentpdo/',
         'framework/oauth/',
         'framework/curl/',
-        'framework/utils/',
-        'models/',
-        'controllers/'
+        'framework/utils/'
     );
    
     //for each directory
@@ -28,7 +28,6 @@ spl_autoload_register(function ($class)
         }           
     }
 });
-
 
 function loadFile($file)
 {
@@ -44,7 +43,6 @@ function loadFile($file)
       return false;
       Debugger::log($e->getMessage());
   }
-
 }
 
 function existsFile($file)
@@ -300,4 +298,109 @@ function normalize_files_array($files = [])
 
     }
     return $normalized_array;
+}
+
+function is_true($key, $array)
+{
+  if(array_key_exists($key, $array) and $array[$key] == 'true') {
+    return true;
+  } else if (array_key_exists($key, $array) and $array[$key] == true) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function is_set($key, $array)
+{
+  if(array_key_exists($key, $array) and $array[$key] != "") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * All of the Defines for the classes below.
+ * @author S.C. Chen <me578022@gmail.com>
+ */
+define('HDOM_TYPE_ELEMENT', 1);
+define('HDOM_TYPE_COMMENT', 2);
+define('HDOM_TYPE_TEXT',  3);
+define('HDOM_TYPE_ENDTAG',  4);
+define('HDOM_TYPE_ROOT',  5);
+define('HDOM_TYPE_UNKNOWN', 6);
+define('HDOM_QUOTE_DOUBLE', 0);
+define('HDOM_QUOTE_SINGLE', 1);
+define('HDOM_QUOTE_NO',  3);
+define('HDOM_INFO_BEGIN',   0);
+define('HDOM_INFO_END',  1);
+define('HDOM_INFO_QUOTE',   2);
+define('HDOM_INFO_SPACE',   3);
+define('HDOM_INFO_TEXT',  4);
+define('HDOM_INFO_INNER',   5);
+define('HDOM_INFO_OUTER',   6);
+define('HDOM_INFO_ENDSPACE',7);
+define('DEFAULT_TARGET_CHARSET', 'UTF-8');
+define('DEFAULT_BR_TEXT', "\r\n");
+define('DEFAULT_SPAN_TEXT', " ");
+define('MAX_FILE_SIZE', 600000);
+// helper functions
+// -----------------------------------------------------------------------------
+// get html dom from file
+// $maxlen is defined in the code as PHP_STREAM_COPY_ALL which is defined as -1.
+function file_get_html(
+    $url, 
+    $use_include_path = false, 
+    $context = null, 
+    $offset = -1, 
+    $maxLen = -1, 
+    $lowercase = true, 
+    $forceTagsClosed = true, 
+    $target_charset = DEFAULT_TARGET_CHARSET, 
+    $stripRN = true, 
+    $defaultBRText = DEFAULT_BR_TEXT, 
+    $defaultSpanText=DEFAULT_SPAN_TEXT
+)
+{
+    // We DO force the tags to be terminated.
+    $dom = new Htmldom(null, $lowercase, $forceTagsClosed, $target_charset, $stripRN, $defaultBRText, $defaultSpanText);
+    // For sourceforge users: uncomment the next line and comment the retreive_url_contents line 2 lines down if it is not already done.
+    $contents = file_get_contents($url, $use_include_path, $context, $offset);
+    // Paperg - use our own mechanism for getting the contents as we want to control the timeout.
+    //$contents = retrieve_url_contents($url);
+    if (empty($contents) || strlen($contents) > MAX_FILE_SIZE)
+    {
+      return false;
+    }
+    // The second parameter can force the selectors to all be lowercase.
+    $dom->load($contents, $lowercase, $stripRN);
+    return $dom;
+}
+
+// get html dom from string
+function str_get_html(
+    $str, 
+    $lowercase=true, 
+    $forceTagsClosed=true, 
+    $target_charset = DEFAULT_TARGET_CHARSET, 
+    $stripRN=true, 
+    $defaultBRText=DEFAULT_BR_TEXT, 
+    $defaultSpanText=DEFAULT_SPAN_TEXT
+)
+{
+  $dom = new Htmldom(null, $lowercase, $forceTagsClosed, $target_charset, $stripRN, $defaultBRText, $defaultSpanText);
+  if (empty($str) || strlen($str) > MAX_FILE_SIZE)
+  {
+    $dom->clear();
+    return false;
+  }
+  $dom->load($str, $lowercase, $stripRN);
+  return $dom;
+}
+
+// dump html dom tree
+function dump_html_tree($node, $show_attr=true, $deep=0)
+{
+  $node->dump($node);
 }

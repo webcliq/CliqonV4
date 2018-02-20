@@ -154,5 +154,9 @@ str['es'] = [
 'Contenido ha sido copiado',
 'Dirección del email',
 '¡La dirección del email no está válido!',
-'Registros por página'
+'Registros por página',
+'Recomendamos hacer una copia de seguridad de su base de datos antes de realizar esta acción.',
+'Confirme la eliminación de',
+'Pagado',
+'Sin remunerado'
 ];

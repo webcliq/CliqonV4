@@ -13,17 +13,42 @@
 			
 			<!-- Horizontal Form -->
 			<div class="col">
+
+				<!-- Add a new Language Code and update all JSON Records -->
+				<div class="card card-outline-success">	
+					<div class="card-block">				
+						<h4 class="card-title">@(Q::cStr('255:Add Language'))</h4>
+						<h6 class="card-subtitle mb-2 text-muted">@(Q::cStr('531:Add a new langauge and update all JSON language strings in database'))</h6>
+						
+						<input type="text" id="newidiomcode" v-model="newidiomcode" data-name="newidiomcode" class="form-control col-1 left" min="2" max="2" pattern="[a-z]{2}" placeholder="zz">
+						<input type="text" id="newidiomname" v-model="newidiomname" data-name="newidiomname" class="form-control col-5 left ml10" placeholder="name">
+						<button type="button" id="newidiombutton" class="btn btn-primary pointer ml10"><i class="fa fa-plus mr5"></i>@(Q::cStr('100:Add'))</button>
+					</div>				
+				</div>
+
+				<!-- Create a template to be used for imporrting a new language -->
+				<div class="card card-outline-success">	
+					<div class="card-block">				
+						<h4 class="card-title">@(Q::cStr('262:Create template'))</h4>
+						<h6 class="card-subtitle mb-2 text-muted">@(Q::cStr('263:Download a template'))</h6>
+						
+						<a href="#" class="btn btn-primary" v-on:click="downloadTemplate"><i class="fa fa-cog mr5"></i>@(Q::cStr('264:Download'))</a>
+					</div>				
+				</div>
+
+				<!-- Delete Languages (which currently does nothing) and Add Language -->
 				<div class="card card-outline-primary">	
 					<div class="card-block">				
 						<h4 class="card-title">@(Q::cStr('253:System Languages'))</h4>
 						<h6 class="card-subtitle mb-2 text-muted">@(Q::cStr('254:Use this grid to add or delete system languages'))</h6>
 						
-						<a v-for="(idm, idx) in idioms" href="#" class="btn btn-danger mr5"><i class="fa fa-trash mr5" v-on:click="deleteIdiom(idx)"></i>{{idm}}</a>
+						<a v-for="(idm, idx) in idioms" href="#" class="btn btn-danger mr5" v-bind:data-lcdcode="idx" v-bind:data-lcdname="idm" v-on:click="deleteIdiom"><i class="fa fa-trash mr5"></i>{{idm}}</a>
 						
-						<a href="#" class="btn btn-primary right" v-on:click="addIdiom"><i class="fa fa-plus mr5"></i>@(Q::cStr('255:Add Language'))</a>
+						<a href="#" class="btn btn-primary right" v-on:click="addIdiom($event, idx)" ><i class="fa fa-plus mr5"></i>@(Q::cStr('255:Add Language'))</a>
 					</div>				
 				</div>
 				
+				<!-- Hidden part of the Add Language form which assumes importing a template -->
 				<div class="card card-outline-success hide" id="addidiomform">	
 					<div class="card-block">				
 						<h4 class="card-title">@(Q::cStr('255:Add Language'))</h4>
@@ -33,7 +58,7 @@
 
 							<div class="form-group">
 								<label for="lcdcode">@(Q::cStr('258:Language Code'))</label>
-								<input type="text" id="lcdcode" v-model="inputform.lcdcode" data-name="lcdcode" class="form-control col-2" autofocus required min="2" pattern="[a-z]{2}" placeholder="zz">
+								<input type="text" id="lcdcode" v-model="inputform.lcdcode" data-name="lcdcode" class="form-control col-2" autofocus required min="2" max="2" pattern="[a-z]{2}" placeholder="zz">
 							</div>
 
 							<div class="form-group">
@@ -75,14 +100,6 @@
 					</div>				
 				</div>
 				
-				<div class="card card-outline-success">	
-					<div class="card-block">				
-						<h4 class="card-title">@(Q::cStr('262:Create template'))</h4>
-						<h6 class="card-subtitle mb-2 text-muted">@(Q::cStr('263:Download a template'))</h6>
-						
-						<a href="#" class="btn btn-primary" v-on:click="downloadTemplate"><i class="fa fa-cog mr5"></i>@(Q::cStr('264:Download'))</a>
-					</div>				
-				</div>
 			</div>	
 			
 			<!-- Results block  -->

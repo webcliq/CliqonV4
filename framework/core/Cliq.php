@@ -1204,6 +1204,7 @@ class Cliq
      * fFormatJSON()
      *
      * **************************************************  Format Functions  *****************************************/
+        
         /**
          * Formats cell contents for most display functions such as grid and table
          * @param - string - fieldname
@@ -1233,7 +1234,7 @@ class Cliq
 
                 case "username":
                     $usr = $clq->resolve('Auth');
-                    $str = A::getUserName($row['c_whomodified'], 2);
+                    $str = A::getUserName($row[$f], 2);
                 break;
 
                 case "fulladdress":
@@ -1251,6 +1252,11 @@ class Cliq
                     $str = self::displayYesNo($row[$f], $prop);
                 break;
 
+                // Paid or Unpaid 
+                case "paidunpaid":
+                    $str = self::paidUnpaid($f, $row, $prop);
+                break;
+
                 // radio, select
                 case "list":
                     $str = self::fList($row[$f], $prop['list']);
@@ -1259,6 +1265,14 @@ class Cliq
                 case "date":
                     array_key_exists($f, $row) ? $date = $row[$f] : $date = "" ;
                     $str = self::fDate(Q::dbDate($date));
+                break;
+
+                case "yearno": case "monthno": case "dayno":
+                    $date = Q::dbDate($row[$prop['relates']]);
+                    $split = explode('-', $date);
+                    $type == "yearno" ? $str = $split[0] : null ; // Year
+                    $type == "monthno" ? $str = $split[1] : null ; // Month
+                    $type == "dayno" ? $str = $split[2] : null ; // Day
                 break;
 
                 case "avatar":
@@ -1307,7 +1321,27 @@ class Cliq
                 break;
 
                 case "json":
-                    $str = self::fFormatJSON($row[$f], $prop);
+                    if(array_key_exists($f, $row)) {
+                        $str = self::fFormatJSON($row[$f], $prop);
+                    } else {
+                        $str = '{}';
+                    }
+                break;
+
+                case "credit":
+                    if($row['c_category'] == 'income') {
+                        $str = self::fNum( Q::dbNum($row['c_value']), true );
+                    } else { // Debit
+                        $str = "";
+                    }
+                break;
+
+                case "debit":
+                    if($row['c_category'] == 'expense') {
+                        $str = self::fNum( Q::dbNum($row['c_value']), true );
+                    } else { // Credit
+                        $str = "";
+                    }
                 break;
 
                 case "email":
@@ -1338,18 +1372,19 @@ class Cliq
                 break;
 
                 case "toml":
+                    $toml = $clq->resolve('Toml');
                     $farray = C::cfgReadString($row[$f]);
-                    $str = '<pre class="pre-scrollable"><code>'.htmlspecialchars(print_r($farray, true)).'</code></pre>';                   
+                    $str = '<pre class="pre-scrollable" style="width:400px;"><code>'.htmlspecialchars(print_r($farray, true)).'</code></pre>';                   
                 break;
 
-                case "text":
+                case "string": case "text":
                     // Stops errors with empty and undefined c_doc strings
                     if(array_key_exists($f, $row)) {
                         if(is_array($row[$f])) {
                             $idm = $clq->get('idiom');
-                            $str = $row[$f][$idm];
+                            $str = self::fHypenate($row[$f][$idm]);
                         } else {
-                            $str = $row[$f];
+                            $str = self::fHypenate($row[$f]);
                         };
                     };
                 break;
@@ -1361,7 +1396,23 @@ class Cliq
             } else {
                 return $str;
             }              
-        }     
+        } 
+
+        /** Hyphenation
+         *
+         * @param - string - input value
+         * @return - string - reformatted
+         **/
+        public static function fHypenate($str)
+        {
+            $qrepl = [
+                '_', ':'
+            ];
+            $qwith = [
+                ' _ ', ' : '
+            ];
+            return str_replace($qrepl, $qwith, $str);
+        }    
 
         /**
          * Format a date in local format according to Config setting format
@@ -1458,7 +1509,9 @@ class Cliq
         public static function fIdm($idmcode)
         {
             global $clq;
-            return $clq->get('idioms')[$idmcode];
+            $basedir = $clq->get('basedir');
+            $idms = C::cfgReadFile($basedir."data/language_codes.cfg");
+            return $idms[$idmcode];
         }    
         
         /*
@@ -1488,25 +1541,31 @@ class Cliq
         /**
          * Display Yes / No as icon
          */
-        public static function displayYesNo($val) 
+        public static function displayYesNo($val, $prop) 
         {
             switch($val) {
-
-                case "y":
-                case "1":
-                case true:
-                    $bool = "y";
-                break;
-
-                default:
-                    $bool = "n";
+                case "y": case "1": $bool = "y"; break;
+                default: $bool = "n"; break;
             };
 
             if($bool == "y" ) {
-                $img = "<i class='fa fa-check-square-o' title='".self::cStr('365:Yes or True')."' style='vertical-align: bottom; font-size: 1.3em; margin-top: 3px;'></i>";
+                $img = H::i(['class' => 'fa fa-check-square-o', 'title' => self::cStr('365:Yes or '.$val), 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;', 'data-action' => 'tono']);
             } else {
-                $img = "<i class='fa fa-square-o' title='".self::cStr('366:No or False')."' style='vertical-align: bottom; font-size: 1.3em; margin-top: 3px;'></i>";
+                $img = H::i(['class' => 'fa fa-square-o', 'title' => self::cStr('366:No or '.$val), 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;', 'data-action' => 'toyes']);
             }
+            return $img;
+        }
+
+        /**
+         * Display Yes / No as icon
+         */
+        public static function paidUnpaid($f, $row, $prop) 
+        {
+            if($row[$f] == 'paid') {
+                $img = H::i(['class' => 'fa fa-check-square-o', 'title' => self::cStr('543:Paid'), 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;', 'data-action' => 'tono', 'data-recid' => $row['id'], 'id' => 'paidunpaid_'.$row['id']]);                
+            } else {
+                $img = H::i(['class' => 'fa fa-square-o', 'title' => self::cStr('557:Unpaid'), 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;', 'data-action' => 'toyes', 'data-recid' => $row['id'], 'id' => 'paidunpaid_'.$row['id']]);
+            };
             return $img;
         }
 
@@ -1570,7 +1629,7 @@ class Cliq
             } else {
                 $prop['title'] = $row['d_title'][$idm];
                 $prop['alt'] = $row['d_title'][$idm];
-                $prop['class'] = 'maxh6 maxc6 img-thumbnail img-fluid float-right '.$prop['class'];
+                $prop['class'] = 'img-thumbnail img-fluid float-right '.$prop['class'];
                 $opts = array_merge(['src' => $row[$f]], $prop);
             };
             
@@ -1651,8 +1710,7 @@ class Cliq
             array_key_exists('mapclass', $prop) ? $class = 'staticmap '.$prop['mapclass'] : $class = 'staticmap' ;
 
             return H::img([
-                'class' => $class, 
-                'id' => $f,
+                'src' => 'https://maps.googleapis.com/maps/api/staticmap?center='.$row[$x].','.$row[$y].'&markers=color:red%7Clabel:C%7C'.$row[$x].','.$row[$y].'&zoom='.$prop['data-zoom'].'&size='.$prop['data-width'].'x'.$prop['data-height'], 'class' => $class, 'id' => $f,
                 'data-zoom' => $prop['data-zoom'],
                 'data-width' => $prop['data-width'],
                 'data-height' => $prop['data-height'],
@@ -1716,7 +1774,7 @@ class Cliq
             );
         }
 
-        /**
+        /** Not correct
          * Idiomtext 
          * @param - array - Value is already converted to an array, only needs language code to display
          * @param - array - Properties
@@ -1761,26 +1819,28 @@ class Cliq
             };
 
             $json = '';
+            if(count($val) > 1) {
+                foreach ($val as $key => $value) {
+                    $json .= str_repeat("\t", $indent + 1);
+                    $json .= "\"".$esc((string)$key)."\": ";
 
-            foreach ($val as $key => $value) {
-                $json .= str_repeat("\t", $indent + 1);
-                $json .= "\"".$esc((string)$key)."\": ";
+                    if (is_object($value) || is_array($value)) {
+                        $json .= "\n";
+                        $json .= self::$fn($value, $indent + 1);
+                    } elseif (is_bool($value)) {
+                        $json .= $value ? 'true' : 'false';
+                    } elseif (is_null($value)) {
+                        $json .= 'null';
+                    } elseif (is_string($value)) {
+                        $json .= "\"" . $esc($value) ."\"";
+                    } else {
+                        $json .= $value;
+                    }
 
-                if (is_object($value) || is_array($value)) {
-                    $json .= "\n";
-                    $json .= self::$fn($value, $indent + 1);
-                } elseif (is_bool($value)) {
-                    $json .= $value ? 'true' : 'false';
-                } elseif (is_null($value)) {
-                    $json .= 'null';
-                } elseif (is_string($value)) {
-                    $json .= "\"" . $esc($value) ."\"";
-                } else {
-                    $json .= $value;
+                    $json .= ",\n";
                 }
-
-                $json .= ",\n";
             }
+    
 
             if (!empty($json)) {
                 $json = substr($json, 0, -2);
@@ -2564,11 +2624,110 @@ class Cliq
             return $dest;
         }
 
-        public static function array_clean(array $array)
-        {
+        /** Clean / Sanitise an array 
+         * synonym for array_filter
+         * @param - array - the input array
+         * @return - array - the cleaned array
+         **/
+         public static function array_clean(array $array)
+         {
             return array_filter($array);
-        }
+         }
         
+        /** Recursively search an array by key 
+         * Recursively searches a multidimensional array for a key and optional value and returns the path as a string representation or subset of the array or a value.
+         *
+         * @author  Akin Williams <aowilliams@arstropica.com>
+         *
+         * @param   int|string $needle Key
+         * @param   array $haystack Array to be searched
+         * @param   bool $strict Optional, limit to keys of the same type. Default false.
+         * @param   string $output Optional, output key path as a string representation or array subset, ('array'|'string'|'value'). Default array.
+         * @param   bool $count Optional, append number of matching elements to result. Default false.
+         * @param   int|string $value Optional, limit results to keys matching this value. Default null.
+         * 
+         * @return  array Array containing matching keys and number of matches
+         **/
+         public static function multi_array_key_search($needle, $haystack, $strict = false, $output = 'array', $count = false, $value = null) 
+         {
+            // Sanity Check
+            if(!is_array($haystack))
+                return false;
+
+            $resIdx='matchedIdx';
+            $prevKey = "";
+            $keys = array();
+            $num_matches = 0;
+
+            $numargs = func_num_args();
+            if ($numargs > 6){
+                $arg_list = func_get_args();
+                $keys = $arg_list[6];
+                $prevKey = $arg_list[7];
+            }
+
+            $keys[$resIdx] = isset($keys[$resIdx]) ? $keys[$resIdx] : 0;
+
+            foreach($haystack as $key => $val) {
+                if(is_array($val)) {
+                    if ((($key === $needle) && is_null($value)) || (($key === $needle) && ($val[$key] == $value) && $strict === false) || (($key === $needle) && ($val[$key] === $value) && $strict === true)){
+                        if ($output == 'value'){
+                            $keys[$keys[$resIdx]] = $val;
+                        } else {
+                            $keys[$keys[$resIdx]] = $prevKey . (isset($keys[$keys[$resIdx]]) ? $keys[$keys[$resIdx]] : "") . "[$key]";
+                        }
+                        $keys[$resIdx] ++;
+                    }
+                    $passedKey = $prevKey . "[$key]";;
+                    $keys = self::multi_array_key_search($needle, $val, $strict, $output, true, $value, $keys, $passedKey);
+                } else {
+                    if ((($key === $needle) && is_null($value)) || (($key === $needle) && ($val == $value) && $strict === false) || (($key === $needle) && ($val === $value) && $strict === true)){
+                        if ($output == 'value'){
+                            $keys[$keys[$resIdx]] = $val;
+                        } else {
+                            $keys[$keys[$resIdx]] = $prevKey . (isset($keys[$keys[$resIdx]]) ? $keys[$keys[$resIdx]] : "") . "[$key]";
+                        }
+                        $keys[$resIdx] ++;
+                    }
+                }
+            }
+            if ($numargs < 7){
+                $num_matches = (count($keys) == 1) ? 0 : $keys[$resIdx];
+                if ($count) $keys['num_matches'] = $num_matches;
+                unset($keys[$resIdx]);
+                if (($output == 'array') && $num_matches > 0){
+                    if (is_null($value)) {
+                        $replacements = self::multi_array_key_search($needle, $haystack, $strict, 'value', false);
+                    }
+                    $arrKeys = ($count) ? array('num_matches' => $num_matches) : array();
+                    for ($i=0; $i < $num_matches; $i ++){
+                        $keysArr = explode(',', str_replace(array('][', '[', ']'), array(',', '', ''), $keys[$i]));
+                        $json = "";
+                        foreach($keysArr as $nestedkey){
+                            $json .= "{" . $nestedkey . ":";
+                        }
+                        if (is_null($value)){
+                            $placeholder = time();
+                            $json .= "$placeholder";
+                        } else {
+                            $json .= "$value";
+                        }
+                        foreach($keysArr as $nestedkey){
+                            $json .= "}";
+                        }
+                        $arrKeys[$i] = json_decode($json, true);
+                        if (is_null($value)) {
+                            array_walk_recursive($arrKeys[$i], function (&$item, $key, &$userdata) {
+                                if($item == $userdata['placeholder'])
+                                    $item = $userdata['replacement'];
+                            }, array('placeholder' => $placeholder, 'replacement' => $replacements[$i]));
+                        }
+                    }
+                    $keys = $arrKeys;
+                }
+            }
+            return $keys;
+         }
 
 }
 

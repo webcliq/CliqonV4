@@ -19,7 +19,6 @@
             idioms: {},
             langcd: jlcd,
             search: '', table: '', tabletype: '', displaytype: '', action: '',
-            sitepath: "http://"+document.location.hostname+"/",
             spinner: new Spinner(),
             formid: 'columnform',
             df: new Object, // Form
@@ -1383,16 +1382,18 @@
          * - editTable()
          * - saveTable()
          * maintainIdiom()
+         * - addNewIdiom()
+         * - deleteIdiom()
          *
          ********************************************************************************************************/
 
-            /**
-             * Javascript routines to convert an import file in Configuration array format
+            /** Javascript routines to convert an import file in Configuration array format 
+             * 
              * @param - array - options
              * @return - test or written content
              **/    
-            var convertarray = function(opts)
-            {
+             var convertarray = function(opts)
+             {
                 var idms = new Vue({
                     el: '#admconvertarray',
                     data: {
@@ -1522,15 +1523,15 @@
                         });     
                     }
                 }); 
-            }
+             }
 
-            /**
-             * Javascript routines to import a CSV formatted data file into the database
+            /** Javascript routines to import a CSV formatted data file into the database 
+             * 
              * @param - array - options
              * @return - test or written content
              **/                
-            var importdata = function(opts) 
-            {
+             var importdata = function(opts) 
+             {
 
                 var idms = new Vue({
                     el: '#admimportdata',
@@ -1612,15 +1613,15 @@
                         });     
                     }
                 });                                 
-            }
+             }
 
-            /**
-             * Javascript routines to export data to a CSV or Array config file
+            /** Javascript routines to export data to a CSV or Array config file  
+             * 
              * @param - array - options
              * @return - test or written content
              **/                
-            var exportdata = function(opts)
-            {
+             var exportdata = function(opts)
+             {
                 var idms = new Vue({
                     el: '#admexportdata',
                     data: {
@@ -1692,9 +1693,9 @@
                         }); 
                     }
                 });                                 
-            }
+             }
 
-            /** Data Dictionary and supporting functions
+            /** Data Dictionary and supporting functions 
              * Javascript routines to support the editing and update of Tabletype definitions when stored in a database
              * @param - array - options
              * @return - test or written content
@@ -1815,7 +1816,7 @@
                     }).go()
                  }
 
-            /**
+            /** Javascript strings 
              * Javascript routines to support the editing and update of the strings used to make the JS functions multi-lingual
              * @param - array - options
              * @return - test or written content
@@ -1916,8 +1917,12 @@
                     }).go();                  
                 }
 
-            var maintainIdiom = function(idioms)
-            {
+            /** Routines to maintain languages 
+             *
+             * @param - array array of languages
+             **/
+             var maintainIdiom = function(idioms)
+             {
                cfg.df = new Vue({
                     el: '#admmaintainidiom',
                     data: {
@@ -1928,17 +1933,20 @@
                             inputfile: '',
                             dbwrite: '',
                             cfgwrite: ''
-                        }
+                        },
+                        newidiomcode: '',
+                        newidiomname: ''                       
                     },
                     methods: {
-                        deleteIdiom: function(idx) {
-                            alert(idx);
+                        deleteIdiom: function(evt) {
+                            var lcdcode = $(evt.target).data('lcdcode');
+                            var lcdname = $(evt.target).data('lcdname');
+                            deleteIdiom(lcdcode, lcdname);
                         },
                         addIdiom: function() {
                             $('#addidiomform').removeClass('hide');
                         },
-                        downloadTemplate: function() {
-                            
+                        downloadTemplate: function() {  
                             var urlstr = '/ajax/'+jlcd+'/doidiomtemplatedownload/dbcollection/string/';
                             aja().method('POST').url(urlstr)
                             .on('40x', function(response) { error('Page not Found - '+urlstr+':'+response)})
@@ -1955,8 +1963,7 @@
                                     }; 
 
                                 } else { error('Response was not JSON object - '+urlstr+':'+response.msg); }
-                            }).go(); 
-                                                            
+                            }).go();                                
                         }
                     },
                     mounted: function() {
@@ -2010,12 +2017,110 @@
                             });         
     
                             return false;
-                        });             
+                        }); 
+
+                        $('#newidiombutton').on('click', function(e) {
+                            return addNewIdiom();
+                        })
                     }
                 })
-            }
+             }
 
-        /** General Display Utilities
+            /** Add a new language 
+             *
+             **/
+             var addNewIdiom = function()
+             {
+                Cliq.msg({
+                    buttons:  [
+                        {addClass: 'm10 mt10 btn btn-primary btn-sm', text: lstr[8], onClick: function($noty) { 
+                            
+                            var target = document.getElementById('idiomresults');
+                            var opts = {};
+                            var spinner = new Spinner(opts).spin(target);
+
+                            var urlstr = '/ajax/'+jlcd+'/addnewidiom/';
+                            var frmdata = new FormData();
+                            frmdata.append('lcdname', cfg.df.$data.newidiomname); 
+                            frmdata.append('lcdcode', cfg.df.$data.newidiomcode);                   
+                            $.ajax({
+                                url: urlstr, data: frmdata,
+                                cache: false, contentType: false, processData: false,
+                                type: 'POST', async: false, timeout: 25000,
+                                success: function(response) {
+
+                                    if(typeof response == 'object') {
+                                        var match = /NotOk/.test(response.flag);
+                                        if(!match == true) {
+                                            spinner.stop();
+                                            var content = prettyPrint(response.data, {
+                                                expanded: true, 
+                                                maxDepth: 5
+                                            });
+                                            $('#idiomresults').empty().html(content);
+                                            $noty.close();
+                                        } else {
+                                            error('Ajax function returned error NotOk - '+urlstr+':'+JSON.stringify(response.msg));
+                                        };                          
+                                    } else {
+                                        error('Response was not JSON object - '+urlstr+':'+JSON.stringify(response));
+                                    };
+                                },
+                                error: function(xhr, status, text) {
+                                    var response = $.parseJSON(xhr.responseText);
+                                    error(JSON.stringify(response.msg));                           
+                                }
+                            });                            
+                        }},
+                        {addClass: 'm10 mt10 btn btn-default btn-sm', text: lstr[30], onClick: function($noty) {    
+                            $noty.close(); 
+                        }}                                                                          
+                    ],
+                    timeout: false,
+                    closeWith: ['button'],
+                    type: 'info',
+                    text: '<p>'+lstr[156]+'</p><p>'+lstr[157]+'</p><p>'+lstr[158]+':</p><p>'+cfg.df.$data.newidiomname+': '+cfg.df.$data.newidiomcode+'</p>'   
+                });
+             }
+
+            /** Delete existing language 
+             *
+             * @param - string - language code
+             * @param - string - language name. Used for confirmation purposes only
+             **/
+             var deleteIdiom = function(lcdcode, lcdname)
+             {
+                Cliq.msg({
+                    buttons:  [
+                        {addClass: 'm10 mt10 btn btn-primary btn-sm', text: lstr[8], onClick: function($noty) { 
+                            var urlstr = '/ajax/'+jlcd+'/deleteidiom/';
+                            aja().method('POST').url(urlstr).cache(false).timeout(2500).type('json')
+                            .data({'lcdcode': lcdcode})
+                            .on('40x', function(response) {Cliq.error('Page not Found - '+urlstr+':'+response);})
+                            .on('500', function(response) {Cliq.error('Server Error - '+urlstr+':'+response);})
+                            .on('timeout', function(response) {Cliq.error('Timeout - '+urlstr+':'+response);})
+                            .on('success', function(response) {
+                                if(typeof response == 'object') {
+                                    // Test NotOK - value already exists
+                                    var match = /NotOk/.test(response.flag);
+                                    if(!match == true) {  
+                                        uLoad();                    
+                                    } else { Cliq.error('Ajax function returned error NotOk - '+urlstr+':'+JSON.stringify(response)); };
+                                } else { Cliq.error('Response was not JSON object - '+urlstr+':'+response.msg); };
+                            }).go();                             
+                        }},
+                        {addClass: 'm10 mt10 btn btn-default btn-sm', text: lstr[30], onClick: function($noty) {    
+                            $noty.close(); 
+                        }}                                                                          
+                    ],
+                    timeout: false,
+                    closeWith: ['button'],
+                    type: 'error',
+                    text: '<p>'+lstr[156]+'</p><p>'+lstr[157]+'</p><p>'+lstr[159]+':</p><p>'+cfg.df.$data.newidiomname+': '+cfg.df.$data.newidiomcode+'</p>'
+                });
+             }
+
+        /** General Display Utilities 
          * 
          * clqAjax()
          * msg()

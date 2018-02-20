@@ -120,6 +120,32 @@ CREATE TABLE `dbitem` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `dbtransaction`
+--
+
+DROP TABLE IF EXISTS `dbtransaction`;
+/*!40101 SET @saved_cs_client   = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dbtransaction` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `c_reference` varchar(255) NOT NULL DEFAULT '',
+ `c_type` varchar(255) NOT NULL DEFAULT '',
+ `c_category` varchar(255) NOT NULL DEFAULT 'other',
+ `c_common` varchar(255) DEFAULT NULL,
+ `c_level` varchar(255) NOT NULL DEFAULT '20:20:20',
+ `c_order` varchar(255) DEFAULT 'zz',
+ `c_parent` varchar(255) DEFAULT 'z',
+ `c_document` longtext NOT NULL,
+ `c_options` varchar(255) DEFAULT NULL,
+ `c_value` varchar(255) NOT NULL DEFAULT '1',
+ `c_dateentered` varchar(255) NOT NULL DEFAULT '2017-01-01',
+ `c_whoentered` varchar(255) NOT NULL DEFAULT 'admin',
+ `c_notes` longtext ,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `dblog`
 --
 

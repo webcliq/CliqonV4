@@ -143,27 +143,24 @@ class Config
     private static function array_to_ini($a,$level = 0)
     {
         if ($level == 0) self::$ini = "" ;
-        self::$arr = array_slice(self::$arr,0,$level) ;
+        self::$arr = array_slice(self::$arr, 0, $level) ;
 
-        foreach($a as $key => $val)
-        {
+        foreach($a as $key => $val) {
             self::$arr[$level] = $key ;
 
-            if (is_array($val))
-            {
-                self::array_to_ini($val,$level+1) ;
-            } else
-            {
-                if (is_numeric($key))
-                {
-                    self::$ini .= $level == 0 ? "{$key}[] = {$val}\n" : join(".",array_slice(self::$arr,0,-1))."[] = \"{$val}\"\n" ;
-                } else
-                {
-                    self::$ini .= $level == 0 ? "{$key} = {$val}\n" : join(".",self::$arr)." = \"{$val}\"\n" ;
+            if (is_array($val)) {
+                self::array_to_ini($val, $level+1) ;
+            } else {
+                is_numeric($val) ? $str = "{$val}" : $str = "'{$val}'"; 
+                // The first set of commas did not exist and the second set were double apostrophes, what is the affect??
+                if (is_numeric($key)) {
+                    self::$ini .= $level == 0 ? "{$key}[] = ".$str." \n" : join(".",array_slice(self::$arr,0,-1))."[] = ".$str." \n";
+                } else {
+                    self::$ini .= $level == 0 ? "{$key} = ".$str." \n" : join(".", self::$arr)." = ".$str." \n";
                 }
             }
         }
-        return(self::$ini) ;
+        return(self::$ini);
     }
 
     /** Preprocess the file, looking for # directives.
@@ -171,8 +168,8 @@ class Config
      * @param string $file The filename to process.
      * @return string The resulting file, less # directives.
      */
-    private static function preProcess($file)
-    {
+     private static function preProcess($file)
+     {
         try {
             
             $out = "" ;
@@ -212,15 +209,15 @@ class Config
         } catch (Exception $e) {
             echo $e->getMessage();
         }
-    }
+     }
 
     /** Process the #include directive.
      * @method array preProcess(array $lines)
      * @param array $lines The lines in the file.
      * @return array The resulting file as an array, less #include directives.
      */
-    private static function processIncludes($lines)
-    {
+     private static function processIncludes($lines)
+     {
         
         try {
 
@@ -262,7 +259,7 @@ class Config
         } catch (Exception $e) {
             echo $e->getMessage();
         }
-    }
+     }
 
     /** Intent: The actual parsing of the ini string.
      * @method mixed parse(string $string, array $conf = [])
@@ -286,50 +283,53 @@ class Config
                 $xline[] = trim($line," \t\n\r\0\x0B");
             };
             $mode = defined(INI_SCANNER_TYPED) ? INI_SCANNER_TYPED : INI_SCANNER_NORMAL ;
-            $conf = parse_ini_string(join("\n", $xline),true, $mode) ;
+            $conf = @parse_ini_string( join("\n", $xline), true, $mode);
         }
+
 
         // Walk the list of first-level vars.
-        foreach($conf as $key => $val)
-        {
-            // Match : and . as level separators.
-            if (preg_match('/[:.]+/',$key)) {
-                // Allow for quoted strings in the dotcolon notation.
-                preg_match_all("/\((?:[^()]|(?R))+\)|'[^']*'|[^().:]+/",$key,$out) ;
-                $list = $out[0] ;
+        if(count($conf) > 1) {
+            foreach($conf as $key => $val) {
+                // Match : and . as level separators.
+                if (preg_match('/[:.]+/',$key)) {
+                    // Allow for quoted strings in the dotcolon notation.
+                    preg_match_all("/\((?:[^()]|(?R))+\)|'[^']*'|[^().:]+/",$key,$out) ;
+                    $list = $out[0] ;
 
-                $ptr = &$conf ;
-                foreach($list as $name) {
-                    $name = trim($name) ;
-                    // Fix any quotation marks on the name.
-                    if ($name[0] == '"' || $name[0] == "'") $name = substr($name,1,strlen($name)-2) ;
+                    $ptr = &$conf ;
+                    foreach($list as $name) {
+                        $name = trim($name) ;
+                        // Fix any quotation marks on the name.
+                        if ($name[0] == '"' || $name[0] == "'") $name = substr($name,1,strlen($name)-2) ;
 
-                    // Attempting to put in in same var as two data types, is not gonna happen.
-                    // Cause the already set string to become a recursion, but don't break execution.
-                    // such as a.b = 1
-                    // a.b[] = ... will point to itself.
-                    if (isset($ptr[$name]) && !is_array($ptr[$name])) { $ptr[$name] = array(&$ptr[$name]) ; }
-                    // If not set, create it...
-                    if (!isset($ptr[$name])) { $ptr[$name] = array() ; }
+                        // Attempting to put in in same var as two data types, is not gonna happen.
+                        // Cause the already set string to become a recursion, but don't break execution.
+                        // such as a.b = 1
+                        // a.b[] = ... will point to itself.
+                        if (isset($ptr[$name]) && !is_array($ptr[$name])) { $ptr[$name] = array(&$ptr[$name]) ; }
+                        // If not set, create it...
+                        if (!isset($ptr[$name])) { $ptr[$name] = array() ; }
 
-                    $ptr = &$ptr[$name] ;
-                }
-                // Leaf node
-                // If value is an array, insert as a repeated array (a.b[])
-                if (isset($ptr) && !is_array($ptr)){
-                    $ptr = array($ptr) ;
-                    $ptr[] = $val ;
+                        $ptr = &$ptr[$name] ;
+                    }
+                    // Leaf node
+                    // If value is an array, insert as a repeated array (a.b[])
+                    if (isset($ptr) && !is_array($ptr)){
+                        $ptr = array($ptr) ;
+                        $ptr[] = $val ;
+                    } else {
+                        // If the value is an array, check up the names on that one for having dots.
+                        $ptr = (is_array($val)) ? array_merge($ptr,(array) self::parse("", $val)) : $val ;
+                    }
+
+                    unset($conf[$key]) ;
                 } else {
-                    // If the value is an array, check up the names on that one for having dots.
-                    $ptr = (is_array($val)) ? array_merge($ptr,(array) self::parse("", $val)) : $val ;
+                    // Otherwise, test the subarray for the same things but for second-level.
+                    if (is_array($conf[$key])) $conf[$key] = (array) self::parse("", $conf[$key]) ;
                 }
-
-                unset($conf[$key]) ;
-            } else {
-                // Otherwise, test the subarray for the same things but for second-level.
-                if (is_array($conf[$key])) $conf[$key] = (array) self::parse("", $conf[$key]) ;
             }
         }
+    
         return($conf) ;
     }
 
@@ -341,13 +341,15 @@ class Config
      * */
     private static function subst(&$a, &$real)
     {
-        foreach ($a as $key => $val) {
-            if (is_array($a[$key])) {
-                self::subst($a[$key], $real);
-            } else {
-                // Need to do this twice in case we do a node into node assignment.
-                $a[$key] = self::nodeReplace($a[$key],$real) ;
-                $a[$key] = self::nodeReplace($a[$key],$real) ;
+        if(count($a) > 1) {
+            foreach ($a as $key => $val) {
+                if (is_array($a[$key])) {
+                    self::subst($a[$key], $real);
+                } else {
+                    // Need to do this twice in case we do a node into node assignment.
+                    $a[$key] = self::nodeReplace($a[$key],$real) ;
+                    $a[$key] = self::nodeReplace($a[$key],$real) ;
+                }
             }
         }
     }
