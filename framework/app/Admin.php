@@ -338,12 +338,13 @@ class Admin
 						'sizes' => [10,15,20]
 					],
 					'dataurl' => '/ajax/'.$idiom.'/getrecorddata/',
-					'toolbarTemplate' => H::div(['class' => 'row col', 'style' => 'height: 32px;'],
-						H::div(['class' => 'col-6 text-left'],
+					'toolbarTemplate' => H::div(['class' => 'row', 'style' => 'height: 32px;'],
+						H::div(['class' => 'col-7 text-left'],
 							H::button(['class' => 'btn btn-sm btn-primary mr5 gridbutton', 'type' => 'button', 'data-action' => 'changetable', 'data-table' => 'dbcollection'], 'dbcollection'),
-							H::button(['class' => 'btn btn-sm btn-primary mr5 gridbutton', 'type' => 'button', 'data-action' => 'changetable', 'data-table' => 'dbitem'], 'dbitem')
+							H::button(['class' => 'btn btn-sm btn-primary mr5 gridbutton', 'type' => 'button', 'data-action' => 'changetable', 'data-table' => 'dbitem'], 'dbitem'),
+							H::button(['class' => 'btn btn-sm btn-primary mr5 gridbutton', 'type' => 'button', 'data-action' => 'changetable', 'data-table' => 'dbtransaction'], 'dbtransaction')
 						),
-						H::div(['data-role' => 'title', 'id' => 'gridtitle', 'class' => 'col-6 text-right h4'])
+						H::div(['data-role' => 'title', 'id' => 'gridtitle', 'class' => 'col-5 text-right h4'])
 					),
 					'notFoundText' => '144:No records for this table available',
 					'columns' => [

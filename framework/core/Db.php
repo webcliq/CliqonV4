@@ -1948,8 +1948,7 @@ class Db
 					'vars' => $vars,
 					'query' => $sql,	
 					'dbrowset' => $rawrs,				
-					'rows' => $rows,
-					'tabledefinition' => $dtcfg
+					'rows' => $rows
 				];
 				L::cLog($err);
 				return [
@@ -3263,8 +3262,8 @@ class Db
     	 * @param - string(optional) - table name in which to search
     	 * @return - string - base value
     	 **/
-    	public static function getValueFromLabel($listname, $searchstr, $table = 'dbcollection')
-    	{
+    	 public static function getValueFromLabel($listname, $searchstr, $table = 'dbcollection')
+    	 {
     		global $clq; $idm = $clq->get('idiom');
     		$sql = "SELECT c_document FROM ".$table." WHERE c_type = ? AND c_reference = ? LIMIT 1";
     		$doc = R::getCell($sql, ['list', $listname]);
@@ -3275,7 +3274,7 @@ class Db
     			}
     		};
     		return "NotFound";
-    	}
+    	 }
 
 
 

@@ -13,6 +13,7 @@
 class Model 
 {
 	const THISCLASS = "Model";
+    protected static $subdir = "models/";
     public function __construct() {
     	global $clq;
     }
@@ -28,10 +29,12 @@ class Model
          * @param - string - the Tabletype such as string or news etc.
          * @return - array - consisting of a set of field definitions derived from Standard but overwritten by this type where necessary
          */
-        function stdModel($service, $table, $tabletype = '') 
+        function stdModel($service, $table, $tabletype = '', $module = '') 
         {
     	    $method = self::THISCLASS.'->'.__FUNCTION__."()";
     	    try {
+
+                $module != '' ? self::$subdir = $module : self::$subdir = 'models/' ;
     			
                 // Setup variables etc.
     			$model = []; global $clq; $common = [];
@@ -124,7 +127,7 @@ class Model
 
             $vars = array(
                 'filename' => $table,
-                'subdir' => 'models/',
+                'subdir' => self::$subdir,
                 'type' => 'collection',
                 'reference' => $table,
                 'key' => 'common'
@@ -134,7 +137,7 @@ class Model
             if($tabletype != '') {
                 $vars = array(
                     'filename' => $table.'.'.$tabletype,
-                    'subdir' => 'models/',
+                    'subdir' => self::$subdir,
                     'type' => 'model',
                     'reference' => $table.'_'.$tabletype,
                     'key' => 'common'
@@ -154,7 +157,7 @@ class Model
         {
             $vars = array(
                 'filename' => $service,         // If file, name of file without extension (.cfg)
-                'subdir' => 'admin/config/',    // If file, name of subdirectory
+                'subdir' => self::$subdir,    // If file, name of subdirectory
                 'type' => 'service',            // If database, value of c_type
                 'reference' => $service,        // If database, value of c_reference
                 'key' => ''
@@ -171,7 +174,7 @@ class Model
         {
             $vars = array(
                 'filename' => $table,
-                'subdir' => 'models/',
+                'subdir' => self::$subdir,
                 'type' => 'collection',
                 'reference' => $table,
                 'key' => $service
@@ -189,7 +192,7 @@ class Model
         { 
             $vars = array(
                 'filename' => $table.'.'.$tabletype,
-                'subdir' => 'models/',
+                'subdir' => self::$subdir,
                 'type' => 'model',
                 'reference' => $table.'_'.$tabletype,
                 'key' => $service
@@ -329,7 +332,7 @@ class Model
             
             $vars = array(
                 'listname' => 'service',
-                'subdir' => 'admin/config/',
+                'subdir' => self::$subdir,
                 'filename' => 'services'
             );
             return self::getAllFromFileorDb($vars);

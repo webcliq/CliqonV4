@@ -1191,6 +1191,7 @@ class Cliq
      * strToArray()
      * tDateSort()
      * displayYesNo()
+     * paidUnpaid()
      * fAvatar()
      * fImage()
      * fLogo()
@@ -1419,7 +1420,7 @@ class Cliq
          * @param string - date in Db format or empty string
          * @return string - formatted date
          * */
-        public static function fDate($date) 
+        public static function fDate($date = '') 
         {
             global $clq;
             if($date == '') {
@@ -1561,11 +1562,23 @@ class Cliq
          */
         public static function paidUnpaid($f, $row, $prop) 
         {
-            if($row[$f] == 'paid') {
-                $img = H::i(['class' => 'fa fa-check-square-o', 'title' => self::cStr('543:Paid'), 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;', 'data-action' => 'tono', 'data-recid' => $row['id'], 'id' => 'paidunpaid_'.$row['id']]);                
-            } else {
-                $img = H::i(['class' => 'fa fa-square-o', 'title' => self::cStr('557:Unpaid'), 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;', 'data-action' => 'toyes', 'data-recid' => $row['id'], 'id' => 'paidunpaid_'.$row['id']]);
-            };
+            switch($row[$f]) {
+                case "paid":
+                    $img = H::i(['class' => 'fa fa-check-square-o', 'title' => self::cStr('543:Paid'), 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;', 'data-action' => 'tono', 'data-recid' => $row['id'], 'id' => 'paidunpaid_'.$row['id']]); 
+                break;
+
+                case "unpaid":
+                    $img = H::i(['class' => 'fa fa-square-o', 'title' => self::cStr('557:Unpaid'), 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;', 'data-action' => 'toyes', 'data-recid' => $row['id'], 'id' => 'paidunpaid_'.$row['id']]);
+                break;
+
+                case "other":
+                    $img = H::i(['class' => 'fa fa-stop-circle-o', 'style' => 'vertical-align: bottom; font-size: 1.3em; margin-top: 3px;']);
+                break;
+
+                default:
+                    $img = "";
+                break;
+            }
             return $img;
         }
 
@@ -1894,6 +1907,40 @@ class Cliq
                 H::img($img)
             );
         }
+
+        /**
+        * Creates a portion of a date from a supplied full date
+        * used to work out month and day numbers etc.
+        **/
+        public static function fDatePart($date, $which = "m", $verbose = false)
+        {
+            try {
+                global $clq;
+                date_default_timezone_set($clq->get('timezone'));
+                $dt = new DateTime($date);
+                switch($which) {
+                    case "d": $verbose == false ? $result = $dt->format('d') : $result = $dt->format('D') ; break;
+                    case "w": $result = $dt->format('W'); break; // Add week number
+                    case "m": $verbose == false ? $result = $dt->format('m') : $result = $dt->format('M') ; break;
+                    case "y": $result = $dt->format('Y'); break;
+                }
+                return $result;
+            } catch(Exception $e) {
+                return $e->getMessage();
+            }
+        }
+
+        public static function fDaysofWeek($dayn)
+        {
+            $days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+            return $days[$dayn];
+        }  
+
+        public static function fMthofYear($mthn)
+        {
+            $mths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            return $mths[$mthn];           
+        }  
 
     /** Utilities
 	 *
