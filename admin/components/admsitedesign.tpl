@@ -1,5 +1,5 @@
 <!-- Admin Genkeys Layout -->
-<link href="@($viewpath)css/grapes.min.css" rel="stylesheet">
+<link href="@($viewpath)/admin/css/grapes.min.css" rel="stylesheet">
 <!-- Breadcrumb -->
 <ol class="breadcrumb">
 	<li class="right">@raw($topbuttons)</li>
