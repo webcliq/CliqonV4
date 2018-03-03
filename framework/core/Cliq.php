@@ -2401,8 +2401,38 @@ class Cliq
          * eg. Sort a menu array or a set of form fields by order
          * @return the reordered array
          **/
-        public static function array_orderby()
-        {
+        public static function array_order_by($array, $orderby = '', $order = 'SORT_ASC', $children = false) {
+            
+            if($orderby == null) {
+                return $array;
+            }
+            
+            $key_value = $new_array = [];
+            foreach($array as $k => $v) {
+                $key_value[$k] = $v[$orderby];
+            }
+
+            if($order == 'SORT_DESC') {
+                arsort($key_value);
+            } else {
+                asort($key_value);
+            }
+
+            reset($key_value);
+            foreach($key_value as $k => $v) {
+                $new_array[$k] = $array[$k];
+                // children
+                if($children && isset($new_array[$k][$children])) {
+                    $new_array[$k][$children] = self::array_orderby($new_array[$k][$children], $orderby, $order, $children);
+                }
+            }
+
+            $new_array = array_values($new_array); 
+            $array = $new_array;
+            return $new_array;
+        }
+
+        public static function array_orderby() {
             $args = func_get_args();
             $data = array_shift( $args );
             if ( ! is_array( $data ) ) {
@@ -2422,7 +2452,7 @@ class Cliq
             $multisort_params[] = &$data;
             call_user_func_array( 'array_multisort', $multisort_params );
             return end( $multisort_params );
-        }  
+        }     
 
         /**
          * Convert an object into an associative array

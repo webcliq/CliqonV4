@@ -158,5 +158,7 @@ str['es'] = [
 'Recomendamos hacer una copia de seguridad de su base de datos antes de realizar esta acción.',
 'Confirme la eliminación de',
 'Pagado',
-'Sin remunerado'
+'Sin remunerado',
+'Elige una opción',
+'Informes'
 ];

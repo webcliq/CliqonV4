@@ -226,7 +226,7 @@ class Admin
 		 {
 			global $clq;	
 			$r = $clq->resolve('Report');
-			return $r->reportGenerator($vars);	
+			return $r->reportDesigner($vars);	
 		 }
 
 		/** Javascript driven site page designer

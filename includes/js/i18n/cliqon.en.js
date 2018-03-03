@@ -158,5 +158,7 @@ str['en'] = [
 'We recommend taking a backup of your database before performing this action.',
 'Please confirm the deletion of',
 'Paid',
-'Unpaid'
+'Unpaid',
+'Select an option',
+'Reports'
 ];

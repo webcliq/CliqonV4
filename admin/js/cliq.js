@@ -615,6 +615,15 @@
                         helpButton();
                     break;
 
+                    case "newreportbutton":
+                        var urlstr = '/admindesktop/'+jlcd+'/reportdesigner/dbitem/report';
+                        uLoad(urlstr);
+                    break;
+
+                    case "savedreportsbutton":
+                        Cliqr.displayReports();
+                    break;                    
+
                     // Ends
                     default: success(action); break;
                 }

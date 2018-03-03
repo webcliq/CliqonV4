@@ -815,6 +815,33 @@ class Ajax
 			];			
 		}
 
+		function previewreport($vars)
+		{
+			global $clq; $rpt = $clq->resolve('Report');
+			return [
+				'content' => $rpt->previewReport($vars),
+				'callBack' => ""
+			];		
+		}
+
+		function updatereport($vars)
+		{
+			global $clq; $rpt = $clq->resolve('Report');
+			return [
+				'content' => $rpt->updateReport($vars),
+				'callBack' => ""
+			];		
+		}
+
+		function listreports($vars)
+		{
+			global $clq; $rpt = $clq->resolve('Report');
+			return [
+				'content' => $rpt->listReports($vars),
+				'callBack' => ""
+			];		
+		}
+
 		function getreport($vars)
 		{
 			global $clq; $rpt = $clq->resolve('Report');
