@@ -421,6 +421,17 @@ class Report extends HTML
 
 	         	);
 
+	        // Filter by - will need field name and value for that field
+	         	$frm .= H::div(['class' => 'form-group'],
+	         		H::label(['for' => 'd_filterby', 'class' => 'c4 text-right mr5'], Q::cStr('173:Filter by')),
+		         	H::div(['class' => 'form-group-inline', 'style' => 'display:inline'],
+		         		H::input(['class' => 'form-control c4 right', 'v-model' => 'formdef.d_filterbyval']),         		
+		         		H::select(['class' => 'custom-select c6', 'id' => 'd_filterby', 'v-model' => 'formdef.d_filterbyfld', 'data-name' => 'd_filterby'], $opts)
+	         		),
+	         		H::div(['class' => 'form-text small text-muted'], Q::cStr('568:Select an option or leave blank'))
+
+	         	);
+
          	return $frm;
          }
 
@@ -748,9 +759,9 @@ class Report extends HTML
 					$tbl->addCell('*', '', 'header', []);
 
 				// tbody
-				$icons = "";
 				$tbl->addTSection('tbody');
 				for($r = 0; $r < count($rset); $r++) {
+					$icons = "";
 					$tbl->addRow();
 						$tbl->addCell($rset[$r]['id']);
 						$tbl->addCell($rset[$r]['c_reference']);
@@ -760,7 +771,7 @@ class Report extends HTML
 							$icons .= H::i(['class' => 'fa fa-fw fa-pencil pointer reporticon', 'data-action' => 'editicon', 'data-recid' => $rset[$r]['id'], 'data-reference' => $rset[$r]['c_reference'], 'data-description' => $rset[$r]['c_common']]);
 							$icons .= H::i(['class' => 'fa fa-fw fa-eye pointer reporticon', 'data-action' => 'viewicon', 'data-recid' => $rset[$r]['id'], 'data-reference' => $rset[$r]['c_reference'], 'data-description' => $rset[$r]['c_common']]);
 							$icons .= H::i(['class' => 'fa fa-fw fa-trash pointer reporticon', 'data-action' => 'deleteicon', 'data-recid' => $rset[$r]['id'], 'data-reference' => $rset[$r]['c_reference'], 'data-description' => $rset[$r]['c_common']]);
-						$tbl->addCell($icons);
+						$tbl->addCell($icons); unset($icons);
 				}
 			    
 				if(is_array($rset)) {
@@ -797,8 +808,6 @@ class Report extends HTML
 				self::$lcd = $vars['idiom'];
 
 				$cell = R::findOne('dbcollection', ['id' => $vars['rq']['recd']]);
-
-
 
 		    	self::$reporttype = 'popup';
 				self::$table = $fdef['c_parent'];
@@ -860,22 +869,26 @@ class Report extends HTML
 				// Create a working recordset
 				$rs = [];
 				for($r = 0; $r < count($rset); $r++) {
-					$row = [];
-					foreach($cols as $q => $col) {
-						$row[$col['d_colid']] = $rset[$r][$col['d_colid']];
-					};	
-					$rs[] = $row; unset($row);				
+					// Filter
+					if($col['d_colid'] == $fdef['d_filterbyfld'] and stristr($rset[$r][$col['d_colid']], $fdef['d_filterbyval']) == false) {
+						exit();
+					} else {
+						$row = [];						
+						foreach($cols as $q => $col) {
+							// Format = formatCell(fieldname, row, attributes for field, table, record id)
+							$fid = $col['d_colid'];
+							$id = $rset[$r][$col['id']];
+							$rrow = $rset[$r];
+							// self::table
+							$attr = $fdef['d_columns'][$fid];
+	        				$row[$fid] = Q::formatCell($fid, $rrow, $attr, self::$table, $id);
+						};	
+						$rs[] = $row; unset($row);							
+					}
 				}
 				
-				// Filter
-
-
-				// Sort 
-
-
-				// Format
-
-
+				// Orderby 
+				$rs = array_orderby($rs, $fdef['d_orderby']);
 
 				return $rs;
 			} catch (Exception $e) {
