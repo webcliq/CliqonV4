@@ -14,6 +14,7 @@ class Menu extends HTML
 {
 
 	const THISCLASS = "Menu extends HTML";
+	const CLIQDOC = "c_document";
 	public static $menuhtml = "";
 	public static $menuscript = "";
 	public static $menudata = [];

@@ -12,47 +12,51 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 @media print {
-  *,
-  *::before,
-  *::after {
+    *,
+    *::before,
+    *::after {
     text-shadow: none !important;
     box-shadow: none !important; }
-  a,
-  a:visited {
+    a,
+    a:visited {
     text-decoration: underline; }
-  abbr[title]::after {
+    abbr[title]::after {
     content: " (" attr(title) ")"; }
-  pre {
+    pre {
     white-space: pre-wrap !important; }
-  pre,
-  blockquote {
+    pre,
+    blockquote {
     border: 1px solid #999;
     page-break-inside: avoid; }
-  thead {
+    thead {
     display: table-header-group; }
-  tr,
-  img {
+    tr,
+    img {
     page-break-inside: avoid; }
-  p,
-  h2,
-  h3 {
+    p,
+    h2,
+    h3 {
     orphans: 3;
     widows: 3; }
-  h2,
-  h3 {
+    h2,
+    h3 {
     page-break-after: avoid; }
-  .navbar {
+    .navbar {
     display: none; }
-  .badge {
+    .badge {
     border: 1px solid #000; }
-  .table {
+    .table {
     border-collapse: collapse !important; }
     .table td,
     .table th {
-      background-color: #fff !important; }
-  .table-bordered th,
-  .table-bordered td {
-    border: 1px solid #ddd !important; } }
+    background-color: #fff !important; }
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #ddd !important; 
+    } 
+    .pb { page-break-after: always; }
+    .printhide {display: block;}
+}
 
 html {
   box-sizing: border-box;
@@ -8729,4 +8733,6 @@ hr.transparent {
   *[dir="rtl"].callout-dark {
     border-right-color: #29363d; }
 
-
+@media screen {
+  .printhide {display: none;}
+}

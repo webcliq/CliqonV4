@@ -10,7 +10,7 @@
  *
  ******************************************************************************************************************/
 
-     var Cliqr = (function($) {
+    var Cliqr = (function($) {
 
         // initialise
         // var shared values
@@ -42,7 +42,7 @@
          * 
          *************************************************************************************/  
 
-            /** Report Generator
+            /** Report Generator  
              *
              * @param - Object with options
              * @return - 
@@ -168,7 +168,7 @@
                                     'd_colstart': col.d_colstart,
                                     'd_colend': col.d_colend,
                                     'd_colname': col.d_colname,
-                                    'd_coltype': col.d_type
+                                    'd_coltype': col.d_coltype
                                 });
                                 $('#gridwrapper').append(str); 
                             });  
@@ -204,7 +204,7 @@
                                 // Then
                                 var cl = that.formdef.d_columns[xid];
                                 that.coldef = {
-                                    'colid': cl.d_colid, 'colname': cl.d_colname, 'colstart': cl.d_colstart, 'colend': cl.d_colend, 'colattrs': cl.d_colattrs, 'xid': xid
+                                    'colid': cl.d_colid, 'colname': cl.d_colname, 'colstart': cl.d_colstart, 'colend': cl.d_colend, 'colattrs': cl.d_colattrs, 'xid': xid, 'coltype': cl.d_coltype
                                 };
                                 $('#d_groupby option:gt(0)').remove();
                                 $('#d_sortby option:gt(0)').remove();
@@ -252,7 +252,7 @@
                 */
              } 
 
-            /* Normalise a routine
+            /* Normalise a routine 
              * de-replicate the routine to make a column
              **/
              var makeCol = function(col)
@@ -260,7 +260,7 @@
                 return '<div class="gridi pointer" data-id="'+col.xid+'" style="grid-column: '+col.d_colstart+'/'+col.d_colend+'; grid-row: 4/5;">'+col.d_colname+'</div>';
              }
 
-            /** Display menu of reports
+            /** Display menu of reports  
              *
              * @return - 
              **/
@@ -326,7 +326,7 @@
                 }).go(); 
              }
 
-            /** All the form and other buttons
+            /** All the form and other buttons  
              *
              * @return - activities and functions 
              **/
@@ -415,7 +415,7 @@
                 cfg.df.$data.formdef.sql = rcfg.sql;
              }
 
-            /** Update a Report in the Database
+            /** Update a Report in the Database  
              *
              * @param - object array
              * @internal - sends report definition to server and displays success message or otherwise
@@ -451,7 +451,7 @@
          * 
          *************************************************************************************/   
 
-            /** Preview a report from Report Designer
+            /** Preview a report from Report Designer 
              *
              * @param - array object - unsaved definition
              * @internal - generates a popup window and sends the definition to the PHP in a semi sql state, 
@@ -490,7 +490,7 @@
                 }).go();  
              }
 
-            /** Finds out if the Report has to have runtime variables updated
+            /** Finds out if the Report has to have runtime variables updated 
              * displays popup to ask questions then calls new window with report
              * @param - string reference of a report, as Recid or c_reference
              * @internal - displays Report in new Window for printing
@@ -514,8 +514,8 @@
 
                             var opts = {
                                 contentSize: {width: 600, height: 470},
-                                headerTitle: response.title,
-                                content: response.html
+                                content: response.html,
+                                headerTitle: response.title
                             };
                             Cliq.win(opts);
 
@@ -524,7 +524,7 @@
                 }).go(); 
              }
 
-            /** Print Report in new Window
+            /** Print Report in new Window 
              *
              * @param - 
              * @internal
@@ -569,7 +569,7 @@
                 }).go();    
              }
 
-            /** Display a Gallery of images
+            /** Display a Gallery of images 
              *
              * @param - 
              * @internal

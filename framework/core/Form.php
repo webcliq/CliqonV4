@@ -14,6 +14,7 @@
 class Form extends HTML
 {
 	const THISCLASS = "Form extends HTML";
+	const CLIQDOC = "c_document";
 	public static $formhtml = "";
 	public static $formscript = "";
 	public static $formdata = [];

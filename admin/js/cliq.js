@@ -2241,7 +2241,12 @@
 
                         switch(action) {
                             case "print":
-                                return event.data.content.print()
+                                if(array_key_exists('content', usroptions)) {
+                                    var rpt = '<h3 class="pad">'+usroptions.headerTitle+'</h3><div>'+usroptions.content+'</div>';
+                                    return $.print(rpt);
+                                } else {
+                                    return event.data.content.print();
+                                }
                             break;
 
                             case "close":

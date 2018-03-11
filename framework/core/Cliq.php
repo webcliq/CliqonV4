@@ -15,7 +15,7 @@ class Cliq
 
 	const THISCLASS = "Cliq";
 	public $tblname = 'dbcollection';
-    const DOCFIELD = "c_document";
+    const CLIQDOC = "c_document";
 
     function __construct() 
     {
@@ -573,7 +573,7 @@ class Cliq
                 $qa = [
                     'table' => $table,          // dbcollection, dbitem
                     'tabletype' => $type,       // string, section etc.
-                    'docfield' => self::DOCFIELD,
+                    'docfield' => self::CLIQDOC,
                     'field' => $fld,            // d_text
                     'reference' => $ref,
                     'idiom' => $idm,            // true, false

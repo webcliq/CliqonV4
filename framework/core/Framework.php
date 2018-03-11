@@ -14,6 +14,7 @@ class Framework
 {
 
 	const THISCLASS = "Framework";
+	const CLIQDOC = "c_document";
 	/**
 	* The frameworks human readable name
 	* @access private
@@ -22,6 +23,11 @@ class Framework
 	private static $thisclass = "Framework";
 	private static $cfg;
 
+
+    /**
+     * Constructor
+     * @param String $user_agent_string Custom User Agent String
+     */
 	public function __construct() {
 		global $cfg;
 		self::$cfg = $cfg;
@@ -29,42 +35,43 @@ class Framework
 		foreach($cfg['site'] as $key => $val) {
 			$clq->set($key, $val);
 		}
-	}
+    }
 
-		/**
-		 * Gets the framework name
-		 * @return String
-		 */
-		public function getFrameworkName()
-		{
-			return self::$frameworkname;
-		}
-
-
-	/** Language Handling
+	/** Language and Client Handling
 	 * getDefLanguage() - public, static
-	 * parseDefaultLanguage() - private, static
+	 * - parseDefaultLanguage() - private, static
+	 * 
+	 * 
+	 * 
 	 *****************************************************  Language  **********************************************/
 
-		/**
-		 * Get the Default Language from the Browser
+    	/** Gets the framework name
+		 * 
+		 * @return String
+		 **/
+		 public function getFrameworkName()
+		 {
+			return self::$frameworkname;
+		 }		
+
+		/** Get the Default Language from the Browser
+		 * 
 		 * @return string of two characters
-		 */
-		public static function getDefLanguage() 
-		{
+		 **/
+		 public static function getDefLanguage() 
+		 {
 			if(isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
 				return self::parseDefaultLanguage($_SERVER["HTTP_ACCEPT_LANGUAGE"]);
 				
 			} else {
 				return self::parseDefaultLanguage(NULL);
 			}
-		}
+		 }
 
-		/**
-		* Helper for above
-		*/ 
-		private static function parseDefaultLanguage($http_accept) 
-		{
+		 /** Helper for above 
+		 **/ 
+		 private static function parseDefaultLanguage($http_accept) 
+		 {
 
 			if(isset($http_accept) && strlen($http_accept) > 1)  {
 				# Split possible languages into array
@@ -93,7 +100,31 @@ class Framework
 			} else {
 				return self::$cfg['site']['defaultidiom'];
 			}
-		}   
+		 }   
+	
+		/** Parse User Client
+		 *
+		 * @return - array - properties
+		 **/
+		 public static function parseClient()
+		 {
+		  	
+		  	global $clq;
+		  	$ua = $clq->resolve('Useragent');
+		  	$client = [
+		  		'useragent' => $ua->string,
+		  		'browsername' => $ua->browserName,
+		  		'browserversion' => $ua->browserVersion,
+		  		'systemstring' => $ua->systemString,	
+		  		'osplatform' => $ua->osPlatform,
+		  		'osversion' => $ua->osVersion,
+		  		'osshortv' => $ua->osShortVersion,		
+		  		'os' => $ua->osArch,
+		  		'ismobile' => $ua->isMobile,
+		  		'mobil' => $ua->mobileName			  		
+		  	];
+		  	return $client;
+		 }
 
 	/** JSON utilities
 	 * decode()
@@ -361,10 +392,8 @@ class Framework
             exit;
         }	
 
-
-
-
 } // Ends Class
 
 # alias +f+ class
 if(!class_exists("F")){ class_alias('Framework', 'F'); };
+

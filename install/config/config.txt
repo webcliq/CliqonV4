@@ -22,6 +22,7 @@ charset = 'utf8'
 [site]
 debug = 'development' ; development / production
 status = 'development' ; development / production
+setdefaultidiom = 'dynamic' ; static
 defaultidiom = 'en'
 timezone = 'Europe/Madrid'
 dateformat = 'd-M-Y'

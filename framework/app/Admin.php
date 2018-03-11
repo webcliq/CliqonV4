@@ -15,6 +15,7 @@ class Admin
 {
 	const THISCLASS = "Admin";
 	protected static $idioms;
+	const CLIQDOC = "c_document";
 
 	function __construct() 
 	{

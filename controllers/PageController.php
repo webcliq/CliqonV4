@@ -17,8 +17,15 @@ class PageController extends Controller
 	{
 		global $clq;
 		$this->cfg = $clq->get('cfg');
-		$idiom = '' ? $this->idiom = $this->cfg['site']['defaultidiom'] : $this->idiom = $idiom;		
-		$clq->set('idiom', $idiom);
+		// We can decide to set the default idiom statically from the config file	
+		if($this->cfg['site']['setdefaultidiom'] == 'static') {
+			$this->idiom = $this->cfg['site']['defaultidiom'];
+		} else if($this->cfg['site']['setdefaultidiom'] == 'dynamic') {
+			// Or get it dynamically
+			$this->idiom = F::getDefLanguage();
+		}
+		$clq->set('idiom', $this->idiom);
+		$clq->set('client', F::parseClient());	
 		$clq->set('lcd', $idiom);
 		Z::zset('Langcd', $idiom);
 		$this->screen = $screen;

@@ -15,6 +15,7 @@ class Cms
 {
 	const THISCLASS = "Cms";
 	private static $idioms;
+	const CLIQDOC = "c_document";
 
 	function __construct() 
 	{

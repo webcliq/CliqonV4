@@ -16,6 +16,7 @@ class Website extends Cliq
 {
 
 	const THISCLASS = "Website extends Cliq";
+    const CLIQDOC = "c_document";
 	public $tblname = 'dbitem';
 
     function __construct() 

@@ -13,6 +13,7 @@
 class View extends HTML
 {
 	const THISCLASS = "View extends HTML";
+	const CLIQDOC = "c_document";
 	public static $viewhtml = "";
 	public static $viewscript = "";
 	public static $viewdata = [];

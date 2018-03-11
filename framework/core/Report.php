@@ -46,6 +46,7 @@
 class Report extends HTML
 {
 	const THISCLASS = "View extends HTML";
+	const CLIQDOC = "c_document";
 	public static $reporthtml = "";
 	public static $reportscript = "";
 	public static $reportdata = [];
@@ -144,6 +145,7 @@ class Report extends HTML
 						'c_options' => $rpt['c_options'],
 						'c_category' => $rpt['c_category'],
 						'c_parent' => $rpt['c_parent'],
+						'c_order' => $rpt['c_order'],
 						'c_status' => $rpt['c_status'],
 						'c_notes' => $rpt['c_notes'],
 						'd_columns' => $rpt['d_columns'],
@@ -376,7 +378,7 @@ class Report extends HTML
 		        // Type
 	         	H::div(['class' => 'form-group'],
 	         		H::label(['for' => 'coltype'], Q::cStr('128:Type')),
-	         		H::select(['class' => 'custom-select c9', 'v-model' => 'coldef.coltype', 'data-name' => 'type'], $types),
+	         		H::select(['class' => 'custom-select c9', 'v-model' => 'coldef.coltype', 'data-name' => 'coltype', 'id' => 'coltype'], $types),
 	         		H::span(['class' => 'form-text small text-muted'], Q::cStr('569:Please select which display type for this column'))
 	         	),
 
@@ -807,7 +809,7 @@ class Report extends HTML
 		    	self::$rq = $vars['rq'];
 				self::$lcd = $vars['idiom'];
 
-				$cell = R::findOne('dbcollection', ['id' => $vars['rq']['recd']]);
+				$cell = R::findOne('dbcollection', ['id' => $vars['rq']['recid']]);
 
 		    	self::$reporttype = 'popup';
 				self::$table = $fdef['c_parent'];
@@ -956,6 +958,139 @@ class Report extends HTML
 			}	
 		 }
 
+        /** Gets the HTML content of a Report   
+         * 
+         * Report parameters are a TOMLMap stored in a dbcollection > report > c_document > d_text
+         * @param - array - array of variables
+         * @return - String HTML 
+         **/
+         public static function getReport($vars) 
+         {
+
+		    $method = self::THISCLASS.'->'.__FUNCTION__."()";
+		    try {
+
+		    	// Set variables
+		    	global $clq;  $sqla = ""; $sqlb = ""; $rcfg = [];
+		    	$db = $clq->resolve('Db');
+		    	self::$rq = $vars['rq'];
+				self::$lcd = $vars['idiom']; 
+
+				// First select gets Report Definition from dbcollection->report
+				$sqla = "SELECT * FROM dbcollection WHERE c_type = ? AND c_reference = ?";
+				$cell = R::getRow($sqla, ['report', self::$rq['reportref']]);
+				$rpt = D::extractAndMergeRow($cell);
+
+				// Report title
+				array_key_exists('c_common', $rpt) ? $title = $rpt['c_common'] : $title = ucfirst($rpt['c_order']);
+
+				// Second select gets data from table and flattens
+				if($rpt['c_order'] != "") {
+					$sqlb = "SELECT * FROM ".$rpt['c_parent']. " WHERE c_type = ?";
+					$rawset = R::getAll($sqlb, [$rpt['c_order']]);	
+				} else {
+					$sqlb = "SELECT * FROM ".$rpt['c_parent'];
+					$rawset = R::getAll($sqlb);			
+				};
+				$rs = D::extractAndMergeRecordset($rawset);
+
+				// Generate HTML for the report
+				$html = self::popupReport($rs, $rpt);
+
+				$props = [];
+				foreach($rpt['d_columns'] as $colid => $col) {
+					$props[] = $col['d_colid'];
+				};
+
+				if(count($rs) > 1) {
+					$report = [
+						'flag' => "Ok",
+						'html' => $html,
+						'data' => $rs,
+						'props' => $props,
+						'title' => $title
+					];
+				} else {
+					$report = [
+						'flag' => "NotOk",
+						'html' => H::div(['class' => 'h2 redc'], Q::cStr('144:No records available')),
+						'title' => $title,
+					];					
+				}
+
+				return $report;
+
+			} catch (Exception $e) {
+				$err = [
+					'errmsg' => $e->getMessage(),
+					'method' => $method,
+					'rq' => self::$rq,
+					'rcfg' => $rcfg,
+					'sqla' => $sqla,
+					'sqlb' => $sqlb
+				];
+				L::cLog($err);
+				$report = [
+					'flag' => "NotOk",
+					'html' => print_f($err),
+					'title' => Q::cStr('570:Error with AJAX activity')
+				];
+				return $report;
+			}				      	
+         }
+
+		/** Creates the CSS Grid based HTML for a Popup Report 
+		 * 
+		 * @param - array - The array of report fields
+		 * @param - array - Recordset 
+		 * @param - string - Tablename
+		 * @return - string - Table HTML
+		 **/
+		 protected static function popupReport($rs, $rpt)
+		 {
+			global $clq;
+		
+			// Header
+			$hdrcells = "";
+			// Step through ordered form fields
+			foreach($rpt['d_columns'] as $colid => $col) {
+				$hdrcells .= H::div(['class' => 'bold bluec', 'style' => 'grid-column: '.$col['d_colstart'].'/'.$col['d_colend'].'; grid-row: 1/2;'], $col['d_colname']);
+			};
+			$thead = H::div(['class' => 'reportwrapper'], $hdrcells);
+
+			// Body
+			$tbody = "";
+			for($r = 0; $r < count($rs); $r++) {
+				$row = "";
+				// Step through ordered form fields
+				foreach($rpt['d_columns'] as $colid => $col) {
+					$props = [
+						'type' => $col['d_coltype'],
+					];
+					if($col['d_colattrs'] != '') {
+						$props = array_merge($props, C::cfgReadString($col['d_colattrs']));
+					}; 
+					$row .= H::div(['style' => 'grid-column: '.$col['d_colstart'].'/'.$col['d_colend']], Q::formatCell($col['d_colid'], $rs[$r], $props, $rpt['c_parent'], $rs[$r]['id']));
+					unset($props);
+				};
+				if( ($r != 0) and ($r %26 == 0 ) ) { 
+					$tbody .= H::div(['class' => 'reportwrapper pb'], $row);
+					$tbody .= H::div(['class' => 'reportwrapper tp10 printhide'], $hdrcells); 
+				} else {
+					$tbody .= H::div(['class' => 'reportwrapper'], $row);
+				}; 
+				unset($row);
+			};
+
+			// Footer
+			$tfoot = "";
+
+			// Generates an HTML Table
+			return H::div(['class' => 'gridreport', 'id' => 'gridreport'],
+				$thead, $tbody, $tfoot
+			);
+		 }
+
 	/** Display Reports - Old versions
 	 *
 	 * displayReport()
@@ -1096,46 +1231,6 @@ class Report extends HTML
 			);
 		 }
 
-		/** Creates the Table HTML for a Popup Report - Old Version   
-		 * 
-		 * @param - array - The array of report fields
-		 * @param - array - Recordset 
-		 * @param - string - Tablename
-		 * @return - string - Table HTML
-		 **/
-		 protected static function popupReport($ordered, $rs, $vars, $rcfg)
-		 {
-			global $clq;
-			
-			// Header
-
-			$hdrcells = "";
-			// Step through ordered form fields
-			foreach($ordered as $fid => $prop) {
-				$hdrcells .= H::td(['class' => $rcfg['reportheader']['hdrcellclass']], Q::cStr($prop['label']));
-			};
-			$thead = H::tr(['class' => $rcfg['reportheader']['headerclass']], $hdrcells);
-
-			// Body
-			$tbody = "";
-			for($r = 0; $r < count($rs); $r++) {
-				$row = "";
-				// Step through ordered form fields
-				foreach($ordered as $fid => $prop) {
-					$row .= H::td(['class' => $rcfg['reportheader']['cellclass']], Q::formatCell($fid, $rs[$r], $prop, $vars['table']));
-				};
-				$tbody .= H::tr(['class' => $rcfg['reportheader']['rowclass']], $row); unset($row);
-			};
-
-			// Footer
-			$tfoot = "";
-
-			// Generates an HTML Table
-			return H::table(['class' => $rcfg['reportheader']['class'], 'id' => $rcfg['id']],
-				$thead, $tbody, $tfoot
-			);
-		 }
-
         /** Generates a version of Galeria - Old Version   
          * Generates a version of Galeria.Js for use as the report function for a Gallery
          * 
@@ -1203,85 +1298,6 @@ class Report extends HTML
 				]; 
 			}
          } 
-
-        /** Gets the HTML content of a Report - Old Version   
-         * 
-         * Report parameters are a TOMLMap stored in a dbcollection > report > c_document > d_text
-         * @param - array - array of variables
-         * @return - String HTML 
-         **/
-         public static function getReport($vars) 
-         {
-
-		    $method = self::THISCLASS.'->'.__FUNCTION__."()";
-		    try {
-
-		    	global $clq;  $sqla = ""; $sqlb = ""; $rcfg = [];
-		    	self::$rq = $vars['rq'];
-				self::$lcd = $vars['idiom']; 
-
-				global $clq;  
-				$sqla = "SELECT c_document FROM dbcollection WHERE c_type = ? AND c_reference = ?";
-				$json = R::getCell($sqla, ['report', self::$rq['reportref']]);
-				$doc = json_decode($json, true);
-				$rcfg = $doc['d_text'];
-
-				array_key_exists('d_title', $doc) ? $title = $doc['d_title'][self::$lcd] : $title = ucfirst(self::$tabletype);
-
-				// Order formfields by order
-				foreach($rcfg['reportfields'] as $key => $config) {
-					if(!array_key_exists('order', $config)) {
-						$rcfg['reportfields'][$key]['order'] = 'zz';
-					}
-				}; $ordered = Q::array_orderby($rcfg['reportfields'], 'order', SORT_ASC);
-
-				// Get data from table
-				$db = $clq->resolve('Db');
-				if($rcfg['reportheader']['reporttable'] != "") {
-					$sql = "SELECT * FROM ".$rcfg['reportheader']['reporttable']. " WHERE c_type = ?";
-					$rs = D::extractAndMergeRecordset(R::getAll($sql, [$rcfg['reportheader']['reporttabletype']]));	
-				} else {
-					$sql = "SELECT * FROM ".$rcfg['reportheader']['reporttable'];
-					$rs = D::extractAndMergeRecordset(R::getAll($sql));				
-				}
-
-				$html = self::popupReport($ordered, $rs, $vars, $rcfg);
-				
-				// Test
-				$test = [
-					'method' => $method,
-					'html' => $html,
-					'rq' => self::$rq,
-					'rcfg' => $rcfg,
-					'sqla' => $sqla,
-					'sqlb' => $sqlb
-				];
-				// L::cLog($test);
-
-				$report = [
-					'flag' => "Ok",
-					'html' => $html,
-					'title' => $title,
-				];
-				return $report;
-
-			} catch (Exception $e) {
-				$err = [
-					'errmsg' => $e->getMessage(),
-					'method' => $method,
-					'rq' => self::$rq,
-					'rcfg' => $rcfg,
-					'sqla' => $sqla,
-					'sqlb' => $sqlb
-				];
-				L::cLog($err);
-				$report = [
-					'flag' => "NotOk",
-					'html' => $err
-				];
-				return $report;
-			}				      	
-         }
 
 		/** Report Generator  - Old Version 
 		 * Provides content for a Report Designer

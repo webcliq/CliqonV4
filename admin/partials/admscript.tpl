@@ -9,13 +9,13 @@ var jwt = "@raw($jwt)"; // This is now essential
 
 // basket.clear(true);
 basket
-.remove() // "'cliqr'","" comma separated list
+.remove('cliqr') // "","" comma separated list
 .require(
 
 	// Libraries that need to loaded in various places, therefore cannot JIT script load
     {url: jspath+"library.js"},
     {url: viewpath+"js/adminlibrary.js"},
-    {url: jspath+"vue.min.js"},
+    {url: jspath+"vue.js"},
     {url: jspath+"tag-it.js"},
     {url: jspath+"phpjs.js"},
 	{url: jspath+"prettyprint.js"},
@@ -36,7 +36,7 @@ basket
     {url: viewpath+"js/cliq.js"},
 	{url: viewpath+"js/cliqd.js"},
 	{url: viewpath+"js/cliqv.js"},
-	{url: viewpath+"js/cliqr.js"},
+	{url: viewpath+"js/cliqr.js", key: "cliqr", skipCache: true},
 	{url: viewpath+"js/cliqm.js"},
 	{url: viewpath+"js/cliqf.js"}
 
