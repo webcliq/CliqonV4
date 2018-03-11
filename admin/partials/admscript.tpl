@@ -9,7 +9,7 @@ var jwt = "@raw($jwt)"; // This is now essential
 
 // basket.clear(true);
 basket
-.remove('cliqr') // "","" comma separated list
+// .remove('') // "","" comma separated list , key: "", skipCache: true
 .require(
 
 	// Libraries that need to loaded in various places, therefore cannot JIT script load
@@ -31,12 +31,12 @@ basket
 	// Cliqon Javascript language file - other JS translations could be included
 	{url: jspath+"i18n/cliqon."+jlcd+".js"},   
 
-    // Apps
+    // Apps 
     {url: viewpath+"js/admin.js"},
     {url: viewpath+"js/cliq.js"},
 	{url: viewpath+"js/cliqd.js"},
 	{url: viewpath+"js/cliqv.js"},
-	{url: viewpath+"js/cliqr.js", key: "cliqr", skipCache: true},
+	{url: viewpath+"js/cliqr.js"},
 	{url: viewpath+"js/cliqm.js"},
 	{url: viewpath+"js/cliqf.js"}
 
