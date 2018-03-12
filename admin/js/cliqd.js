@@ -18,7 +18,7 @@
 			tabletype: 'admdashboard',
 			idioms: {}, panels: {}, icons: {},
 			dz: {}
-		};
+		}, cfg = {};
 
 		/**
 		 * Handles all matters related to the display of an Administrative Dashboard
@@ -27,8 +27,13 @@
 		 **/
 		var dbdisplay = function(data) {
 
+			// getdashboard, dodashboard
+			cfg = Cliq.config();
+			console.log('Dashboard JS Loaded');
+
 			// Intercooler.debug();
 			dcfg.panels = data.panels;
+
 			// Global Variable = Dz
 			dcfg.dz = new Vue({
 				el: '#clqpanel',
@@ -37,10 +42,11 @@
 					admdbpanels: data.panels
 				},
 				methods: {
-					iconAction(event, icn, crd, crdid) {
+					iconAction(event, icn, crd, recid) {
 						console.log(icn.action);
 						var that = event.target;					
 						switch(icn.action) {
+
 							case "resize":
 								if( $(that).hasClass('fa-compress') ){
 									$(that).removeClass('fa-compress').addClass('fa-expand');
@@ -62,18 +68,7 @@
 							break;
 
 							case "settings":
-								var opts = {
-									contentAjax: {
-										url: crd.formurl+'?ref='+crdid,
-										autoload: true, method: 'GET',	dataType: 'html'
-									},
-									contentSize: {
-										width: crd.formwidth,
-										height: crd.formheight
-									},
-									headerTitle: crd.title
-								};
-								var formPopup = Cliq.win(opts);
+								Cliqf.crudButton(recid, 'update');
 							break;
 
 							case "dummy":
@@ -84,9 +79,9 @@
 						// return false;
 					}
 				},
-
 				// define class=treeli-placeholder
 				mounted: function() {
+					
 					$("#clqpanel").sortable({
 						items: "> div.card",
 						placeholder: "softyellow",
@@ -104,10 +99,35 @@
 							$(ui.item).removeClass('lightgray');
 						}						
 					});
+
 					$('[data-toggle="tooltip"]').tooltip();
 					$('[data-toggle="popover"]').popover();
+
 					require(viewpath+'js/coolclock.js');
+					
 					// Add other functions here
+					// Javascript to generate iframe, check user key is valid
+
+					var f = check_valid_oanda_link();
+					var iframe_source = document.location.protocol + "//www.oanda.com/embedded/converter/show/b2FuZGFlY2N1c2VyLy9kZWZhdWx0/" + f + "/en/";
+					var iframe_style = "width: 200px; height: 250px;";
+
+					var ifrm = document.createElement('iframe');
+					ifrm.setAttribute('src', iframe_source);
+					ifrm.setAttribute('style', iframe_style);
+					ifrm.setAttribute('scrolling', 'no');
+					ifrm.setAttribute('width', '200');
+					ifrm.setAttribute('height', '350');
+					ifrm.setAttribute('frameBorder', '0');
+
+					var cc_link = document.getElementById('oanda_cc_link');
+					var ecc_div = document.getElementById('oanda_ecc');
+
+					if (cc_link) {
+					    ecc_div.insertBefore(ifrm, ecc_div.firstChild);
+					} else {
+					    document.getElementById('oanda_ecc').appendChild(ifrm);
+					}
 				}
 			});	
 		}
@@ -120,6 +140,15 @@
 		 **/
 		var callErrorfunction = function() { 
 			var notcompleted = Cliq.msg({buttons:false, type: 'warning', text: 'No matching records'}) 
+		}
+
+		var check_valid_oanda_link = function(){
+		    var link2 = document.getElementById('oanda_cc_link');
+		    if ((typeof link2 === "undefined") || (link2 == null) || (/https?\:\/\/www\.oanda\.com(\/lang\/[A-Za-z]{2})?\/currency\/converter|https?:\/\/fxtrade\.oanda\.com/.exec(link2.href) == null)) {
+		        return 1;
+		    } else {
+		        return 0;
+		    }
 		}
 
 		// explicitly return public methods when this object is instantiated
@@ -146,3 +175,5 @@
 			}
 	});
 	*/
+
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://weatherwidget.io/js/widget.min.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","weatherwidget-io-js");

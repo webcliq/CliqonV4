@@ -1615,6 +1615,7 @@
 						$.each(tinyeditors, function(i, teditor) {
 							var name = trim(teditor.id, '_te'); // works fine
 							var val = tinymce.get(teditor.id).getContent();
+							// rawurlencode() ??
 							Vue.set(cfg.df, teditor.id, val);
 						});	
 					};
@@ -1624,6 +1625,7 @@
 		           		var fldid = $(this).attr('id');
 		           		// var te = $('.trumbowyg-editor').trumbowyg('html');
 		           		var te = $(this).trumbowyg('html');
+		           		// rawurlencode() ??
 		           		Vue.set(cfg.df, fldid, te);	
 		           	});	
 
@@ -1639,6 +1641,7 @@
 						fcfg.jeditor = findJSONEditor('#'+fcfg.jeditid);
 						var jeditdata = fcfg.jeditor.get();
 						jeditdata = JSON.stringify(jeditdata);
+						// rawurlencode() ??
 						Vue.set(cfg.df, fcfg.jeditid, jeditdata);
 					});	
 
@@ -1646,7 +1649,7 @@
 	                $('.toml').each(function() {
 	                    var fldid = $(this).attr('id');
 	                    var tomlcontent = fcfg.ceditor.getValue();                   
-	                    Vue.set(cfg.df, fldid, tomlcontent);  
+	                    Vue.set(cfg.df, fldid, rawurlencode(tomlcontent));  
 	                });  
 
 	            // If currency and maskMoney is being used

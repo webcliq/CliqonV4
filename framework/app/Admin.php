@@ -28,7 +28,6 @@ class Admin
 	 *
 	 * page()
 	 * plugin()
-	 * dashboard()
 	 * reportdesigner()
 	 * sitedesign() // Hopefully using Grape.Js
 	 * recordcreator() - generic record management
@@ -117,96 +116,6 @@ class Admin
 				loadFile("/framework/plugins/$action/$file.php");
 				$plugin = new $file();
 				return $plugin->publish($vars);
-
-	        } catch(Exception $e) {
-				$err = [
-					'method' => self::THISCLASS.'->'.__FUNCTION__.'()',
-					'errmsg' => $e->getMessage(),
-					'vars' => $vars,
-				];
-				L::cLog($err);
-				return $e->getMessage();
-	        } 
-		 }
-
-		/** Dashboard
-		 * Provides content for admin page Dashboard.tpl
-		 * @param - array - usual collection of variables as an array
-		 * @return - HTML string 
-		 **/
-		 function dashboard(array $vars)
-		 {
-			$method = self::THISCLASS.'->'.__FUNCTION__.'()';
-			try {
-
-				global $clq;
-				$idiom = $vars['idiom'];
-	            $args = array(
-	                'filename' => 'admdashboard',         // If file, name of file without extension (.cfg)
-	                'subdir' => 'admin/config/',    	// If file, name of subdirectory
-	                'type' => 'service',            	// If database, value of c_type
-	                'reference' => 'admdashboard',        // If database, value of c_reference
-	                'key' => ''
-	            );
-	            $config = $clq->resolve('Config');
-	            $dcfg = C::cfgRead($args);					
-
-	            // Icons
-				$icncfg = [];
-				foreach($dcfg['icons'] as $i => $icon) {
-					$icncfg[$i] = $icon;
-					$icncfg[$i]['tooltip'] = Q::cStr($icon['tooltip']);	
-				};
-
-	            // Panels come from database - each one shall generate a template that the template and Vue will consume
-	            $sql = "SELECT * FROM dbcollection WHERE c_type = ? ORDER BY c_order ASC";
-	            $rawset = R::getAll($sql, ['admdashboard']);
-	            $db = $clq->resolve('Db');
-				$rs = D::extractAndMergeRecordset($rawset);
-				
-				$panelcfg = [];
-				for($r = 0; $r < count($rs); $r++) {
-					$panel = [];
-					$panel['title'] = $rs[$r]['d_text'][$idiom];
-					$panel['options'] = C::cfgReadString($rs[$r]['c_options']);
-					$cardid = $rs[$r]['c_reference'];
-					$panelcfg[$cardid] = $panel; unset($panel);
-				}
-
-				// Create any Javascript
-				$js = "
-					console.log('Dashboard JS Loaded');
-					Cliq.set('gmapsapi', '".$clq->get('gmapsapi')."');
-					Cliq.set('bingkey', '".$clq->get('bingkey')."');
-					// Insert Vue routines here 
-					var options = {
-						idioms: ".object_encode($clq->get('idioms')).",
-						icons: ".object_encode($icncfg).",
-						panels: ".object_encode($panelcfg)."
-					};
-					Cliqd.dbDisplay(options);
-				";
-
-				// Name of the Admin Component template which will be loaded from /admin/components/
-				$tpl = "admdashboard.tpl"; // This component uses Vue
-				
-				// Template variables these are used and converted by the template
-				$thisvars = ['admdashboard' => $dcfg];			
-
-				// Set the Javascript into the system to be used at the base of admscript.tpl, otherwise known as pagescripts
-				global $clq; $clq->set('js', $js);
-
-				// Test
-				$test = [
-					'method' => self::THISCLASS.'->'.__FUNCTION__.'()',
-					'vars' => $vars
-				];
-
-				// Set to comment when completed
-				// L::cLog($test);  
-				
-				// If not returned already 				
-				return self::publishTpl($tpl, $thisvars);
 
 	        } catch(Exception $e) {
 				$err = [
@@ -463,6 +372,167 @@ class Admin
 				return ['flag' => 'NotOk', 'html' => $e->getMessage()];
 	        } 
 		 }
+
+	/** Dashboard
+	 *
+	 * dashboard()
+	 * 
+	 * getDashBoard()
+	 * doDashBoard()
+	 *
+	 *************************************************************************************************************/
+
+		/** Dashboard 
+		 * Provides content for admin page Dashboard.tpl
+		 * @param - array - usual collection of variables as an array
+		 * @return - HTML string 
+		 **/
+		 function dashboard(array $vars)
+		 {
+			$method = self::THISCLASS.'->'.__FUNCTION__.'()';
+			try {
+
+				global $clq;
+				$idiom = $vars['idiom'];
+	            $args = array(
+	                'filename' => 'admdashboard',       // If file, name of file without extension (.cfg)
+	                'subdir' => 'admin/config/',    	// If file, name of subdirectory
+	                'type' => 'service',            	// If database, value of c_type
+	                'reference' => 'admdashboard',      // If database, value of c_reference
+	                'key' => ''
+	            );
+	            $config = $clq->resolve('Config');
+	            $dcfg = C::cfgRead($args);					
+
+	            // Icons
+				$icncfg = [];
+				foreach($dcfg['icons'] as $i => $icon) {
+					$icncfg[$i] = $icon;
+					$icncfg[$i]['tooltip'] = Q::cStr($icon['tooltip']);	
+				};
+
+	            // Panels come from database - each one shall generate a template that the template and Vue will consume
+	            $sql = "SELECT * FROM dbcollection WHERE c_type = ? ORDER BY c_order ASC";
+	            $rawset = R::getAll($sql, ['admdashboard']);
+	            $db = $clq->resolve('Db');
+				$rs = D::extractAndMergeRecordset($rawset);
+				
+				$panelcfg = [];
+				for($r = 0; $r < count($rs); $r++) {
+					$panel = [];
+					$panel['title'] = $rs[$r]['d_text'][$idiom];
+					$panel['options'] = C::cfgReadString($rs[$r]['c_options']);
+					$panel['reference'] = $rs[$r]['c_reference'];
+					$panel['recid'] = $rs[$r]['id'];
+					$cardid = $rs[$r]['c_reference'];
+					$panelcfg[$cardid] = $panel; unset($panel);
+				}
+
+				// Create any Javascript
+				$js = "
+					Cliq.set('table', 'dbcollection');
+			        Cliq.set('tabletype', 'admdashboard');
+			        Cliq.set('displaytype', 'dashboard');
+			        Cliq.set('formtype', 'popupform');
+			        Cliq.set('langcd', '".$idiom."');
+			        Cliq.set('lcd', '".$idiom."');
+			        Cliq.set('idioms', ".object_encode(self::$idioms).");
+					Cliq.set('gmapsapi', '".$clq->get('gmapsapi')."');
+					Cliq.set('bingkey', '".$clq->get('bingkey')."');
+					// Insert Vue routines here 
+					var options = {
+						idioms: ".object_encode($clq->get('idioms')).",
+						icons: ".object_encode($icncfg).",
+						panels: ".object_encode($panelcfg)."
+					};
+					Cliqd.dbDisplay(options);
+				";
+
+				// Name of the Admin Component template which will be loaded from /admin/components/
+				$tpl = "admdashboard.tpl"; // This component uses Vue
+				
+				// Template variables these are used and converted by the template
+				$thisvars = ['admdashboard' => $dcfg];			
+
+				// Set the Javascript into the system to be used at the base of admscript.tpl, otherwise known as pagescripts
+				global $clq; $clq->set('js', $js);
+
+				// Test
+				$test = [
+					'method' => self::THISCLASS.'->'.__FUNCTION__.'()',
+					'vars' => $vars
+				];
+
+				// Set to comment when completed
+				// L::cLog($test);  
+				
+				// If not returned already 				
+				return self::publishTpl($tpl, $thisvars);
+
+	        } catch(Exception $e) {
+				$err = [
+					'method' => self::THISCLASS.'->'.__FUNCTION__.'()',
+					'errmsg' => $e->getMessage(),
+					'vars' => $vars,
+				];
+				L::cLog($err);
+				return $e->getMessage();
+	        } 
+		 }
+
+		/** Dashboard routines that respond to AJAX GET requests
+		 * 
+		 * @param - array - usual collection of variables as an array
+		 * @return - array for conversion to JSON
+		 **/
+		 public static function getDashBoard(array $vars)
+		 {
+			$method = self::THISCLASS.'->'.__FUNCTION__.'()';
+			try {
+
+				global $clq;
+				$idiom = $vars['idiom'];
+
+
+				return ['flag' => 'Ok', 'msg' => ''];
+
+	        } catch(Exception $e) {
+				$err = [
+					'method' => self::THISCLASS.'->'.__FUNCTION__.'()',
+					'errmsg' => $e->getMessage(),
+					'vars' => $vars,
+				];
+				L::cLog($err);
+				return ['flag' => 'NotOk', 'msg' => $e->getMessage()];
+	        } 
+	     }
+
+		/** Dashboard routines that respond to AJAX POST requests 
+		 * 
+		 * @param - array - usual collection of variables as an array
+		 * @return - array for conversion to JSON
+		 **/
+		 public static function doDashBoard(array $vars)
+		 {
+			$method = self::THISCLASS.'->'.__FUNCTION__.'()';
+			try {
+
+				global $clq;
+				$idiom = $vars['idiom'];
+
+
+				return ['flag' => 'Ok', 'msg' => ''];
+
+	        } catch(Exception $e) {
+				$err = [
+					'method' => self::THISCLASS.'->'.__FUNCTION__.'()',
+					'errmsg' => $e->getMessage(),
+					'vars' => $vars,
+				];
+				L::cLog($err);
+				return ['flag' => 'NotOk', 'msg' => $e->getMessage()];
+	        } 
+	     }
 
 	/** Data Display pages 
 	 *

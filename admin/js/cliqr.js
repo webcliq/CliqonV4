@@ -51,7 +51,7 @@
              {               
                 cfg = Cliq.config();
                 console.log('Reportdesigner JS loaded');
-                console.log(opts.defaultdata.formdef.recid);
+                
                 rcfg.df = new Vue({
                     el: '#reportdesigner',
                     data: opts.defaultdata, // New report or data from saved record

@@ -65,19 +65,21 @@
 												<i 
 													v-for="(itm, ikey) in admdbicons" 
 													v-if="ikey == 'settings' && crd.options.settings != false || ikey != 'settings'" 
-													v-bind:class="'fa fa-fw fa-' + itm.icon" 
+													v-bind:class="'fa fa-fw lp3 fa-' + itm.icon" 
 													v-bind:title="itm.tooltip"  
 													v-bind:style="'cursor:'+itm.cursor" 
-													v-on:click="iconAction($event, itm, crd.options, ckey)" 
+													v-on:click="iconAction($event, itm, crd.options, crd.recid)" 
 												></i>
 											</span>
 											<h5 class="left" v-html="crd.title"></h5>									
 										</div>
 
-										<div class="card-text mt30 mr10" v-bind:id="ckey+'_content'">
-											<div class="img-fluid" v-html="crd.options.text"></div>
-											<!-- crd.footer has lost the correct formatting -->
-											<div class="text-muted" v-html="crd.options.footer"></div>
+										<div class="card-text mt30" v-bind:id="ckey+'_content'">
+											<!-- Content of Widget - watch use of Intercooler -->
+											<div v-html="crd.options.text"></div>
+
+											<!-- Footer of Widget if exists -->
+											<div v-if="crd.options.footer" v-html="crd.options.footer"></div>
 										</div>
 
 									</div>

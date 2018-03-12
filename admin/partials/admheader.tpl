@@ -12,6 +12,7 @@
     <meta name="copyright" content="Webcliq"/>
     <meta name="format-detection" content="true"/>
     <meta name="robots" content="noarchive"/>
+    <meta name="intercoolerjs:use-data-prefix" content="true"/>
     
     <link href="@($viewpath)css/style.css" rel="stylesheet">
     <script type="text/javascript" src="@($includepath)js/basket.js"></script>

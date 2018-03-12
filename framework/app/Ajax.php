@@ -63,6 +63,38 @@ class Ajax
 		}
 
 		/**
+		 * Administrative Dashboard - GET by AJAX
+		 * generally deals with display of items on the Dashboard
+		 * @param - array - usual $vars
+		 * @return - array - to be converted to JSON
+		 **/
+		function getdashboard($vars)
+		{
+			global $clq;
+			$adm = $clq->resolve('Admin');
+			return [
+				'content' => $adm->getDashBoard($vars),
+				'callBack' => ""
+			];			
+		}
+
+		/**
+		 * Administrative Dashboard - POST by AJAX
+		 * generally deals with CRUD related activities on the Dashboard, such as adding, modifying and deleting
+		 * @param - array - usual $vars
+		 * @return - array - to be converted to JSON
+		 **/
+		function dodashboard($vars)
+		{
+			global $clq;
+			$adm = $clq->resolve('Admin');
+			return [
+				'content' => $adm->doDashBoard($vars),
+				'callBack' => ""
+			];			
+		}
+
+		/**
 		 * Either does a test of the import or does a live import of language variables
 		 *
 		 * @param - array - Variables from Construct

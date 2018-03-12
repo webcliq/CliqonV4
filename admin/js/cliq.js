@@ -338,7 +338,7 @@
                             Cliqf.crudButton(collection.id, 'update');
                         },
                         deleteButton: function(evt, collection, key) {
-                            Cliqf.deleteButton(collection.c_reference);
+                            Cliqf.deleteButton(collection.id);
                         }, 
                         topButton: function(e, action) {
                             switch(action) {
