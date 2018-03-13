@@ -284,8 +284,7 @@ class Toml
         $lineBuffer     = '';
 
         $strLen = strlen($toml);
-        for($i = 0; $i < $strLen; $i++)
-        {
+        for($i = 0; $i < $strLen; $i++) {
             $keep = true;
 
             if($toml[$i] == '[' && !$openString && !$openLString && !$openMString && !$openMLString)

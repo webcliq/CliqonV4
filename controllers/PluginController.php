@@ -36,6 +36,7 @@ class PluginController extends Controller
 			$this->table = $table;
 			$this->tabletype = $tabletype;	
 			$this->rq = $_REQUEST;
+			$extn = $this->cfg['site']['extension'];
 
 			$vars = [
 				'protocol' => $clq->get('protocol'),
@@ -88,7 +89,7 @@ class PluginController extends Controller
 	            // also $array['callBack']
 				$vars = array_replace($vars, [
 					'viewpath' => $clq->get('rootdir').'admin/',
-					'pluginpath' => $clq->get('basedir').'plugin/',
+					'pluginpath' => $clq->get('basedir').'plugins/',
 					'jwt' => F::encode($token, $this->cfg['site']['secret']),
 					'page' => $this->page,
 					'admincontent' => $array['content'],
@@ -106,7 +107,7 @@ class PluginController extends Controller
 				$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."admin"), $clq->get('basedir')."admin/cache/".$idiom);
 			}
 		
-			$template = $this->page.'.tpl';		
+			$template = $this->page.'.'.$extn;;		
 			echo $tpl->render($template, $vars);
 		}
 

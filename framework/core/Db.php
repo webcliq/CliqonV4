@@ -874,8 +874,9 @@ class Db
 				$txt = urldecode($rq['text']);
 				// $filtered = preg_replace("/\r\n/", "\n", $txt);
 
-				$toml = $clq->resolve('Toml');
-				$request = Toml::parse($txt); 
+				// $toml = $clq->resolve('Toml');
+				// $request = Toml::parse($txt); 
+				$request = C::cfgReadString($txt);
 				$doc = [];
 
 	        	// Walk through all the fields and values in the request

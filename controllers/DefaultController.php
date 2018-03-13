@@ -28,10 +28,11 @@ class DefaultController
 		$this->page = "index";
 		$cms = $clq->resolve('Cms');
 		$mnu = $clq->resolve('Menu');
+		$extn = $this->cfg['site']['extension'];
 
 		// Load Template Engine 
 		$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."views"), $clq->get('basedir')."cache/".$this->idiom);		
-		$template = $this->page.'.tpl';
+		$template = $this->page.'.'.$extn;
 		$vars = [
 			'protocol' => $clq->get('protocol'),
 			'rootpath' => $clq->get('rootpath'),

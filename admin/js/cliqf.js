@@ -1417,8 +1417,11 @@
 	     *
 	     ************************************************************************************************/
 
-            var changePasswordButton = function(uname, email, recid)
-            {
+	     	/** Change user password
+	     	 *
+	     	 **/ 
+             var changePasswordButton = function(uname, email, recid)
+             {
                 cfg = Cliq.config();
                 cfg.action = 'lostpassword'; cfg.displaytype = 'lostpassword';
                 var urlstr = '/ajax/'+jlcd+'/'+cfg.action+'/'+cfg.table+'/'+cfg.tabletype+'/';
@@ -1430,14 +1433,14 @@
                     type: 'POST', async: false, timeout: 25000,
                     success: handleResponse, error: handleError
                 });
-            }
+             }
 
-            /**
-             * Display a formlet to permit the reset of a password
+            /** Display a formlet to permit the reset of a password   
+             * 
              * @param - array JSON - usroptions to configure a Noty
              * @return - string HTML - creates a Noty popup with content
              **/
-            var resetPassword = function(msg) {
+             var resetPassword = function(msg) {
                 var options = $.parseJSON(msg);
                 var $noty = Cliq.msg(options); // returns $noty
 
@@ -1477,10 +1480,13 @@
                         Cliq.error(lstr[137]);
                     }
                 });         
-            }
+             }
 
-            var passwordStrength = function(pwd) 
-            {
+	     	/** Password strength 
+	     	 *
+	     	 **/ 
+             var passwordStrength = function(pwd) 
+             {
                 var strongRegex = new RegExp("^(?=.{8,})(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*\\W).*$", "g");
                 var mediumRegex = new RegExp("^(?=.{7,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))).*$", "g");
                 var enoughRegex = new RegExp("(?=.{6,}).*", "g");
@@ -1491,10 +1497,13 @@
                 } else {
                     return '';
                 }
-            }
+             }
 
-            var changeUserStatusButton = function(recid)
-            {
+	     	/** Change user status 
+	     	 *
+	     	 **/ 
+             var changeUserStatusButton = function(recid)
+             {
                 cfg = Cliq.config();
                 cfg.action = 'changeuserstatus'; cfg.displaytype = 'changestatus';
                 var urlstr = '/ajax/'+jlcd+'/'+cfg.action+'/'+cfg.table+'/'+cfg.tabletype+'/';
@@ -1506,10 +1515,13 @@
                     type: 'POST', async: false, timeout: 25000,
                     success: handleResponse, error: handleError
                 });
-            }
+             }
 
-            var changeStatus = function(msg)
-            {
+	     	/** Change general status
+	     	 *
+	     	 **/ 
+             var changeStatus = function(msg)
+             {
                 var options = $.parseJSON(msg);
                 var $noty = Cliq.msg(options); // returns $noty
 
@@ -1535,7 +1547,7 @@
                         }
                     });  
                 }); 
-            }
+             }
 
         /** Form Support Functions 
          * modInput()
@@ -1545,14 +1557,14 @@
          *
          *************************************************************************************/	
 
-         	/**
-         	 * Next Reference, Next ID, Is Unique
+         	/** Next Reference, Next ID, Is Unique       
+         	 * 
          	 * @param - 
          	 * @param -
          	 * @return - 
          	 **/
-			var modInput = function(fldid, action, prefix) // eg 'reference'
-			{               
+			 var modInput = function(fldid, action, prefix) // eg 'reference'
+			 {               
                 cfg = Cliq.config();
                	// console.log(fldid, action, table, tabletype);
                 var urlstr = '/ajax/'+cfg.langcd+'/'+action+'/'+cfg.table+'/'+cfg.tabletype+'/';
@@ -1589,15 +1601,15 @@
 	                    } else { Cliq.error('Ajax function returned error NotOk - '+urlstr+':'+JSON.stringify(response)); }; 
 	                } else { Cliq.error('Response was not JSON object - '+urlstr+':'+response.msg); }
 	            }).go(); 	
-			}
+			 }
 
-         	/**
+         	/** Get all form data for a form  
          	 * A function to collect any and all data, including files from a form
          	 * @param - boolean - add filename
          	 * @param - string - 
          	 * @return - object - the FormData
          	 **/
-         	var getFormData = function(addfilename) {
+         	 var getFormData = function(addfilename) {
 
          		// Test config files
          		// console.log(cfg, fcfg);
@@ -1689,13 +1701,13 @@
 				// New image handling will get image contents anyway
 	
 				return frmData;		
-         	}
+         	 }
 
-         	/**
+         	/** Handle a successful response after form is submitted  
          	 * After form submits
          	 **/
-         	var handleResponse = function(response, statusText, xhr)
-         	{
+         	 var handleResponse = function(response, statusText, xhr)
+         	 {
 				// Stop and close the Spinner
 				cfg.spinner.stop();
 
@@ -1784,18 +1796,18 @@
 				} else {
 					Cliq.error('Response was not JSON object - '+JSON.stringify(response))
 				};
-         	}
+         	 }
 
-         	/**
+         	/** Handle an error after form submitted  
          	 * Handles any 500 Errors from the AJAX routine
          	 */
-         	var handleError = function(xhr, status, text) 
-         	{
+         	 var handleError = function(xhr, status, text) 
+         	 {
 				cfg.spinner.stop();
 				var response = $.parseJSON(xhr.responseText);
 				Cliq.error(JSON.stringify(response.msg));
 				return false;
-         	}
+         	 }
 
         /** Import - Export Routines
          *

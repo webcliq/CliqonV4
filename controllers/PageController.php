@@ -34,6 +34,7 @@ class PageController extends Controller
 		$cms = $clq->resolve('Cms');
 		$mnu = $clq->resolve('Menu');
 		$rq = $this->inputs();
+		$extn = $this->cfg['site']['extension'];
 
 		$token = array();
 		if(!array_key_exists('UserName', $_SESSION)) {
@@ -42,7 +43,7 @@ class PageController extends Controller
 		
 		// Load Template Engine 
 		$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."views"), $clq->get('basedir')."cache/".$idiom);		
-		$template = $this->screen.'.tpl';
+		$template = $this->screen.'.'.$extn;
 		$vars = [
 			'protocol' => $clq->get('protocol'),
 			'rootpath' => $clq->get('rootpath'),
@@ -76,6 +77,7 @@ class PageController extends Controller
 			$clq->set('lcd', $idiom);
 			$this->cfg = $clq->get('cfg');
 			$rq = $this->inputs();
+			$extn = $this->cfg['site']['extension'];
 
 			// Introduce JWT security here
 			$token = F::decode($rq['token'], $this->cfg['site']['secret'], false);

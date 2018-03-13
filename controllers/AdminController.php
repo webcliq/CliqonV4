@@ -24,6 +24,7 @@ class AdminController
 		$this->table = $table;
 		$this->tabletype = $tabletype;	
 		$this->rq = $_REQUEST;
+		$extn = "tpl";
 
 		$vars = [
 			'protocol' => $clq->get('protocol'),
@@ -101,7 +102,7 @@ class AdminController
 			$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."admin"), $clq->get('basedir')."admin/cache/".$idiom);
 		}
 	
-		$template = $this->page.'.tpl';		
+		$template = $this->page.'.'.$extn;		
 		echo $tpl->render($template, $vars);
 		// or
 		// $tpl->publishtpl($template, $vars);	

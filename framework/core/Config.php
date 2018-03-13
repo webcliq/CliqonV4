@@ -151,9 +151,10 @@ class Config
             if (is_array($val)) {
                 self::array_to_ini($val, $level+1) ;
             } else {
-                is_numeric($val) ? $str = "{$val}" : $str = "'{$val}'"; 
-                // The first set of commas did not exist and the second set were double apostrophes, what is the affect??
-                if (is_numeric($key)) {
+                if(is_numeric($val) or $key == 'c_options')  {$str = "{$val}";} else {$str = "'{$val}'";}; 
+                if($key == 'c_options') {
+                    self::$ini .= $level == 0 ? "{$key} = ".'"'.$str.'"'." \n" : join(".", self::$arr)." = ".'"'.$str.'"'." \n";
+                } else if (is_numeric($key)) {
                     self::$ini .= $level == 0 ? "{$key}[] = ".$str." \n" : join(".",array_slice(self::$arr,0,-1))."[] = ".$str." \n";
                 } else {
                     self::$ini .= $level == 0 ? "{$key} = ".$str." \n" : join(".", self::$arr)." = ".$str." \n";

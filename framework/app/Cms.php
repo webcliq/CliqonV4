@@ -84,11 +84,13 @@ class Cms
 		 function content($idiom, $screen, $action, $subaction, $rq)
 		 {
 			global $clq;
+			$this->cfg = $clq->get('cfg');
+			$extn = $this->cfg['site']['extension'];
 			$js = ""; $content = ""; $thisvars = ['rq' => $rq, 'idiom' => $idiom];
 			if($screen == 'content') {
 
 				// Name of the Component template which will be loaded from /views/components/
-				$tpl = $action.".tpl"; // Default, may be overwritten
+				$tpl = $action.".".$extn; // Default, may be overwritten
 				// Only needs a routine below if cannot be dealt with completely by the template
 				switch($action) {
 					// case "welcome": break;
@@ -102,7 +104,7 @@ class Cms
 						$result = self::listing($idiom, $subaction, $rq);
 						$thisvars = $result['vars'];
 						$js = $result['js']; 
-						$tpl = $subaction.".tpl"; 
+						$tpl = $subaction.".".$extn; 
 					break;
 
 					default: continue; 
