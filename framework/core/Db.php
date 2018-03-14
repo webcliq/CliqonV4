@@ -23,7 +23,6 @@ class Db
         // Make table if not exists
         $tablename = "dbindex";
 	}
-
     /** Cliqon ORM Helpers to write records to the database
      *
      * postForm()
@@ -732,7 +731,7 @@ class Db
             }
          } 		
 
-        /** Save Content
+        /** Save Content 
          * Save content from a multi-lingual popup rich text content editor (TinyMCE) to a JSON field in c_document, probably d_text in c_document
          * @param - array - Usual $arguments
          * @return - array - Ok flag and data or error
@@ -1042,6 +1041,71 @@ class Db
 				]; 
 			}	    		 	
 		 }
+
+		/** Save a contenteditable value to dbitem
+         * Save text from a content editable action
+         * @param - array - Usual $arguments
+         * @return - array - Ok flag and data or error
+         **/
+		public static function updateItemVal($vars)
+		{
+	        try {
+
+				if(!A::getAuth("write", $vars['table'], $vars['tabletype'], '')) {
+					throw new Exception("Not authorised based on table > tabletype > fields");
+				};
+
+	        	global $clq;
+			    $rq = $vars['rq'];
+				$table = $vars['table'];
+				$tabletype = $vars['tabletype'];
+
+				if($tabletype == 'string') {
+					$ref = "ustr(".$rq['reference'].")";
+					$fld = "d_text";
+				} else if($tabletype == 'text') {
+					$ref = $rq['reference'];
+					$fld = "d_text";
+				}
+
+	        	$row = R::findOne($table, 'WHERE c_type = ? AND c_reference = ?', [$tabletype, $ref]);
+	        	$doc = json_decode($row['c_document'], true);
+
+	        	if(!is_array($doc) and !$row['id'] > 0) {
+	        		throw new Exception("The search did not find and convert an array");
+	        	}
+
+	        	$vars['rq']['recid'] = $row['id'];
+				$doc[$fld][$vars['idiom']] = $rq['value']; 
+	        	$row->c_document = F::jsonEncode($doc);
+	        	$row->c_whomodified = Q::whoMod();
+	        	$row->c_lastmodified = Q::lastMod();
+
+	        	// Deal with revision or version
+	        	$v = Q::versionControl($vars);
+	        	$versionfield = $v['fld'];
+	        	$versionnumber = $v['newval'];
+	        	$row->$versionfield = $versionnumber;
+
+	        	$result = R::store($row);
+	        	if(is_int($result) && (int)$result > 0) {
+	        		$msg = Q::cStr('370:Record updated successfully');
+	        	} else {
+	        		$msg = Q::cStr('371:Error saving record').' - '.$result;
+	        	}
+				return [
+					'flag' => "Ok",
+					'data' => $rq['value'],
+					'msg' => $msg
+				];
+
+			} catch (Exception $e) {
+				return [
+					'flag' => "NotOk",
+					'msg' => $e->getMessage() 
+				]; 
+			}	
+		}
 
     /** Data Retrieval
      *

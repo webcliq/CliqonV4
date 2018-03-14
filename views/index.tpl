@@ -23,7 +23,7 @@
                         <i class="fa fa-rocket"></i>
                         @(Q::uStr('5:Get Started Quickly'))
                     </h3>
-                    <p>@(Q::uStr('6:Organise your template ...'))</p>
+                    <p class="editable">@raw(Q::eStr('6:Organise your template ...'))</p>
 
                 </div>
                 <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
@@ -32,7 +32,7 @@
                         <i class="fa fa-paste"></i>
                         @(Q::uStr('7:Copy it into views ...'))
                     </h3>
-                    <p>@(Q::uStr('8:Publish your files'))</p>
+                    <p class="editable">@raw(Q::eStr('8:Publish your files'))</p>
 
                 </div>
                 <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
@@ -41,7 +41,7 @@
                         <i class="fa fa-paragraph"></i>
                         @(Q::uStr('9:Enter your content'))
                     </h3>
-                    <p>@(Q::uStr('10:Use the Admin system'))</p>
+                    <p class="editable">@raw(Q::eStr('10:Use the Admin system'))</p>
 
                 </div>
                 <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
@@ -50,7 +50,7 @@
                         <i class="fa fa-external-link"></i>
                         @(Q::uStr('11:Publish your website'))
                     </h3>
-                    <p>@(Q::uStr('12:Transfer your database'))</p>
+                    <p class="editable">@raw(Q::eStr('12:Transfer your database'))</p>
 
                 </div>
             </div>

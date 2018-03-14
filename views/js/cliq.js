@@ -123,7 +123,7 @@
                 var tpl = `
                     <div class="noty_message minh3">
                         <div class="pad center">
-                           <h5 class="noty_text bluec"></h5> 
+                           <h3 class="noty_text bluec"></h3> 
                         </div>
                         <div class="noty_close"></div>
                     </div>
@@ -131,7 +131,6 @@
                 var options = {
                     'text': '',
                     'layout':'topCenter',
-                    'theme':'bootstrapTheme',
                     'timeout': 5000,
                     // success (light green), error (pink), warning (orangey cream), information (lilac), notification (lilac)
                     'type':'success', 
@@ -152,188 +151,13 @@
                 return $noty;
             }
 
-            /**
-             * JSPanel Window - supports HTML content direct, HTML content from existing Div, Content by Ajax and iFrame
-             * @param - object - Usroptions that overwrite defaults
-             **/
-            var win = function(usroptions)
-            {
-                cfg.dp++;
-                var thisid = 'jsPanel-'+cfg.dp;
-        
-                // drag - fa-arrows-alt
-                var tb = `
-                <div class="bluec col">
-                    <span class="col-6 txt-right mr-20 right">
-                        <i class="fa fa-fw fa-print pointer" data-action="print"></i>
-                        <i class="fa fa-fw fa-expand pointer" data-action="maximize"></i>
-                        <i class="fa fa-fw fa-compress pointer" data-action="normalize"></i>
-                        <i class="fa fa-fw fa-close pointer" data-action="close"></i>
-                    </span>
-                    <span class="col-6 left ml-20 txt-left bold">`+usroptions.headerTitle+`</span>
-                </div>
-                `;
-
-                var htb = [{
-                    item:     tb,
-                    event:    "click",
-                    callback: function(event){ 
-                        
-                        var action = $(event.target).data('action');
-
-                        switch(action) {
-                            case "print":
-                                return event.data.content.print()
-                            break;
-
-                            case "close":
-                                return event.data.close();
-                            break;
-
-                            case "maximize":
-                                return event.data.maximize();
-                            break;
-
-                            case "normalize":
-                                return event.data.normalize();
-                            break;
-
-                            default:
-                                return false;
-                            break;
-                        }
-                    }
-                }];
-
-                var options = {
-                    container:       'body',
-                    content:         false,
-                    contentAjax:     false,
-                    contentIframe:   false,
-                    contentOverflow: {"overflow-x": "hidden", "overflow-y": "scroll"},
-                    contentSize:     {
-                        width: 600,
-                        height: 610
-                    },
-                    custom:          false,
-                    dblclicks:       false,
-                    footerToolbar:  false,
-                    headerControls: {controls: 'none'},
-                    headerLogo: '<img src="'+sitepath+'admin/img/logo.png" class="h30 ml10 mt10 mb0" id="panelHdr" />',
-                    headerRemove:  false,
-                    template:  false,
-                    headerTitle: false,
-                    headerToolbar: htb,
-                    theme: 'bootstrap-default',
-                    id: thisid,
-                    maximizedMargin: {
-                        top:    85,
-                        right:  25,
-                        bottom: 25,
-                        left:   25
-                    },
-                    minimizeTo:         true,
-                    position:           'center', // all other defaults are set in jsPanel.position()
-                    dragit: {
-                        handles:  "#panelHdr",
-                        opacity: 0.8
-                    },
-                    resizeit: {
-                        handles:   'n, e, s, w, ne, se, sw, nw',
-                        minWidth:  400,
-                        minHeight: 400
-                    }
-                };
-                options = array_replace(options, usroptions);
-                $.jsPanel({config: options});  
-                $('#'+thisid).css('z-index', 10000+cfg.dp);
-            }  
-
-            var popup = function(options) 
-            {
-                      
-                var thisid = uniqid();
-                var tb = `
-                <div class="e30" id="popup_box">
-                    <div class="card shadow round4" style="width: 100%" id="`+thisid+`_modal">
-                        <div class="card-header">`+options.headerTitle+`</div>
-                        <div class="card-body" id="`+thisid+`_content">`+lstr[144]+` ....</div>
-                        <div class="card-footer">
-                            <button type="button" id="close_button" class="btn btn-sm btn-primary">`+lstr[30]+`</button>
-                            <button type="button" id="cancel_button" class="btn btn-sm">`+lstr[17]+`</button>
-                        </div>
-                    </div>    
-                </div>        
-                `;  
-
-                $(options.parent).append(tb);
-                    new Tether({
-                        element: '#popup_box',
-                        target: options.parent,
-                        attachment: 'middle center',
-                        targetAttachment: 'middle center',
-                        targetOffset: '20% 0%',
-                        constraints: [
-                            {
-                              to: 'window',
-                              pin: ['top', 'bottom']
-                            },
-                            {
-                              to: 'scrollParent',
-                              pin: ['top', 'bottom']
-                            }
-                          ],
-                        targetModifier: 'visible'
-                    });            
-                    showpopup();
-
-                $('#close_button').on('click', function() {
-                    hidepopup();
-                });
-               
-                aja().method('GET').url(options.url).cache(false).timeout(25000).type('json')
-                .data(options.data)
-                .on('40x', function(response) { Cliq.error('Page not Found - '+options.url+':'+response)})
-                .on('500', function(response) { Cliq.error('Server Error - '+options.url+':'+response)})
-                .on('timeout', function(response){ Cliq.error('Timeout - '+options.url+':'+response)})
-                .on('200', function(response) {
-
-                    if(typeof response == 'object')
-                    {
-                        // Test NotOK - value already exists
-                        var match = /NotOk/.test(response.flag);
-                        if(!match == true) {
-                            // $('#'+thisid+'_content').html(response.data);
-                        } else { // Error
-                            Cliq.error('Ajax function returned error NotOk - '+options.url+':'+JSON.stringify(response))
-                        }; 
-
-                    } else { Cliq.error('Response was not JSON object - '+options.url+':'+response.msg); }
-                }).go();    
-            }
-
-            function showpopup()
-            {
-                $("#popup_box").fadeToggle();
-                $("#popup_box").css({"visibility":"visible","display":"block"});
-            }
-
-            function hidepopup()
-            {
-                $("#popup_box").fadeToggle(500);
-                $("#popup_box").css({"visibility":"hidden","display":"none"});
-            }
-
-	
         // explicitly return public methods when this object is instantiated
         return {
             // outside: inside
             set: _set,
             get: _get,
             config: _config,
-            popup: popup,
             clqAjax: clqAjax,
-            win: win,
             error:error,
             success: success,
             msg: msg
@@ -341,3 +165,25 @@
     })(jQuery); 
 
 
+function razr(code, data) {
+
+    //escape "@@" into one "@"
+    code = code.split("@@").join("\1");
+    var parts = code.split("@");
+    var buff = parts.map(function (a, b) {
+        if (!b) {
+            return JSON.stringify(a);
+        } /* end if */
+
+        var l = a.split(/([<\n"])/),
+            code = l[0];
+        return code + "+\n" + JSON.stringify(l.slice(1).join(""));
+    }).join("+");
+
+    buff = buff.replace(/(for\(\s*)(\w+)(\s+in)(\s+)(\w+)(\s*\))(\+\r?\n)([^\n]+)\+\n/gm,
+        "(function lamb(){var b=[]; $1$2$3$4 $5$6 { if( $5.hasOwnProperty($2)){ $2=$5[$2]; b.push($8);}}; return b.join(''); }())+ ");
+    with(data) {
+        return eval(buff).split("\1").join("@");
+    }
+
+}; /* end razr() */

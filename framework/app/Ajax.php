@@ -997,6 +997,30 @@ class Ajax
 			];	
 		}	
 
+		/** Update website user strings using contenteditable
+		 * @param - array usual variables
+		 **/
+		function updateuserstring($vars)
+		{
+			global $clq; $db = $clq->resolve('Db');
+			return [
+				'content' => $db->updateItemVal($vars),
+				'callBack' => ""
+			];	
+		}
+
+		/** Update website user text using contenteditable
+		 * @param - array usual variables
+		 **/
+		function updateusertext($vars)
+		{
+			global $clq; $db = $clq->resolve('Db');
+			return [
+				'content' => $db->updateItemVal($vars),
+				'callBack' => ""
+			];	
+		}
+
 		// Always Last
 		protected function get_status_message(){
 			$status = array(

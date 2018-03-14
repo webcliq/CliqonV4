@@ -19,7 +19,6 @@
     <meta name=”robots” content=”index,follow”>
     <meta name="revisit-after" content="7 days">
     <meta name="distribution" content="web">
-    <meta http-equiv="refresh" content="30">
     <meta name=”robots” content=”noodp”>
     
     <!--Optional Meta Tags-->

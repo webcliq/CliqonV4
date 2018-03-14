@@ -993,6 +993,62 @@ class Cliq
             return 'Field: '.$fld.' set to: '.$val.', by '.self::whoMod().' on '.self::lastMod().'\n'.PHP_EOL;
         }
 
+        /** Static function to support contenteditabler user strings
+         * @param - string - string reference
+         * @return - string - if Operator/Admin has logged in, appropriate content will become editable
+         **/
+        public static function eStr($str)
+        {
+            $txt = self::uStr($str);
+            if($_SESSION['UserName']) {
+
+                global $clq;
+                $idm = $clq->get('idiom');
+                $key = explode(':', $str);
+
+                return '<span 
+                    class="contenteditable" 
+                    id="id_'.$key[0].'" 
+                    data-url="/ajax/'.$idm.'/updateuserstring/dbitem/string/" 
+                    data-type="textarea" 
+                    data-ok-button="&#10004;" 
+                    data-cancel-button="&#10008;" 
+                    data-object="'.$key[0].'" 
+                >'.$txt.'</span>';
+
+            } else {
+                return $txt;
+            }
+        }
+
+        /** Static function to support contenteditabler user sections
+         * @param - string - section reference
+         * @return - string - if Operator/Admin has logged in, appropriate content will become editable
+         **/
+        public static function eSecn($str)
+        {
+
+            $txt = self::uSecn($str);
+            if($_SESSION['UserName']) {
+
+                global $clq;
+                $idm = $clq->get('idiom');
+
+                return '<span 
+                    class="contenteditable" 
+                    id="'.$str.'" 
+                    data-url="/ajax/'.$idm.'/updateusertext/dbitem/text/" 
+                    data-type="textarea" 
+                    data-ok-button="&#10004;" 
+                    data-cancel-button="&#10008;" 
+                    data-object="id_'.$str.'" 
+                >'.$txt.'</span>';
+
+            } else {
+                return $txt;
+            }
+        }
+
     /** Caching
      * cacheRead()
      * cacheWrite()

@@ -1,5 +1,6 @@
 @import url("pure.min.css");
 @import url("font-awesome.min.css");
+@import url("cliqon.css");
 
 * {
     -webkit-box-sizing: border-box;
@@ -306,74 +307,4 @@ a.pure-button-primary {
     padding: 1em;
 }
 
-    .hide {display:none;}
-    .show {display:block;}
-    .inline {display:inline;}
-    .currency, .txt-right {text-align:right;} .txt-center {text-align:center;} .txt-left {text-align:left;}
 
-    /* position */  
-    .above {position:absolute;}
-    .left { float:left;} 
-    .right { float:right; }
-    .center {margin: 0 auto;}
-    .top { margin-top:0; padding-top:0; vertical-align: top;}
-    .top5 { margin-top:0; padding-top:5px; vertical-align: top;}
-    .bottom { margin-bottom:0; padding-bottom:0; }
-    .front { z-index: 1000; }
-    .back { z-index: -1000; }
-    .fixed { position:fixed; }
-    .nowrap { white-space: nowrap;}
-
-    .bold       {font-weight: bold }
-    .quiet      { color: #d9d9d9; }
-    .loud       { color: #000; }
-    .highlight  { background:#ff0; }
-    .added      { background:#060; color: #fff; }
-    .removed    { background:#900; color: #fff; }
-
-    /* -- background colors -- */
-    .white { background:#fff; }
-    .black { background: #373A3C; }
-    .silver { background:#c0c0c0; }
-    .lightgray { background:#e0e0e0; }
-    .softgreen { background-color: #C6D880 }    /* soft colors */
-    .softblue { background-color: #8ad4ee }
-    .softred { background-color: #FBC2C4 }
-    .softyellow{ background-color: #FDEE89 }
-    .pastelgreen { background-color: #E6EFC2 }
-    .greybg {background-color: #526872;}
-    .faded {  
-    background-color: #373A3C;
-    color: #ccc;
-    }
-
-    /* -- colors  -----*/
-    .whitec {color: #fff;} 
-    .blackc {color: #373A3C;}
-    .greyc {color: #263238;}
-    .bluec {color: #003366;}
-    .lightbluec {color: #8ad4ee;}
-    .orangec {color: #F58113;}
-    .redc {color:#EF2E31;}
-
-    .pointer {
-        cursor:pointer;
-    }
-
-    /* scroll */
-    .clip {overflow:hidden;}
-    .clip-x {overflow-x:hidden;}
-    .clip-y {overflow-y:hidden;}
-    .scrollable { overflow:auto;}
-
-    input:required {
-        background:#e0e0e0; 
-        border: 1px solid #EF2E31;
-    }
-
-    .required label:after {
-        color: #e32;
-        content: ' *';
-        font-weight: bold;
-        display:inline;
-    }
