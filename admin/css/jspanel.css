@@ -2,8 +2,11 @@
 /* jspanel.sass: 2017-06-17 11:56 */
 @font-face {
   font-family: "jsglyph";
-  src: url("fonts/jsglyph.eot");
-  src: url("fonts/jsglyph.eot?#iefix") format("embedded-opentype"), url("fonts/jsglyph.ttf") format("truetype"), url("fonts/jsglyph.woff") format("woff"), url("fonts/jsglyph.svg#jsglyph") format("svg"); }
+  src: url("../fonts/jsglyph.eot");
+  src: url("../fonts/jsglyph.eot?#iefix") format("embedded-opentype"), 
+	/* url("../fonts/jsglyph.ttf") format("truetype"), 
+	url("../fonts/jsglyph.woff") format("woff"), */
+	url("../fonts/jsglyph.svg#jsglyph") format("svg"); }
 .jsglyph {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: "jsglyph" !important;
@@ -726,4 +729,3 @@
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px; }
 
-/*# sourceMappingURL=jquery.jspanel.css.map */

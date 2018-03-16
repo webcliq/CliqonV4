@@ -995,8 +995,6 @@
                                 headerTitle: '<span class="">'+lstr[31]+'</span>',
                                 callback: function() {
 
-                                    sitepath = "http://"+document.location.hostname+"/";
-
 					        		// Manage Tabs
 				        			$('#contenttabs a:first').tab('show');
 									$('#contenttabs a').click(function (e) {
@@ -1009,139 +1007,150 @@
 											e.stopImmediatePropagation();
 										}
 									}); 
-
-                                    var tinypath = jspath+'tinymce';
-									tinymce.baseURL = tinypath;
-									$('.rte').tinymce({
-										document_base_url: tinypath,
-										script_url: tinypath,
-										theme: 'modern',
-										skin: 'cliqon',
-                                        content_css: sitepath+'views/css/cliqon_theme.css',  // 
-                                        content_style: 'html {padding: 10px 20px; min-height: 400px;}',
-										plugins: [
-											'advlist code codemirror anchor autosave charmap colorpicker contextmenu hr image imagetools insertdatetime lists link nonbreaking paste print preview searchreplace table template textcolor textpattern visualblocks visualchars'
-										], // wordcount
-										toolbar1: 'savebutton translate | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor | print preview | code',
-										// templates: '/dir/templates.php' - URL return JSON output
-										image_advtab: true,
-										external_filemanager_path: jspath + 'tinymce/plugins/filemanager/',
-										filemanager_title:'Filemanager',
-										external_plugins: { 'filemanager' : jspath + 'tinymce/plugins/filemanager/plugin.min.js'},
-										codemirror: {
-										    indentOnInit: true, // Whether or not to indent code on init.
-										    fullscreen: true,   // Default setting is false
-										    path: jspath+'codemirror', // Path to CodeMirror distribution
-										    config: {           // CodeMirror config object
-										       mode: 'application/x-httpd-php',
-										       lineNumbers: false
-										    },
-										    width: 800,         // Default value is 800
-										    height: 600,        // Default value is 550
-										    saveCursorPosition: true,    // Insert caret marker
-										    jsFiles: [          // Additional JS files to load
-										       'mode/clike/clike.js',
-										       'mode/php/php.js'
-										    ]
-										},
-										setup: function(editor) {
-											// Save to Database
-											editor.addButton('savebutton', {
-											  	icon: 'save',
-                                                classes: 'bypassChanges',
-											  	tooltip: 'Save Record',
-											  	onclick: function (e) {													
-                                                    e.stopImmediatePropagation();
-
-                                                    // Get any tinymce Editors if exist and update the Vue instance with Tiny editor content
-                                                    
-                                                    var tinyeditors = tinymce.EditorManager.editors;
-                                                    var frmData = new FormData();
-                                                    frmData.set('recid', recid);
-                                                    frmData.set('fldname', 'd_text');
-                                                    $.each(tinyeditors, function(i, teditor) {
-                                                        var fld = trim(teditor.id, '_te'); // works fine
-                                                        var val = tinymce.get(teditor.id).getContent();
-                                                        frmData.set(fld, rawurlencode(val));
-                                                    }); 
-
-                                                    var urlstr = '/ajax/'+cfg.langcd+'/savecontent/'+cfg.table+'/'+cfg.tabletype+'/';                                                       
-                                                    $.ajax({
-                                                        url: urlstr, data: frmData,
-                                                        cache: false, contentType: false, processData: false,
-                                                        type: 'POST', async: false, timeout: 25000,
-                                                        success: function(response, statusText, xhr) {
-                                                            if(typeof response == 'object') {
-                                                                // Test NotOK - value already exists
-                                                                var match = /NotOk/.test(response.flag);
-                                                                if(!match == true) {
-                                                                    // Stops erroneous leave page error
-                                                                    $('#dataform').submit(function(e) {return false;});
-                                                                    for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
-                                                                        var ed_id = tinymce.editors[i].id;
-                                                                        tinyMCE.execCommand("mceRemoveEditor", true, ed_id);
-                                                                    }; 
-                                                                    Cliq.success(lstr[10]);
-                                                                    window.jsPanel.closeChildpanels("body"); 
-                                                                    return;
-                                                                } else { // Error
-                                                                    Cliq.error('Ajax function returned error NotOk - '+response.msg);
-                                                                }; 
-
-                                                            } else {
-                                                                Cliq.error('Response was not JSON object - '+JSON.stringify(response));
-                                                            }
-                                                        }, 
-                                                        error: function(xhr, status, text) {
-                                                            Cliq.error('Error saving Text to Database - '+urlstr+':'+text);
-                                                        }
-                                                    }); 	
-													return true;					     	
-											  	}
-											}),
-											// Translate
-                                            editor.addButton('translate', {
-                                                icon: 'moon',
-                                                // image: '',
-                                                tooltip: 'Translate Record',
-                                                onclick: function (e) {
-                                                    var tinyeditors = tinymce.EditorManager.editors;
-                                                    var vals = [];
-                                                    $.each(tinyeditors, function(i, teditor) {
-                                                        var fld = trim(teditor.id, '_te'); // works fine
-                                                        var val = tinymce.get(teditor.id).getContent();
-                                                        vals[fld] = val;      
-                                                    });
-                                                    var textfrom = vals[data.fldname+'_'+jlcd];
-                                                    
-                                                    $.each(data.idioms, function(lcdcode, lcdname) {
-                                                        if(lcdcode != jlcd) {
-                                                            
-                                                            $.ajax({
-                                                                url: "https://api.microsofttranslator.com/V2/Ajax.svc/Translate",
-                                                                dataType: "jsonp", jsonp: "oncomplete", crossDomain: true,
-                                                                data: {appId: data.bingkey, from: jlcd, to: lcdcode, contentType: "text/plain", text: textfrom},
-                                                                success: function(ttxt, status){
-                                                                    $.each(tinyeditors, function(i, teditor) {
-                                                                        var fld = trim(teditor.id, '_te'); // works fine
-                                                                        if(fld == data.fldname+'_'+lcdcode) {
-                                                                            tinymce.get(teditor.id).setContent(ttxt);
-                                                                        }
-                                                                    });                                          
-                                                                }
-                                                            }); 
-                                                        }
-                                                    }); // End for each languuage plus text
-                                                }
-                                            })											
-										} // End Editor Setup
-									});		
+									
+									tinyEditor(cfg, '.rte');	
                                 }
                             };
                             var contentEditor = Cliq.win(opts);  
 	                    } else { Cliq.error('Ajax function returned error NotOk - '+urlstr+':'+JSON.stringify(response)); }; 
 	                } else { Cliq.error('Response was not JSON object - '+urlstr+':'+response.msg); }
 	            }).go();   
+	         }
+
+	        /** TinyMCE Content Editor for a JSPanel Popup
+	         * @param - object pass the local cfg
+	         * @param - string element
+	         **/
+	         var tinyEditor = function(cfg, ele)
+	         {
+                var tinypath = jspath+'tinymce';
+				tinymce.baseURL = tinypath;
+				return $(ele).tinymce({
+					document_base_url: tinypath,
+					script_url: tinypath,
+					theme: 'modern',
+					skin: 'cliqon',
+                    content_style: 'html {padding: 10px 20px; min-height: 400px;}',
+					plugins: [
+						'advlist code codemirror anchor autosave charmap colorpicker contextmenu hr image imagetools insertdatetime lists link nonbreaking paste print preview searchreplace table template textcolor textpattern visualblocks visualchars'
+					], // wordcount
+					toolbar1: 'savebutton translate | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor | print preview | code',
+					// templates: '/dir/templates.php' - URL return JSON output
+					image_advtab: true,
+					external_filemanager_path: jspath + 'tinymce/plugins/filemanager/',
+					filemanager_title:'Filemanager',
+					external_plugins: { 'filemanager' : jspath + 'tinymce/plugins/filemanager/plugin.min.js'},
+					codemirror: {
+					    indentOnInit: true, // Whether or not to indent code on init.
+					    fullscreen: true,   // Default setting is false
+					    path: jspath+'codemirror', // Path to CodeMirror distribution
+					    config: {           // CodeMirror config object
+					       mode: 'application/x-httpd-php',
+					       lineNumbers: false
+					    },
+					    width: 800,         // Default value is 800
+					    height: 600,        // Default value is 550
+					    saveCursorPosition: true,    // Insert caret marker
+					    jsFiles: [          // Additional JS files to load
+					       'mode/clike/clike.js',
+					       'mode/php/php.js'
+					    ]
+					},
+					setup: function(editor) {
+						
+						// Save to Database
+						editor.addButton('savebutton', {
+						  	icon: 'save',
+                            classes: 'bypassChanges',
+						  	tooltip: 'Save Record',
+						  	onclick: function (e) {													
+                                e.stopImmediatePropagation();
+
+                                // Get any tinymce Editors if exist and update the Vue instance with Tiny editor content
+                                
+                                var tinyeditors = tinymce.EditorManager.editors;
+                                var frmData = new FormData();
+                                frmData.set('recid', recid);
+                                frmData.set('fldname', 'd_text');
+                                $.each(tinyeditors, function(i, teditor) {
+                                    var fld = trim(teditor.id, '_te'); // works fine
+                                    var val = tinymce.get(teditor.id).getContent();
+                                    frmData.set(fld, rawurlencode(val));
+                                }); 
+
+                                var urlstr = '/ajax/'+cfg.langcd+'/savecontent/'+cfg.table+'/'+cfg.tabletype+'/';                                                       
+                                $.ajax({
+                                    url: urlstr, data: frmData,
+                                    cache: false, contentType: false, processData: false,
+                                    type: 'POST', async: false, timeout: 25000,
+                                    success: function(response, statusText, xhr) {
+                                        if(typeof response == 'object') {
+                                            // Test NotOK - value already exists
+                                            var match = /NotOk/.test(response.flag);
+                                            if(!match == true) {
+                                                // Stops erroneous leave page error
+                                                $('#dataform').submit(function(e) {return false;});
+                                                for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
+                                                    var ed_id = tinymce.editors[i].id;
+                                                    tinyMCE.execCommand("mceRemoveEditor", true, ed_id);
+                                                }; 
+                                                Cliq.success(lstr[10]);
+                                                window.jsPanel.closeChildpanels("body"); 
+                                                return;
+                                            } else { // Error
+                                                Cliq.error('Ajax function returned error NotOk - '+response.msg);
+                                            }; 
+
+                                        } else {
+                                            Cliq.error('Response was not JSON object - '+JSON.stringify(response));
+                                        }
+                                    }, 
+                                    error: function(xhr, status, text) {
+                                        Cliq.error('Error saving Text to Database - '+urlstr+':'+text);
+                                    }
+                                }); 	
+								return true;					     	
+						  	}
+						}), // End save to Database
+
+						// Translate
+                        editor.addButton('translate', {
+                            icon: 'globe',
+                            // image: '',
+                            tooltip: 'Translate Record',
+                            onclick: function (e) {
+                                var tinyeditors = tinymce.EditorManager.editors;
+                                var vals = [];
+                                $.each(tinyeditors, function(i, teditor) {
+                                    var fld = trim(teditor.id, '_te'); // works fine
+                                    var val = tinymce.get(teditor.id).getContent();
+                                    vals[fld] = val;      
+                                });
+                                var textfrom = vals[data.fldname+'_'+jlcd];
+                                
+                                $.each(data.idioms, function(lcdcode, lcdname) {
+                                    if(lcdcode != jlcd) {
+                                        
+                                        $.ajax({
+                                            url: "https://api.microsofttranslator.com/V2/Ajax.svc/Translate",
+                                            dataType: "jsonp", jsonp: "oncomplete", crossDomain: true,
+                                            data: {appId: data.bingkey, from: jlcd, to: lcdcode, contentType: "text/plain", text: textfrom},
+                                            success: function(ttxt, status){
+                                                $.each(tinyeditors, function(i, teditor) {
+                                                    var fld = trim(teditor.id, '_te'); // works fine
+                                                    if(fld == data.fldname+'_'+lcdcode) {
+                                                        tinymce.get(teditor.id).setContent(ttxt);
+                                                    }
+                                                });                                          
+                                            }
+                                        }); 
+                                    }
+                                }); // End for each languuage plus text
+                            }
+                        }) // End Translator
+
+					} // End Editor Setup
+				});		         	
 	         }
 
             /** Code button, invoked from Grid or List row
@@ -1759,12 +1768,8 @@
                                     } else { Cliq.error('Response was not JSON object - '+urlstr+':'+response.msg); }
                                 }).go(); 
                             break;
-
-                            case "datalist": 
-                            	Cliq.success(txt);
-                                Cliq.loadTableData(); 
-                            break;
-
+							
+							case "datalist": 
                             case "datatable":
                             	// Cliq.loadTableData();
                             	// Cliq.success(txt);

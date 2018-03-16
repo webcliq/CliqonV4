@@ -84,8 +84,8 @@
              * @param - 
              * @return - 
              **/
-            var dataGrid = function(gridOptions)
-            {
+             var dataGrid = function(gridOptions)
+             {
                 cfg.opts = gridOptions;
                 cfg.dg = $('#datagrid').grid(cfg.opts);   
 
@@ -93,15 +93,15 @@
                     e.preventDefault(); e.stopImmediatePropagation();
                     Cliq.gridButton(this);
                 });  
-            };
+             };
 
             /** DataTree
              *
              * @param - 
              * @return - 
              **/
-            var dataTree = function(treeOptions)
-            {
+             var dataTree = function(treeOptions)
+             {
                 console.log('Tree loaded '+cfg.treetype);
                 cfg.opts = treeOptions;
                 cfg.dt = $('#datatree');
@@ -159,8 +159,8 @@
              * @param - 
              * @return - 
              **/
-            var dataTable = function(tableOptions)
-            {             
+             var dataTable = function(tableOptions)
+             {             
                 cfg.opts = tableOptions;
                 cfg.records = cfg.opts.records;
                 // var pageselect = explode(',', cfg.opts.pager);
@@ -227,15 +227,15 @@
                         })
                     }
                 });
-            };
+             };
 
             /** DataList
              *
              * @param - 
              * @return - 
              **/
-            var dataList = function(listOptions)
-            {
+             var dataList = function(listOptions)
+             {
                 
                 cfg.opts = listOptions;
                 cfg.records = cfg.opts.records;
@@ -310,15 +310,15 @@
                         })
                     }
                 }); 
-            };            
+             };            
 
-            /**
+            /** DataCard  
              * Publishes a series of Panels in a grid
              * @param - object - options passed to the function from the calling PHP
              * @return - HTML to populate the id: admindesktop
              **/
-            var dataCard = function(cardOptions)
-            {
+             var dataCard = function(cardOptions)
+             {
                 cfg.opts = cardOptions;
                 // console.log(cfg.opts.data);
                 var dta = cfg.opts;
@@ -369,15 +369,15 @@
                         });      
                     }
                 }); // End Vue routine
-            };
+             };
 
             /** Calendar
              * now using DHTMLX Scheduler instead of FullCalendar - better presentation and handling of data
              * @param - 
              * @return - 
              **/
-            var calendar = function(calOptions)
-            {
+             var calendar = function(calOptions)
+             {
                 cfg.opts = calOptions;
                 console.log(cfg.opts);
                 cfg.app = cfg.opts.xtra;
@@ -468,15 +468,15 @@
                     return true;
                 });
                 */
-            };
+             };
 
             /** Gallery
              * our own Gallery with Vue, not Galeria. Still best to use this for front end
              * @param - 
              * @return - 
              **/
-            var gallery = function(galOptions)
-            {
+             var gallery = function(galOptions)
+             {
                
                 cfg.opts = galOptions;
                 console.log(cfg.opts.data);                 
@@ -507,7 +507,7 @@
                         })
                     }
                 }); // End Vue routine
-            };    
+             };    
 
         /** Events
          * 
@@ -519,13 +519,13 @@
          *
          **********************************************************************************************************/ 
 
-            /**
+            /** Top of Page Buttons
              * Reacts to top button a table or tree
              * @param - object - the button
              * @return - the activity
              **/
-            var topbtn = function(btn)
-            {
+             var topbtn = function(btn)
+             {
                 var dta = $(btn).data();
                 switch(dta.action) {
                     case "addrecord":
@@ -627,15 +627,15 @@
                     // Ends
                     default: success(action); break;
                 }
-            };
+             };
 
-            /**
+            /** Top of Grid buttons  
              * Reacts to top button a table or tree
              * @param - object - the button
              * @return - the activity
              **/
-            var gridbtn = function(btn)
-            {
+             var gridbtn = function(btn)
+             {
                 var dta = $(btn).data();
                 switch(dta.action) {
                     case "changetable":
@@ -646,26 +646,26 @@
                     // Ends
                     default: success(action); break;
                 }
-            };
+             };
 
             /** Generic Row Button for Grids etc. with extra params, pointer to rowicon
              * @param - object - Event
              * @internal - pointer for rowicon as grids have to interrogated for recid and action
              **/
-            var rowbtn = function(e)
-            {
+             var rowbtn = function(e)
+             {
                 var recid = $(e).closest('tr').find('td:first').text();
                 var dta = $(e).data();
                 rowicon(e, recid, dta.action, dta);
-            };
+             };
 
             /** Generic Row Icon for Tables etc.
              * @param - object - Event
              * @param - array - Row data
              * @return the the action
              **/
-            var rowicon = function(event, recid, action, dta)
-            {
+             var rowicon = function(event, recid, action, dta)
+             {
                 cfg.recid = recid;
                 switch(action) {
 
@@ -704,13 +704,13 @@
                     // Responds to clicks to change c_status for a recordset row, 
                     default: return actionButton(dta); break;
                 } // End Switch
-            }
+             }
 
             /** Generic Help Button
              *
              **/
-            var helpButton = function()
-            {
+             var helpButton = function()
+             {
                 var urlstr = "/ajax/"+jlcd+"/gethelp/"+cfg.table+"/"+cfg.tabletype+"/";
                 aja().method('GET').url(urlstr).cache(false).timeout(2500).type('json')
                 .data({type:'admhelp', table: 'dbcollection'})
@@ -736,13 +736,14 @@
                         } else { error( 'Ajax function returned error NotOk - '+urlstr+':'+JSON.stringify(response)); }; 
                     } else { error('Response was not JSON object - '+urlstr+':'+response.msg); };
                 }).go();   
-            }
+             }
 
             /** Utilities Button
              * @param - object - Dropdown link item
              * @return - mixed - HTML and or Javascript
              **/
-            var utilButton = function(evt) {
+             var utilButton = function(evt) 
+             {
 
                 var type = $(evt).data('type');
                 switch(type) {
@@ -787,10 +788,13 @@
 
                     default: success(type); break;
                 }
-            }
+             }
 
-            var convertButton = function(recid)
-            {
+            /** Conversion Button
+             *
+             **/
+             var convertButton = function(recid)
+             {
                 
                 var urlstr = '/ajax/'+jlcd+'/tomlconverter/';
                 aja().method('GET').url(urlstr).cache(false).timeout(10000).type('json')
@@ -852,15 +856,15 @@
 
                     } else { error('Response was not JSON object - '+urlstr+':'+response.msg); };
                 }).go();  
-            }
+             }
 
             /** Generic Grid, Table, List etc,. action button
              * probably use this for internal App purposes
              * how to role this out to others ???
              * 
              **/
-            var actionButton = function(dta)
-            {
+             var actionButton = function(dta)
+             {
                 
                 switch(dta.action) {
 
@@ -878,7 +882,7 @@
                         jQuery.globalEval('('+myfn+')');
                     break;
                 }
-            }
+             }
 
         /** Subroutines
          *
@@ -2422,4 +2426,60 @@
         }; 
 
     })(jQuery); 
+	
+    $.noty.themes.bootstrapTheme = {
+        name: 'bootstrapTheme',
+        modal: {
+            css: {
+                position: 'fixed',
+                width: '100%',
+                height: '100%',
+                backgroundColor: '#000',
+                zIndex: 10000,
+                opacity: 0.6,
+                display: 'none',
+                left: 0,
+                top: 0
+            }
+        },
+        style: function() {
+
+            var containerSelector = this.options.layout.container.selector;
+            $(containerSelector).addClass('list-group');
+
+            this.$bar.addClass( "list-group-item" ).css('padding', '0px');
+
+            switch (this.options.type) {
+                case 'alert': case 'notification':
+                    this.$bar.addClass( "list-group-item-info" );
+                    break;
+                case 'warning':
+                    this.$bar.addClass( "list-group-item-warning" );
+                    break;
+                case 'error':
+                    this.$bar.addClass( "list-group-item-danger" );
+                    break;
+                case 'information':
+                    this.$bar.addClass("list-group-item-default");
+                    break;
+                case 'success':
+                    this.$bar.addClass( "list-group-item-success" );
+                    break;
+            }
+
+            this.$message.css({
+                fontSize: '13px',
+                lineHeight: '16px',
+                textAlign: 'left',
+                padding: '0px 10px 0px 10px',
+                width: 'auto',
+                position: 'relative'
+            });
+        },
+        callback: {
+            onShow: function() {  },
+            onClose: function() {  }
+        }
+    };
+
 	

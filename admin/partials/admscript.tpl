@@ -26,6 +26,7 @@ basket
 	{url: jspath+"codemirror/addon/display/panel.js"},
 	{url: jspath+"tinymce/tinymce.min.js"},
 	{url: jspath+"tinymce/jquery.tinymce.min.js"},
+	{url: jspath+"tinymce/themes/modern/theme.min.js"},
 	{url: viewpath+"js/app.js"},
 
 	// Cliqon Javascript language file - other JS translations could be included

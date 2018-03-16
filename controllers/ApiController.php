@@ -28,7 +28,6 @@ final class ApiController extends Controller
 			$clq->set('lcd', $lcd);
 			$cfg = $clq->get('cfg');
 			$rq = $this->inputs();
-			$extn = $this->cfg['site']['extension'];
 
 			// Introduce JWT security here
 			$token = F::decode($rq['token'], $cfg['site']['secret'], false);
