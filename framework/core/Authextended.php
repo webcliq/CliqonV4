@@ -12,7 +12,7 @@
  * @version    Release: 4.1.0
  * @link       http://cliqon.com
  */
-loadFile('framework/cord/Auth.php');
+
 class Authextended extends Auth {
 
 	const THISCLASS = "Authextended extends Auth";
@@ -40,7 +40,7 @@ class Authextended extends Auth {
      ***************************************************************************************************/
 
         /** New User Form
-         * This is a reduced version of a User Form. User is expected to modify their Profikle at a later stage.
+         * This is a reduced version of a User Form. User is expected to modify their Profile at a later stage.
          * @param - array - usual variables
          * @return - string - HTML for a form
          **/

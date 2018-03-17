@@ -41,8 +41,9 @@ class Api
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->publishNewUserForm($vars),
+				'content' => $authex->publishNewUserForm($vars),
 				'callBack' => ""
 			];				
 		}
@@ -69,8 +70,9 @@ class Api
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->valueExists($vars),
+				'content' => $authex->valueExists($vars),
 				'callBack' => ""
 			];
 		}
@@ -85,8 +87,9 @@ class Api
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->userRegister($vars),
+				'content' => $authex->userRegister($vars),
 				'callBack' => ""
 			];
 		}
@@ -99,8 +102,9 @@ class Api
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->userActivate($vars),
+				'content' => $authex->userActivate($vars),
 				'callBack' => ""
 			];
 		}
@@ -113,8 +117,9 @@ class Api
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->identifyUser($vars),
+				'content' => $authex->identifyUser($vars),
 				'callBack' => ""
 			];
 		}
@@ -127,8 +132,9 @@ class Api
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->changeUserPassword($vars),
+				'content' => $authex->changeUserPassword($vars),
 				'callBack' => ""
 			];
 		}
