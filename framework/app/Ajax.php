@@ -914,12 +914,28 @@ class Ajax
 		 * @param - array of variables
 		 * @return - array of message and content
 		 **/
+		function changepassword($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->identifyUser($vars),
+				'callBack' => ""
+			];
+		}
+
+		/** Reset or Lost Password
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
 		function lostpassword($vars)
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->identifyUser($vars),
+				'content' => $authex->forgotPassword($vars),
 				'callBack' => ""
 			];
 		}
@@ -932,8 +948,9 @@ class Ajax
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->changeUserPassword($vars),
+				'content' => $authex->changeUserPassword($vars),
 				'callBack' => ""
 			];
 		}
@@ -942,8 +959,9 @@ class Ajax
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->changeStatus($vars),
+				'content' => $authex->changeStatus($vars),
 				'callBack' => ""
 			];
 		}
@@ -952,8 +970,9 @@ class Ajax
 		{
 			global $clq;
 			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
 			return [
-				'content' => $auth->doChangeStatus($vars),
+				'content' => $authex->doChangeStatus($vars),
 				'callBack' => ""
 			];
 		}

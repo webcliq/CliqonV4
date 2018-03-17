@@ -1432,7 +1432,7 @@
              var changePasswordButton = function(uname, email, recid)
              {
                 cfg = Cliq.config();
-                cfg.action = 'lostpassword'; cfg.displaytype = 'lostpassword';
+                cfg.action = 'changepassword'; cfg.displaytype = 'lostpassword';
                 var urlstr = '/ajax/'+jlcd+'/'+cfg.action+'/'+cfg.table+'/'+cfg.tabletype+'/';
                 var frmData = new FormData();
                 frmData.append('id', recid);
@@ -1777,7 +1777,7 @@
                 				uLoad(urlstr);
                             break;
 
-                            case "lostpassword": rrd(response.msg); break;
+                            case "lostpassword": resetPassword(response.msg); break;
                             case "changestatus": changeStatus(response.msg); break;
 
                             case "datatablesnet":

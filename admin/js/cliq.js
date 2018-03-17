@@ -777,12 +777,12 @@
                     break;
 
                     case "changepassword":
-                        var dta = $("#cliqontable tbody tr").find('input:checkbox:checked').data(); 
-                        Cliqf.changePasswordButton(dta.id);
+                        var dta = $("#cliqontable tbody tr td").find('input:checkbox:checked').data(); 
+                        Cliqf.changePasswordButton(dta.uname, dta.email, dta.id);
                     break;
 
                     case "changestatus":
-                        var dta = $("#cliqontable tbody tr").find('input:checkbox:checked').data(); 
+                        var dta = $("#cliqontable tbody tr td").find('input:checkbox:checked').data(); 
                         Cliqf.changeStatusButton(dta.id);
                     break;
 

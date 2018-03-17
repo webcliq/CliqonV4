@@ -39,13 +39,13 @@ class Authextended extends Auth {
      *
      ***************************************************************************************************/
 
-        /** New User Form
+        /** New User Form 
          * This is a reduced version of a User Form. User is expected to modify their Profile at a later stage.
          * @param - array - usual variables
          * @return - string - HTML for a form
          **/
-        function publishNewUserForm(array $vars)
-        {
+         function publishNewUserForm(array $vars)
+         {
             try {
 
                 $method = self::THISCLASS.'->'.__FUNCTION__."()";
@@ -127,14 +127,14 @@ class Authextended extends Auth {
                     'html' => $err
                 ]; 
             }          
-        }
+         }
 
-        /** Checks if a value exists in dbuser such as c_email or c_username
+        /** Checks if a value exists in dbuser such as c_email or c_username 
          * @param - array - usual variables
          * @return - array - Flag and Message
          **/       
-        function valueExists($vars)
-        {
+         function valueExists($vars)
+         {
             try {
 
                 $method = self::THISCLASS.'->'.__FUNCTION__."()";
@@ -165,15 +165,15 @@ class Authextended extends Auth {
                     'html' => $err
                 ]; 
             } 
-        }
+         }
 
-        /** Registers the new User with a short form record
+        /** Registers the new User with a short form record 
          *
          * @param - array - usual variables
          * @return - array - Flag and Message
          **/
-        function userRegister($vars)
-        {
+         function userRegister($vars)
+         {
             try {
 
                 $method = self::THISCLASS.'->'.__FUNCTION__."()";
@@ -256,15 +256,15 @@ class Authextended extends Auth {
                     'html' => $err
                 ]; 
             } 
-        }
+         }
 
-        /** Activate user registration
+        /** Activate user registration 
          * clq.red/page/en/activate/dbuser//?newuser=markrichards
          * @param - array - arguments
          * @return - array containing Msg etc.
          **/
-        function userActivate($rq)
-        {
+         function userActivate($rq)
+         {
             try {
 
                 $method = self::THISCLASS.'->'.__FUNCTION__."()";
@@ -299,25 +299,25 @@ class Authextended extends Auth {
                     'html' => $err
                 ]; 
             }                 
-        }  
+         }  
 
-        /** Activate user registration
+        /** Activate user registration 
          *
          * @param - array - arguments
          * @return - array containing Msg etc.
          **/
-        function resendActivation($vars)  
-        {
+         function resendActivation($vars)  
+         {
 
-        }    
+         }    
 
-        /** Member has forgotten password
+        /** Member has forgotten password 
          * Ask for valid email address and send link to reactivate
          * @param - array - usual variables
          * @return - string - HTML for a form
          **/
-        function forgotPassword(array $vars)
-        {
+         function forgotPassword(array $vars)
+         {
             try {
 
                 $method = self::THISCLASS.'->'.__FUNCTION__."()";
@@ -375,15 +375,15 @@ class Authextended extends Auth {
                     'html' => $err
                 ]; 
             }          
-        }
+         }
 
         /** Member has responded to forgotten password form
          * Check if we can identify the user, if so, let them change their password
          * @param - array - usual variables
          * @return - string - HTML for a message to be displayed in a Noty popup, so they can change their password
          **/
-        function identifyUser(array $vars)
-        {
+         function identifyUser(array $vars)
+         {
 
             try {
 
@@ -403,12 +403,12 @@ class Authextended extends Auth {
                         // Password - c_password - two fields with confirm
                         H::input(['type' => 'hidden', 'name' => 'id', 'value' => $id]),
                         H::div(['class' => 'form-group'],
-                            H::label(['for' => 'c_password', 'class' => 'bold text-left'], Q::uStr('64:Password')),
+                            H::label(['for' => 'c_password', 'class' => 'h5 text-left'], Q::cStr('2:Password')),
                             H::div(['class' => 'form-inline'],
-                                H::input(['type' => 'password', 'class' => 'form-control col-5', 'placeholder' => Q::uStr('64:Password'), 'required' => 'true', 'name' => 'c_password_confirm']),
-                                H::input(['type' => 'password', 'name' => 'c_password', 'class' => 'form-control col-6 ml10', 'aria-describedby' => 'c_password_help', 'placeholder' => Q::uStr('64:Password'), 'required' => 'true', 'id' => 'c_password'])
+                                H::input(['type' => 'password', 'class' => 'form-control col-5', 'placeholder' => Q::cStr('2:Password'), 'required' => 'true', 'name' => 'c_password_confirm']),
+                                H::input(['type' => 'password', 'name' => 'c_password', 'class' => 'form-control col-6 ml10', 'aria-describedby' => 'c_password_help', 'placeholder' => Q::cStr('2:Password'), 'required' => 'true', 'id' => 'c_password'])
                             ),
-                            H::span(['class' => 'small orangec text-left', 'id' => 'c_password_help'], Q::uStr('71:Enter a secure password of at least 8 characters including, letters, numbers and symbols. Please confirm it.'))
+                            H::span(['class' => 'small text-left', 'id' => 'c_password_help'], Q::cStr('571:Enter a secure password of at least 8 characters including, letters, numbers and symbols. Please confirm it.'))
                         )
                     );
                     $btns = [
@@ -433,7 +433,7 @@ class Authextended extends Auth {
                 };
 
                 $html = H::div(['class' => 'noty_message minh5'],
-                    H::div(['class' => 'noty_text']),
+                    H::div(['class' => 'noty_text pad']),
                     H::div(['class' => 'noty_close'])
                 );
 
@@ -462,7 +462,7 @@ class Authextended extends Auth {
                     'html' => $err
                 ]; 
             }  
-        }
+         }
 
         function userProfile(array $vars)
         {

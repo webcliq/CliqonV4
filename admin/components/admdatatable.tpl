@@ -69,7 +69,7 @@
 
 	                            <!-- Rows are returned -->
 	                            <tr v-else v-for="(row, rowid) in rows" v-bind:data-id="row.id">
-	                            	<td scope="row"><input type="checkbox" class="form-control mb0 mt5" v-bind:data-id="row.id" ></td>
+	                            	<td scope="row"><input type="checkbox" class="form-control mb0 mt5" v-bind:data-id="row.id" v-bind:data-uname="row.c_username" v-bind:data-email="row.c_email" ></td>
 	                                <td 
 	                                	v-for="(col, colid) in cols" 
 	                                	v-html="row[colid]"
