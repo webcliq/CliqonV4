@@ -342,22 +342,28 @@ class Files
          * @return - string - Ok or NotOk flage or error message
          * @todo - 
          **/
-         public static function deleteDirectory($d) 
-         { 
+         public static function deleteDirectory($d)
+         {
+            
             $sp = self::setRoot();
-            $dir = $sp.$d;
-            if (!file_exists($dir)) { return true; }
-            if (!is_dir($dir) || is_link($dir)) {
-                return unlink($dir);
+            $path = $sp.$d;
+            if(is_dir($path) == TRUE) {
+                $rootFolder = scandir($path);
+                if(sizeof($rootFolder) > 2){
+                    foreach($rootFolder as $folder){
+                        if($folder != "." && $folder != "..") {
+                            //Pass the subfolder to function
+                            self::deleteDirectory($path."/".$folder);
+                        }
+                    }
+                    //On the end of foreach the directory will be cleaned, and you will can use rmdir, to remove it
+                    @rmdir($path);
+                }
+            } else {
+                if(file_exists($path) == TRUE) {
+                    unlink($path);
+                }
             }
-            foreach (scandir($dir) as $item) { 
-                if ($item == '.' || $item == '..') { continue; }
-                if (!deleteDirectory($dir . "/" . $item, false)) { 
-                    chmod($dir . "/" . $item, 0777); 
-                    if (!deleteDirectory($dir . "/" . $item, false)) return false; 
-                }; 
-            } 
-            return rmdir($dir); 
          }
 
         /** Display existing files in a tree 

@@ -1,0 +1,83 @@
+/* --- Colors --- */
+
+body {
+ 	background:#322;
+}
+.box, .section {
+ 	background:#644;
+}
+.stripe ul li {
+  background:#000;
+}
+.stripe ul li .head, #panel {
+  background:#966;
+}
+#screen, #panel, .currentTextHolder,.section a,.qtip-content, li .content a {
+  color:#fff;
+}
+#detail,.currentTextHolder {
+  color:#000;
+}
+#detail .msgtitle .title,#detail .text a {
+  color:#966;
+}
+.stripe ul li .new {
+ 	background:#cff;
+}
+.stripe ul li:hover .head {
+ 	background:#fcc;
+  color:#000;
+}
+.stripe ul li:hover .content,
+.stripe ul li:hover .content a {
+  background:#fff;
+  color:#000;
+}
+
+/* --- Fonts --- */
+
+* {
+	font-family: Calibri, Arial, Helvetica, sans-serif;
+}
+#detail .msgtitle .title {
+  font-size:2em;
+  font-style:italic;
+  font-weight:bold;
+}
+#detail .text {
+  font-size:1.45em;
+}
+#detail .text a {
+  text-decoration:none;
+}
+.currentTextHolder {
+ 	font-size:1.2em;
+}
+.section a,.qtip-content {
+ 	font-size:1.2em;
+ 	font-weight:bold;
+}
+.stripe ul li .text, .modal {
+  font-size:1.45em;
+}
+.stripe ul li .title {
+  font-style:italic;
+  font-weight:bold;
+}
+
+/* --- Search and Form --- */
+
+.stripe ul li.highlight {
+  border-color:#0ff;
+}
+#results {
+  background:#0ff;
+  border-color:#0ff;
+  color:#000;
+}
+#timeline {
+  background:#0ff;
+}
+#panel input {
+  border-color:#644;
+}

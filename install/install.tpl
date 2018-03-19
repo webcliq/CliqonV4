@@ -292,6 +292,22 @@ basket
       $('#directories').load(url + 'directories');
   });
 
+  $('#directories.clqtable').on('click', 'div.clqtable_row div.createdir', function(e) {
+      e.preventDefault;
+      e.stopImmediatePropagation;
+      var dta = $(this).data();
+      $.ajax({
+          url: url+'createdirectory/?dir='+dta.dir, type: 'POST',
+          success: function(data) {
+              return $('#directories').load(url + 'directories');
+          },
+          failure: function(data) {
+              return error(data[0]);
+          }
+      });  
+      return false;
+  });
+
   $('#previewconfigform').on('click', function(e) {
       
       e.preventDefault;

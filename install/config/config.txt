@@ -8,6 +8,8 @@
 type = '{type}'
 server = '{server}'
 dbname = '{dbname}'
+rootuser = '{rootuser}'
+rootpassword = '{rootpassword}'
 username = '{username}'
 password = '{password}'
 port = '{portno}'

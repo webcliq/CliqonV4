@@ -14,3 +14,7 @@
 
 <link href="@($viewpath)css/style.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="@($viewpath)js/basket.js"></script>
+
+<style>
+.placeholder{color: green;}
+</style>

@@ -1,0 +1,87 @@
+/* --- Colors --- */
+
+body {
+ 	background:#fff;
+}
+.box, .section {
+ 	background:#fff;
+}
+.stripe ul li {
+  background:#EDEFF4;
+}
+.stripe ul li .head {
+  background:#fff;
+}
+#panel {
+  background:#3B5998;
+}
+#screen, #panel, .currentTextHolder,.section a,.qtip-content, li .content a {
+  color:#666;
+}
+#detail,.currentTextHolder {
+  color:#000;
+}
+.stripe ul li .title, #detail .msgtitle .title,#detail .text a {
+  color:#3B5998;
+}
+.stripe ul li .new {
+ 	background:#3B5998;
+}
+.stripe ul li:hover .head {
+ 	background:#fff;
+ 	color:#3B5998;
+}
+.stripe ul li:hover .content,
+.stripe ul li:hover .content a{
+  background:#E2E8F6;
+  color:#000;
+}
+
+/* --- Fonts --- */
+
+* {
+	font-family:  "lucida grande",tahoma,verdana,arial,sans-serif;
+}
+#detail .msgtitle .title {
+  font-size:1.75em;
+  font-weight:bold;
+}
+#detail .text {
+  font-size:1.15em;
+}
+#detail .text a {
+  text-decoration:none;
+}
+.currentTextHolder {
+ 	font-size:1.15em;
+}
+.section a,.qtip-content {
+ 	font-size:1.15em;
+ 	font-weight:bold;
+}
+.stripe ul li .text, .modal {
+  font-size:1.15em;
+}
+.stripe ul li .title {
+  font-weight:bold;
+}
+
+/* --- Search and Form --- */
+
+.stripe ul li.highlight {
+  border-color:#900;
+  color:#fff;
+}
+#results {
+  background:#900;
+  border-color:#900;
+  color:#fff;
+}
+#timeline {
+  background:#f00;
+}
+#panel input {
+  border-color:#6484B4;
+  background-color:#fff;
+  color:#777777;
+}

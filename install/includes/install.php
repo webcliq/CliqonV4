@@ -3,6 +3,9 @@
 // declare(strict_types = 1);
 
 // Load Debug
+if (!file_exists($basedir.'log')) {
+    mkdir($basedir.'log', 0777, true);
+};
 require_once $basedir.'framework/logging/tracy.php';
 T::enable(T::DEVELOPMENT, $basedir."log/");  // PRODUCTION or DEVELOPMENT
 T::$logSeverity = E_NOTICE | E_WARNING;

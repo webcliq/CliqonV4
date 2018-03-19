@@ -279,8 +279,9 @@ box-sizing: border-box;
 
 input::-webkit-input-placeholder,
 input:-moz-placeholder,
-.placeholder{
-color:#bbb;
+input:placeholder,
+.placeholder {
+  color:#ea8511;
 }
 
 input::-moz-focus-inner {border:0;}

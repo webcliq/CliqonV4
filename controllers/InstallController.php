@@ -94,12 +94,21 @@ final class InstallController extends Controller
 					$row .= H::div(['class' => 'clqtable-cell greenc'], $exists.$notwritable);
 				}
 			} else {
-				$row .= H::div(['class' => 'clqtable-cell redc'], 'Does not exist');
+				$row .= H::div(['class' => 'clqtable-cell redc createdir', 'style' => 'cursor:pointer;', 'data-dir' => $clq->get('basedir').$dn], 'Does not exist');
 			}			
 
 			$dirs .= H::div(['class' => 'clqtable-row'], $row);
 		}
 		echo $dirs;		
+	 }
+
+	/**
+	 * createdirectory/?dir='+dta.dir
+	 *
+	 **/
+	 function createdirectory($idiom, $rq)
+	 {
+    	global $clq; if(mkdir($clq->get('basedir').$rq['dir'], 0777, true) == true) {return true;} else {return false;};
 	 }
 
 	/** Copy the Dummy Config Text file to an active Config file 
@@ -408,6 +417,7 @@ final class InstallController extends Controller
 	 function deleteinstaller($idiom, $rq)
 	 {   
 		global $clq;
+		$result = '';
     	$rootpath = $clq->get('basedir');
     	$sitepath = $clq->get('rootpath');	
 	    $f = $clq->resolve('Files');
@@ -416,11 +426,9 @@ final class InstallController extends Controller
 	    $ren = Y::renameFile($oldname, $newname);
 	    $controller = "controllers/InstallController.php";
 	    $del1 = Y::deleteFile($controller);
-	    $install = "includes/install.php";
-	    $del2 = Y::deleteFile($install);
 	    $installdir = "install";
 	    $del3 = Y::deleteDirectory($installdir);
-	    $result = $ren.$del1.$del2.$del3;
+	    $result = $ren.$del1.$del3;
         if($result) {
         	echo json_encode(['Install successful']);
         } else {

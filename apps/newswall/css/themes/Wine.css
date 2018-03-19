@@ -1,0 +1,84 @@
+/* --- Colors --- */
+
+body {
+ 	background:#600;
+}
+.box, .section {
+ 	background:#fff;
+}
+.stripe ul li {
+  background:#600;
+}
+.stripe ul li .head, .stripe ul li .content, #panel {
+  background:#600;
+  background:-moz-linear-gradient(top, #700, #500);
+  background:-webkit-gradient(linear, left top, left bottom, from(#700), to(#500));
+}
+#screen, #panel, .currentTextHolder,.section a,.qtip-content, li .content a {
+  color:#fff;
+}
+#detail,.currentTextHolder {
+  color:#000;
+}
+#detail .msgtitle .title,#detail .text a {
+  color:#600;
+}
+.stripe ul li .new {
+  background:#fff;
+}
+.stripe ul li:hover .head {
+  background:#600;
+  color:#fff;
+}
+.stripe ul li:hover .content,
+.stripe ul li:hover .content a {
+  background:#600;
+  color:#fff;
+}
+
+/* --- Fonts --- */
+
+* {
+	font-family: Calibri, Arial, Helvetica, sans-serif;
+}
+#detail .msgtitle .title {
+  font-size:2em;
+  font-weight:bold;
+}
+#detail .text {
+  font-size:1.45em;
+}
+#detail .text a {
+  text-decoration:none;
+}
+.currentTextHolder {
+ 	font-size:1.2em;
+}
+.section a,.qtip-content {
+ 	font-size:1.2em;
+ 	font-weight:bold;
+}
+.stripe ul li .text, .modal {
+  font-size:1.45em;
+}
+.stripe ul li .title {
+  font-weight:bold;
+}
+
+/* --- Search and Form --- */
+
+.stripe ul li.highlight {
+  border-color:#f00;
+  color:#fff;
+}
+#results {
+  background:#f00;
+  border-color:#f00;
+  color:#fff;
+}
+#timeline {
+  background:#f00;
+}
+#panel input {
+  border-color:#600;
+}

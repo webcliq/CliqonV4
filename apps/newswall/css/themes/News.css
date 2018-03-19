@@ -1,0 +1,94 @@
+.stripe ul li .head,
+.stripe ul li .content {
+  width:150px;
+  height:100px;
+}
+
+/* --- Colors --- */
+
+body {
+ 	background:#eee;
+}
+.box, .section {
+ 	background:#eee;
+}
+.stripe ul li {
+  background:#fff;
+}
+.stripe ul li .head {
+  background:#fff;
+}
+#panel {
+  background:#999;
+}
+#screen, #panel, .currentTextHolder,.section a,.qtip-content, li .content a {
+  color:#000;
+}
+#detail,.currentTextHolder {
+  color:#000;
+}
+#detail .msgtitle .title,#detail .text a {
+  color:#000;
+}
+.stripe ul li .new {
+ 	background:#900;
+}
+.stripe ul li:hover .head {
+ 	background:#ddd;
+ 	color:#000;
+}
+.stripe ul li:hover .content,
+.stripe ul li:hover .content a {
+  background:#ddd;
+  color:#000;
+}
+
+/* --- Fonts --- */
+
+* {
+	font-family: Trebuchet, Arial, Helvetica, sans-serif;
+}
+#detail .msgtitle .title {
+  font-family: Georgia, Garamond, serif;
+  font-size:2em;
+  font-style:italic;
+  font-weight:bold;
+}
+#detail .text {
+  font-size:1.45em;
+}
+#detail .text a {
+  text-decoration:none;
+}
+.currentTextHolder {
+ 	font-size:1.2em;
+}
+.section a,.qtip-content {
+ 	font-size:1.2em;
+ 	font-weight:bold;
+}
+.stripe ul li .text, .modal {
+  font-size:1.45em;
+}
+.stripe ul li .title {
+  font-family: Georgia, Garamond, serif;
+  font-style:italic;
+  font-weight:bold;
+}
+
+/* --- Search and Form --- */
+
+.stripe ul li.highlight {
+  border-color:#f00;
+}
+#results {
+  background:#f00;
+  border-color:#f00;
+  color:#fff;
+}
+#timeline {
+  background:#fff;
+}
+#panel input {
+  border-color:#ccc;
+}

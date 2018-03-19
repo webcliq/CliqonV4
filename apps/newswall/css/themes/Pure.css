@@ -1,0 +1,91 @@
+/* --- Colors --- */
+
+body {
+ 	background:#fff;
+}
+.box, .section {
+ 	background:#fff;
+}
+.stripe ul li {
+  background:#ccc;
+}
+.stripe ul li .head, #panel {
+  background:#fff;
+}
+#screen, #panel, .currentTextHolder,.section a,.qtip-content, li .content a {
+  color:#666;
+}
+.stripe ul li .content {
+  background:#fff;
+  color:#000;
+}
+.stripe ul li .content a,
+#detail,.currentTextHolder {
+  color:#666;
+}
+#detail .msgtitle .title,#detail .text a {
+  color:#333;
+}
+.stripe ul li .new {
+  background:#eee;
+  border-color:#fff;
+}
+.stripe ul li:hover .head {
+  background:#fff;
+  color:#333;
+}
+.stripe ul li:hover .content,
+.stripe ul li:hover .content a {
+  background:#fff;
+  color:#333;
+}
+
+/* --- Fonts --- */
+
+* {
+	font-family: Calibri, Arial, Helvetica, sans-serif;
+}
+#detail .msgtitle .title {
+  font-family: Georgia, Garamond, serif;
+  font-size:2em;
+  font-weight:bold;
+}
+#detail .text {
+  font-size:1.45em;
+}
+#detail .text a {
+  text-decoration:none;
+}
+.currentTextHolder {
+ 	font-size:1.2em;
+}
+.section a,.qtip-content {
+ 	font-size:1.2em;
+ 	font-weight:bold;
+}
+.stripe ul li .text, .modal {
+  font-size:1.45em;
+}
+.stripe ul li .title {
+  font-family: Georgia, Garamond, serif;
+  font-weight:bold;
+}
+
+
+/* --- Search and Form --- */
+
+.stripe ul li.highlight {
+  border-color:#999;
+}
+#results {
+  background:#666;
+  border-color:#666;
+  color:#fff;
+}
+#timeline {
+  background:#999;
+}
+#panel input {
+  border-color:#ccc;
+  color:#999;
+}

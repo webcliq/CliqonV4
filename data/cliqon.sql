@@ -202,7 +202,7 @@ CREATE TABLE `dbuser` (
  `c_email` varchar(255) NOT NULL DEFAULT 'other',
  `c_group` varchar(255) DEFAULT NULL,
  `c_level` varchar(255) NOT NULL DEFAULT '50:50:50',
- `c_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+ `c_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'other',
  `c_document` longtext NOT NULL,
  `c_options` varchar(255) DEFAULT NULL,
  `c_status` varchar(255) NOT NULL DEFAULT 'active',
