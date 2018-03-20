@@ -1,0 +1,320 @@
+Service
+
+; Config File for a standard datatable
+
+[language]	
+	lengthMenu = '{replace in Method}'
+	zeroRecords = '142:Nothing found - sorry'
+	info = '533:Showing page&nbsp;&nbsp;_PAGE_&nbsp;&nbsp;of&nbsp;&nbsp;_PAGES_'
+	infoEmpty = '144:No records available'
+	infoFiltered = '534:(filtered from&nbsp;&nbsp;_MAX_&nbsp;&nbsp;total records)'
+	emptyTable = '55:No data available in table'
+	loadingRecords = '147:Loading...'
+	processing = '148:Processing...' ; 
+	search = '149:Search&nbsp;'
+	decimal = ','
+	thousands = '.'
+	infoPostFix = ''
+
+[language:paginate]
+	first = '150:First'
+	previous = '151:Previous'
+	next = '152:Next'
+	last = '153:Last'
+
+[language:aria]
+	sortAscending = '154: - activate to sort column ascending'
+	sortDescending = '155: - activate to sort column descending'
+
+[datatable]
+    processing = 'true' ; Displays indicator while processing data
+    serverSide = 'true' ; Process on server or locally
+	paging = true
+	ordering = false
+	dom = ''
+	pagingType = 'full_numbers'
+	lengthMenu = '10,15,20,25,30|10,15,20,25,30'
+	pageLength = '15'
+	searching = 'true'		; Switches searching on or off
+	stateSave = 'true'
+	rowId = 'id'
+	colReorder = 'false'
+	scrolly = 'true'
+	responsive = 'true'
+	select = 'true'
+	style = 'single'
+	autoWidth = 'true'
+	rowId = 'id'
+
+	[datatable:order]
+		0 = 'asc'	
+
+	[datatable:buttons:0]
+		name = 'reload'		
+		extend = 'reload'
+		text = 'Reload'
+		className = 'topbutton btn-sm btn-danger mr5 reloadbutton'
+		titleAttr = 'Reload table'
+			
+	[datatable:buttons:1]
+		name = 'copy'		
+		extend = 'copyHtml5'
+		text = 'Copy'
+		className = 'topbutton btn-sm btn-primary mr5'
+		titleAttr = 'Copy to Clipboard'
+
+	[datatable:buttons:2]
+		name = 'print'		
+		extend = 'print'
+		text = 'Print'
+		className = 'topbutton btn-sm btn-success mr5'
+		titleAttr = 'Print table'
+
+	[datatable:buttons:3]
+		name = 'csvHtml5'		
+		extend = 'csvHtml5'
+		text = 'CSV'
+		className = 'topbutton btn-sm btn-secondary'
+		titleAttr = 'Export data to CSV'
+
+	[datatable:buttons:4]
+		name = 'excelHtml5'		
+		extend = 'excelHtml5'
+		text = 'Excel'
+		className = 'topbutton btn-sm btn-secondary'
+		titleAttr = 'Copy data to Excel'
+
+	[datatable:buttons:5]
+		name = 'pdfHtml5'		
+		extend = 'pdfHtml5'
+		text = 'PDF'
+		className = 'topbutton btn-sm btn-secondary mr5'
+		titleAttr = 'Export data to PDF'
+
+	; These four buttons will be overwritten by specific Config
+
+	[datatable:buttons:6]
+
+	[datatable:buttons:7]
+
+	[datatable:buttons:8]
+
+	[datatable:buttons:9]
+    
+;; YADCF DataTable Filtering
+[yadcf]
+
+Collection
+
+[datatablesnet]
+	[datatablesnet:datatable]
+	select = 'single'
+    ajax.type = 'GET'
+    ajax.dataType = 'json'
+
+	[datatablesnet:datatable:columns]
+		;[datatablesnet:datatable:columns:0]
+		;	visible = 'true'
+		;	width = '15%'			
+		;	searchable = 'false'
+		;	className = 'bold'
+		; 	data = 'function() {}' 	; Name of datafield, function
+		;	name = ''				; Name of datafield
+		;	title = '9999:'	
+		;	type = 'string'			; date, num, num-fmt, html-num, html-num-fmt, html, string
+		;Record ID
+		[datatablesnet:datatable:columns:0]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'true'
+            orderable = 'true'
+			className = 'bold'
+			data = 'id'
+			title = '9999:Id'	
+			type = 'string'	 
+
+Model
+
+[datatablesnet]
+	[datatablesnet:datatable]
+	; initComplete = 'function () {}'
+	autoWidth = 'true'
+	title = 'Cashbook'
+    ajax.url = '/plugin/en/gettabledata/dbtransaction/cashbook/'
+
+	; [datatablesnet:datatable:order]
+		;2 = 'asc'	
+   
+   	[datatablesnet:datatable:columns]
+    	
+        ; Id
+        
+		; Transaction Reference
+		[datatablesnet:datatable:columns:1]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			className = ''
+			data = 'c_reference'
+			title = '542:Ref.'	
+			type = 'string'	
+
+		; Transaction date
+		[datatablesnet:datatable:columns:2]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			className = 'nowrap'
+			data = 'd_transactiondate'
+			title = '183:Date'	
+			type = 'date'	
+
+		; Description	
+		[datatablesnet:datatable:columns:3]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			data = 'd_description'
+			title = '125:Description'	
+			type = 'string'	
+			
+		; Who paid
+		[datatablesnet:datatable:columns:4]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			data = 'd_responsible'
+			title = '221:Responsibility'	
+			type = 'list'
+            list = 'operators'
+
+		; Paid / Unpaid
+		[datatablesnet:datatable:columns:5]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			data = 'c_status'
+			title = '543:Paid'	
+			type = 'yesno'	
+
+		; Category - (i)ncome or (e)expense
+		[datatablesnet:datatable:columns:6]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			className = 'capitalize'
+			data = 'c_category'
+			title = '128:Type'	
+			type = 'string'	
+
+		; Income or Expense type
+		[datatablesnet:datatable:columns:7]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			className = ''
+			data = 'c_common'
+			title = '196:Category'	
+			type = 'list'
+            list = 'transactiontypes'
+			
+		; Credit entry
+		[datatablesnet:datatable:columns:8]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			className = 'nowrap'
+			data = 'x_credit'
+			title = '544:Credit'	
+			type = 'credit'	
+
+		; Debit Entry
+		[datatablesnet:datatable:columns:9]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			className = 'nowrap'
+			data = 'x_debit'
+			title = '545:Debit'	
+			type = 'debit'	
+            
+		; Icons
+		[datatablesnet:datatable:columns:10]
+			visible = 'true'
+			searchable = 'false'
+			sortable = 'false'
+            orderable = 'false'
+			className = 'nowrap'
+			data = 'x_icons'
+			title = '9999:*'	
+            
+ 		; Icons
+		[datatablesnet:datatable:icons]  
+        	[datatablesnet:datatable:icons:edit]  
+            	icon = 'pencil'
+                action = 'editrecord'
+                tooltip = '338:Edit record'
+                
+        	[datatablesnet:datatable:icons:view]  
+            	icon = 'eye'
+                action = 'viewrecord'
+                tooltip = '112:View record'
+                
+        	[datatablesnet:datatable:icons:delete]  
+            	icon = 'trash'
+                action = 'deleterecord'
+                tooltip = '235:Delete Record'
+
+		;; Buttons and other options
+		[datatablesnet:datatable:buttons]
+			[datatablesnet:datatable:buttons:6]
+				name = 'helpButton'	
+				extend = 'topbutton'	
+				text = 'Help'
+				className = 'topbutton btn-sm btn-warning mr5'
+				titleAttr = 'Help'
+				rel = 'dbitem|cashbook'
+
+			[datatablesnet:datatable:buttons:7]
+				name = 'addButton'	
+				extend = 'topbutton'	
+				text = 'Add'
+				className = 'topbutton btn-sm btn-success mr5'
+				titleAttr = 'Add new record'
+				rel = 'dbitem|cashbook'		
+
+			[datatablesnet:datatable:buttons:8]
+				name = 'previsionButton'	
+				extend = 'topbutton'	
+				text = 'Prevision'
+				className = 'topbutton btn-sm btn-danger'
+				titleAttr = 'Convert Prevision to Income or Expense'
+				rel = 'dbitem|cashbook'		
+
+	;; YADCF DataTable Filtering
+	[datatablesnet:yadcf]
+
+	[datatablesnet:yadcf:0]
+		column_number = 2
+        filter_type = 'range_date'
+        filter_container_id = 'fc1'
+        filter_default_label = 'Date'
+        style_class = 'form-control'
+        reset_button_style_class = 'btn btn-sm btn-primary pad6 ml5'
+	[datatablesnet:yadcf:1]
+		column_number = 7
+        filter_container_id = 'fc2'
+        filter_default_label = 'Category'
+        case_insensitive = 'true'
+        style_class = 'custom-select'
+        reset_button_style_class = 'btn btn-sm btn-primary pad6 ml5'
+	
