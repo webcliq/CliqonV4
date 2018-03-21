@@ -1000,7 +1000,7 @@ class Cliq
         public static function eStr($str)
         {
             $txt = self::uStr($str);
-            if($_SESSION['UserName']) {
+            if(array_key_exists('UserName', $_SESSION) and $_SESSION['UserName'] != "") {
 
                 global $clq;
                 $idm = $clq->get('idiom');
