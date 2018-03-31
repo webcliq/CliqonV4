@@ -179,7 +179,7 @@ class Menu extends HTML
 			$mnu = "";
 			$mnu .= H::li(['class' => 'nav-item dropdown'],
 				H::a(['class' => 'nav-link dropdown-toggle nav-link', 'data-toggle' => 'dropdown', 'href' => '#', 'role' => 'button', 'aria-haspopup' => 'true', 'aria-expanded' => 'false'],
-					H::img(['class' => 'img-avatar', 'src' => '/public/images/'.Q::makeAvatar(Z::zget('UserName'), 50), 'title' => Z::zget('UserName'), 'class' => '', 'alt' => $_SESSION['UserName']])
+					H::img(['class' => 'img-avatar', 'src' => '/public/images/'.Q::makeAvatar($_SESSION['UserName'], 50), 'title' => $_SESSION['UserName'], 'class' => '', 'alt' => $_SESSION['UserName']])
 				),
 				H::div(['class' => 'dropdown-menu dropdown-menu-right'],
 					H::div(['class' => 'dropdown-header text-center bold'], Q::cStr('391:Account')),

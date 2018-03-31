@@ -30,7 +30,7 @@ class DefaultController
 		$mnu = $clq->resolve('Menu');
 		$extn = $this->cfg['site']['extension'];
 
-		// Load Template Engine 
+		// Load Template Engine - $vars only apply to outside template!!
 		$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."views"), $clq->get('basedir')."cache/".$this->idiom);		
 		$template = $this->page.'.'.$extn;
 		$vars = [

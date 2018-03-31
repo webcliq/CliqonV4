@@ -10,7 +10,7 @@
  * @version    Release: 4.1.0
  * @link       http://cliqon.com
  */
-class Genmail extends PHPMailer
+class Genmail
 {
 	const THISCLASS = "Genmail extends PHPMailer";
 	private static $idioms;
@@ -26,38 +26,41 @@ class Genmail extends PHPMailer
 
 	function sendMail($args)
 	{
-        $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+        $method = self::THISCLASS.'->'.__FUNCTION__."()";                          
         try {
-            $method = self::THISCLASS.'->'.__FUNCTION__."()";
             global $clq; 
+            $this->cfg = $clq->get('cfg');
+            $mcfg = $this->cfg['mail'];
+
+            $phpmail = $clq->resolve('PHPMailer');
+            $smtp = $clq->resolve('SMTP');
+            $mail = new PHPMailer(true); // Passing `true` enables exceptions
 
 	        //Server settings
 	        $mail->SMTPDebug = 0;                               // Enable verbose debug output 0 - 3
 	        $mail->isSMTP();                                    // Set mailer to use SMTP
-	        $mail->Host = $this->cfg['mail']['hostname'];       // Specify main and backup SMTP servers
+	        $mail->Host = $mcfg['hostname'];       // Specify main and backup SMTP servers
 	        $mail->SMTPAutoTLS = true;
-	        $mail->SMTPAuth = $this->cfg['mail']['smtpauth'];   // Enable SMTP authentication
-	        $mail->AuthType = $this->cfg['mail']['authtype'];
-	        $mail->Username = $this->cfg['mail']['username'];   // SMTP username
-	        $mail->Password = $this->cfg['mail']['password'];   // SMTP password
-	        $mail->SMTPSecure = $this->cfg['mail']['security']; // Enable TLS encryption, `ssl` also accepted
-	        $mail->Port = $this->cfg['mail']['port'];           // TCP port to connect to
+	        $mail->SMTPAuth = $mcfg['smtpauth'];   // Enable SMTP authentication
+	        $mail->AuthType = $mcfg['authtype'];
+	        $mail->Username = $mcfg['username'];   // SMTP username
+	        $mail->Password = $mcfg['password'];   // SMTP password
+	        $mail->SMTPSecure = $mcfg['security']; // Enable TLS encryption, `ssl` also accepted
+	        $mail->Port = $mcfg['port'];           // TCP port to connect to
 
 	        //Recipients
-	        $mail->setFrom($this->cfg['mail']['mailfrom'], $this->cfg['mail']['mailfromname']);
+	        $mail->setFrom($mcfg['mailfrom'], $mcfg['mailfromname']);
 	        $mail->addAddress($args['mailtoaddress'], $args['mailtoname']);     // Add a recipient
-	        $mail->addReplyTo($this->cfg['mail']['mailreplyto'], $this->cfg['mail']['mailreplytoname']);
-	        $mail->addBCC($this->cfg['mail']['altmailto'], $this->cfg['mail']['altmailtoname']);
+	        $mail->addReplyTo($mcfg['mailreplyto'], $mcfg['mailreplytoname']);
+            if($mcfg['altmailto'] != '') {
+                $mail->addBCC($mcfg['altmailto'], $mcfg['altmailtoname']);
+            }
 
 	        //Content
 	        $mail->isHTML(true);                                  // Set email format to HTML
 	        $mail->Subject = $args['subject'];
 	        $mail->Body = $args['msg'];
 	        $mail->send();
-
-            if($mail->ErrorInfo != '') {
-                throw new Exception(Q::cStr('493:Message could not be sent').$mail->ErrorInfo);
-            } 
 
             if($mail->ErrorInfo != '') {
                 throw new Exception(Q::cStr('493:Message could not be sent').$mail->ErrorInfo);
@@ -76,6 +79,62 @@ class Genmail extends PHPMailer
                 'html' => $err
             ]; 
         }                 
+	}
+
+	function diagnoseEmail($vars)
+	{
+
+        $method = self::THISCLASS.'->'.__FUNCTION__."()";                          
+        try {
+            
+            global $clq; global $mmsg;
+            $this->cfg = $clq->get('cfg');
+            $mcfg = $this->cfg['mail'];
+            $rq = $vars['rq'];     
+     
+            $phpmail = $clq->resolve('PHPMailer');
+            $smtp = $clq->resolve('SMTP');
+            $mail = new PHPMailer(true); // Passing `true` enables exceptions
+
+            //Server settings
+            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+            $mail->SMTPDebug = 2;                               // Enable verbose debug output 0 - 3
+            $mail->Debugoutput = function($str, $level) {$GLOBALS['mmsg'] .= "$level: $str\n";};
+            
+            $mail->isSMTP();                                    // Set mailer to use SMTP
+            $mail->Host = $mcfg['hostname'];       // Specify main and backup SMTP servers
+            $mail->SMTPAutoTLS = true;
+            $mail->SMTPAuth = $mcfg['smtpauth'];   // Enable SMTP authentication
+            $mail->AuthType = $mcfg['authtype'];
+            $mail->Username = $mcfg['username'];   // SMTP username
+            $mail->Password = $mcfg['password'];   // SMTP password
+            $mail->SMTPSecure = $mcfg['security']; // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = $mcfg['port'];           // TCP port to connect to
+
+            //Recipients
+            $mail->setFrom($mcfg['mailfrom'], $mcfg['mailfromname']);
+            $mail->addAddress($rq['mailto'], $rq['mailtoname']);     // Add a recipient
+            $mail->addAddress($rq['mailreplyto'], $rq['mailreplytoname']);
+            $mail->addReplyTo($rq['mailreplyto'], $rq['mailreplytoname']);
+            if($mcfg['altmailto'] != '') {
+                $mail->addBCC($mcfg['altmailto'], $mcfg['altmailtoname']);
+            }
+            
+            //Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->Subject = $rq['subject'];
+            $mail->Body = $rq['message'];
+            $mail->send();
+
+            if($mail->ErrorInfo != '') {
+                throw new Exception(Q::cStr('493:Message could not be sent').$mail->ErrorInfo);
+            }
+
+            return [$mmsg];
+        } catch (Exception $e) {
+            $mmsg = $e->getMessage();
+            return [$mmsg];
+        }              
 	}
 }
 

@@ -18,6 +18,8 @@
 			<div class="col-12">			
 				<div class="card">
 					<div class="card-block" id="@($tblopts.tableId)" style="@($tblopts.style)">
+						
+						<!-- Toolbar -->
 						<div class="toolbar" id="toolbar"></div>
 
 						<!-- DataTable -->
@@ -115,7 +117,6 @@
 		                    <nav class="right">
 		                        <ul class="pagination smaller" id="tablepagination"></ul>
 		                    </nav>
-
 		                </div>
 	                    
 					</div>	

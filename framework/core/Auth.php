@@ -329,78 +329,93 @@ class Auth {
             try {
 
                 global $clq;
-                // Call to Database for Username and Password
-                $sql = "SELECT * FROM dbuser WHERE c_username = ? AND c_status = ?";
-                $row = R::getRow($sql, [$rq['username'], 'active']);
+                $check = false;
 
-                if($row) {
-                    $hasher = new PasswordHash(8, false);
-                    $check = $hasher->CheckPassword($rq['password'], $row['c_password']); // Input, Database
+                //if session isnt active but a cookie exists load the user back up.
+                if (((isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === false) || !isset($_SESSION['loggedin'])) && isset($_COOKIE['loggedin'])  && $_COOKIE['loggedin'] == 1) {
                     
-                    if($check) {
+                    //DONT FORGET - USER CAN CHANGE THE COOKIE :O - check the hash
+                    $hash = $_COOKIE['hash'];
+                    $id = $_COOKIE['UserID'];
 
-                        $_SESSION['FullName'] = self::getUserFullName($row, false);
-                        $_SESSION['UserName'] = $row['c_username'];
-                        $_SESSION['Group'] = $row['c_group'];
-                        $_SESSION['UserID'] = $row['id'];
-                        $_SESSION['UserEmail'] = $row['c_email'];
-                        $_SESSION['UserLevel'] = $row['c_level'];
-                        $_SESSION['UserGroup'] = $row['c_group'];
-                        $_SESSION['UserLanguage'] = $rq['langcd'];
+                    if ($hash == md5('rand_3453*'.$id.'_87@hashHASH')) {
+                        // Call to Database for Username and Password
+                        $sql = "SELECT * FROM dbuser WHERE c_username = ? AND c_status = ?";
+                        $row = R::getRow($sql, [$rq['username'], 'active']);
+                        $check = true;
+                    } else {
+                        //destroy the cookie, its been tampered with.
+                        setcookie("loggedin", '', time() - 9999);
+                        setcookie("UserID", '', time() - 9999);
+                        setcookie("hash", '', time() - 9999);
+                    }
 
-                    } 
-                                    
                 } else {
 
-                    $users = $clq->get('cfg')['site']['users'];
-                    
-                    $check = false;
+                    // Call to Database for Username and Password
+                    $sql = "SELECT * FROM dbuser WHERE c_username = ? AND c_status = ?";
+                    $row = R::getRow($sql, [$rq['username'], 'active']);
 
-                    foreach($users as $id => $user) {
-                        // Does User exist in Config file ??
-                        if($rq['username'] == $user['c_username']) {
-                            if($user['c_password'] == $rq['password']) {
-                                $check = true;
-                                $row = $user;
-                                $row['id'] = $id;
-                                if($check) {
+                    if($row) {
+                        $hasher = new PasswordHash(8, false);
+                        $check = $hasher->CheckPassword($rq['password'], $row['c_password']); // Input, Database         
+                    } else {
 
-                                    $_SESSION['FullName'] = self::getUserFullName($row, false);
-                                    $_SESSION['UserName'] = $row['c_username'];
-                                    $_SESSION['Group'] = $row['c_group'];
-                                    $_SESSION['UserID'] = $row['id'];
-                                    $_SESSION['UserEmail'] = $row['c_email'];
-                                    $_SESSION['UserLevel'] = $row['c_level'];
-                                    $_SESSION['UserGroup'] = $row['c_group'];
-                                    $_SESSION['UserLanguage'] = $rq['langcd'];
+                        $users = $clq->get('cfg')['site']['users'];
+                        foreach($users as $id => $user) {
+                            // Does User exist in Config file ??
+                            if($rq['username'] == $user['c_username']) {
+                                if($user['c_password'] == $rq['password']) {
+                                    $check = true;
+                                    $row = $user;
+                                    $row['id'] = $id;  
 
-                                }                        
-                                break;
-                            } else {
-                                break;
+                                    break;
+                                } else {
+                                    break;
+                                }
+                                
                             }
                             
-                        }
-                        
-                    } // End foreach $users
-                } // End if Row
+                        } // End foreach $users
+                    } // End if Row
+
+                    // Remember me
+                    if(isset($rq['rememberme']) and $rq['rememberme'] == 'remember-me') {
+                        setcookie("UserID", $row['id'], time() + (3600 * 24 * 14));
+                        setcookie("hash", md5('rand_3453*'.$row['id'].'_87@hashHASH'), time() + (3600 * 24 * 14));
+                    };                    
+
+                }
 
                 if($check) {
-
+                    self::setSession($row);
+                    $_SESSION['loggedin'] = true;
                     $clq->set('lcd', $rq['langcd']); 
-                    $_SESSION['CliqonAdminUser'] = $_SESSION['UserName'];
-                    Z::zset('Langcd', $rq['langcd']); // 2 hours
-                    Z::zset('UserName', $_SESSION['UserName']); // 2 hours
-                    Z::zset('UserID', $_SESSION['UserID']); // 2 hours
-                    return ['flag' => 'Ok', 'msg' => ''];
 
+                    Z::zset('Langcd', $rq['langcd']); // 2 hours
+                    return ['flag' => 'Ok', 'msg' => $_SESSION['UserName'], 'data' => ['recid' => $_SESSION['UserID']]];
                 } else { 
                     return ['flag' => 'NotOk', 'msg' => Q::cStr('364:Login failed')];
-                }  
+                } 
 
             } catch(Exception $e) {
                 return ['flag' => 'NotOk', 'msg' => $e->getMessage()];
             }
+        }
+
+        private function setSession($row)
+        {
+            $_SESSION['FullName'] = self::getUserFullName($row, false);
+            $_SESSION['UserName'] = $row['c_username'];
+            $_SESSION['Group'] = $row['c_group'];
+            $_SESSION['UserID'] = $row['id'];
+            $_SESSION['UserEmail'] = $row['c_email'];
+            $_SESSION['UserLevel'] = $row['c_level'];
+            $_SESSION['UserGroup'] = $row['c_group'];
+            $_SESSION['CliqonAdminUser'] = $_SESSION['UserName'];
+
+            return;
         }
 
         /**

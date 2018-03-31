@@ -855,6 +855,7 @@ class Admin
 
 			    	Cliq.datatable(".F::jsonEncode($dtcfg).");
 			    ";
+			    
 			    $clq->set('js', $js);
 
 				// Test
@@ -3743,5 +3744,6 @@ class Admin
 		/** Add more utility methods here 
 		 *
 		 **/
+		 
 
 } // Class Ends

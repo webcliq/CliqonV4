@@ -146,6 +146,53 @@ class Website extends Cliq
             return Q::cVal('dbindex', '', 'c_value', $ref, false);
         }
 
+    /** Unit tests  
+     * 
+     * 
+     ***********************************************************************************************************************/
+
+        /** Diagnose email 
+         * @param - array - usual variables
+         * @return - HTML containg test
+         **/
+        function diagnoseEmail($vars)
+        {
+            $method = self::THISCLASS.'->'.__FUNCTION__.'()';
+            try {
+
+                global $clq;
+                $rq = $vars['rq'];
+                $idiom = $vars['idiom'];
+                $table = $vars['table'];
+                $idioms = $clq->get('idioms');
+                $this->cfg = $clq->get('cfg');
+                $extn = $this->cfg['site']['extension'];
+                $js = ""; $content = ""; 
+                $thisvars = ['rq' => $rq, 'idiom' => $idiom, 'idioms' => $clq->get('idioms'), 'viewpath' => $clq->get('rootpath').'views/', 'cfg' => $this->cfg];
+                $tpl = "testemail.".$extn;
+                $content = Q::publishTpl($tpl, $thisvars, "views/components", "cache/".$idiom);
+                $data = [
+                    'mailtoname' => '',
+                    'mailto' => '',
+                    'mailreplytoname' => $this->cfg['mail']['mailreplytoname'],
+                    'mailreplyto' => $this->cfg['mail']['mailreplyto'],
+                    'subject' => '',
+                    'message' => ''
+                ];
+                $clq->set('js', $js);       
+                return ['flag' => 'Ok', 'msg' => $content, 'data' => $data];
+
+            } catch(Exception $e) {
+                $err = [
+                    'method' => $method,
+                    'errmsg' => $e->getMessage(),
+                    'vars' => $vars,
+                ];
+                L::cLog($err);
+                return ['flag' => 'NotOk', 'msg' => $e->getMessage()];
+            } 
+        }
+
 } // Class ends
 
 # alias +e+ class

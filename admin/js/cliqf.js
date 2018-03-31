@@ -415,7 +415,7 @@
 							$('#'+id).empty().focus();
 							Cliq.msg({buttons:false, type:'error', text:lstr[137]});
 						}
-					})
+					});
 
 				// Slider
 					$('.slider').slider({
@@ -425,7 +425,7 @@
 					});
 					$('.slider').on('slide', function(evt) {
 						Vue.set(cfg.df, evt.target.id, evt.value);
-					})
+					});
 
 				// Reduced width Trumbo editor
 					$.trumbowyg.svgPath = sitepath+'admin/css/icons.svg';

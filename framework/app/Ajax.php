@@ -36,31 +36,14 @@ class Ajax
 			];				
 		}
 
-		function login($vars)
-		{
-			// table == dbuser, tabletype == "", $rq == username, password
-			global $clq;
-			$auth = $clq->resolve('Auth');
-			return [
-				'content' => $auth->login($vars['rq']),
-				'callBack' => ""
-			];				
-		}
-
-		/**
-		 * Logout 
-		 * @param - Request string
-		 * @return - Template and initial data
-		 **/
-		function logout($vars)
-		{
-			global $clq;
-			$auth = $clq->resolve('Auth');
-			return [
-				'content' => $auth->logout(),
-				'callBack' => ""
-			];	
-		}
+	/** Administration, Dashboard and Desktop    
+	 * 
+	 * getdashboard() - 
+	 * dodashboard() - 
+	 * dotemplatedownload()
+	 * postadminjstrings()
+	 *
+	 **************************************** Administration *******************************************************/	
 
 		/**
 		 * Administrative Dashboard - GET by AJAX
@@ -109,6 +92,42 @@ class Ajax
 				'callBack' => ""
 			];
 		}
+
+		/**
+		 * Write altered Javascript strings back to their respective files
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - Message
+		 **/
+		function postadminjstrings($vars)
+		{
+			global $clq;
+			$adm = $clq->resolve('Admin');
+			return [
+				'content' => $adm->writeAdminJStrings($vars),
+				'callBack' => ""
+			];	
+		}
+
+	/** Utilities    
+	 * 
+	 * doconvertarray() - 
+	 * dotestarray() - 
+	 * dolcdimport()
+	 * addnewoption()
+	 * addnewidiom()
+	 * deleteidiom()
+	 * doimportdata
+	 * fileupload()
+	 * clearcache()
+	 * clearlogs()
+	 *
+	 * getsitemap()
+	 * dositemap()
+	 * dictionaryedit()
+	 * dictionarycopy()
+	 *
+	 **************************************** Utilities *******************************************************/	
 
 		/**
 		 * Either does a test of the convert or does a live convert
@@ -306,107 +325,6 @@ class Ajax
 		    }		
 		}
 
-		/**
-		 * Create a file and return true or false
-		 *
-		 * @param - array - Variables from Construct
-		 * @return - string - Message
-		 **/	
-		function createfile($vars)
-		{	
-			global $clq;
-			$fl = $clq->resolve('Files');
-			return [
-				'content' => ['flag' => 'Ok', 'data' => Y::creatFile($vars['rq']['filepath'])],
-				'callBack' => ""
-			];			
-		}
-
-		/**
-		 * Open and read a file
-		 *
-		 * @param - array - Variables from Construct
-		 * @return - string - File contents
-		 **/	
-		function openfile($vars)
-		{	
-			global $clq;
-			$fl = $clq->resolve('Files');
-			$tomlmap = Y::readFile($vars['rq']['filepath']);
-			// $tomlmap = preg_replace("/\t/", " ", $tomlmap); // tabs with spaces
-	        // $tomlmap = preg_replace("/\s+/", " ", $tomlmap); // Multiple spaces with single space
-			$tomlmap = preg_replace("/\r\n/", "\n", $tomlmap); // Carriage return and newline (not respected by CodeEditor display) with just Newline
-
-			return [
-				'content' => ['flag' => 'Ok', 'data' => $tomlmap],
-				'callBack' => ""
-			];
-		}
-
-		/**
-		 * Create a file if it doesn't already exists and write content to it
-		 *
-		 * @param - array - Variables from Construct
-		 * @return - string - Message
-		 **/	
-		function writefile($vars)
-		{	
-			global $clq;
-			$fl = $clq->resolve('Files');
-			return [
-				'content' => ['flag' => 'Ok', 'data' => Y::writeFile($vars['rq']['filepath'], $vars['rq']['content'])],
-				'callBack' => ""
-			];
-		}
-
-		/**
-		 * Delete an existing file
-		 *
-		 * @param - array - Variables from Construct
-		 * @return - string - Message
-		 **/	
-		function deletefile($vars)
-		{	
-			global $clq;
-			$fl = $clq->resolve('Files');
-			return [
-				'content' => ['flag' => 'Ok', 'data' => Y::deleteFile($vars['rq']['filepath'])],
-				'callBack' => ""
-			];
-		}
-
-		/**
-		 * Rename an existing file
-		 *
-		 * @param - array - Variables from Construct
-		 * @return - string - Message
-		 **/	
-		function renamefile($vars)
-		{	
-			global $clq;
-			$fl = $clq->resolve('Files');
-			return [
-				'content' => ['flag' => 'Ok', 'data' => Y::renameFile($vars['rq']['oldfilepath'], $vars['rq']['newfilepath'])],
-				'callBack' => ""
-			];
-		}
-
-		/**
-		 * Write altered Javascript strings back to their respective files
-		 *
-		 * @param - array - Variables from Construct
-		 * @return - string - Message
-		 **/
-		function postadminjstrings($vars)
-		{
-			global $clq;
-			$adm = $clq->resolve('Admin');
-			return [
-				'content' => $adm->writeAdminJStrings($vars),
-				'callBack' => ""
-			];	
-		}
-
 		function fileeditor($vars)
 		{
 			global $clq; $fi = $clq->resolve('Files');
@@ -508,18 +426,19 @@ class Ajax
 			];				
 		}
 
-		/**
-		 * Serverside translation call
-		 *
-		 **/
-		function translate($vars)
-		{
-			global $clq; $adm = $clq->resolve('Admin');
-			return [
-				'content' => $adm->getTranslation($vars),
-				'callBack' => ""
-			];				
-		}
+	/** Data Retrieval    
+	 * 
+	 * getdata() - single row 
+	 * getgriddata() - for Gijgo grid
+	 * gettabledata()
+	 * getlistdata()
+	 * gettreedata()
+	 * getcarddata()
+	 * getgjtreedata() - for Gijgo Tree
+	 * treenodedrop()
+	 * getcalandardata()
+	 *
+	 **************************************** Data Retrieval *********************************************************/	
 
 		/**
 		 * Get single row
@@ -638,7 +557,19 @@ class Ajax
 				'content' => $db->getCalendarData($vars),
 				'callBack' => ""
 			];	
-		}	
+		}
+
+	/** Forms Management    
+	 * 
+	 * getform() - 
+	 * getformletdata() - 
+	 * getnextref()
+	 * isunique()
+	 * bootcomplete()
+	 * translate()
+	 * postform()
+	 **
+	 **************************************** Forms Management *******************************************************/	
 
 		function getform($vars)
 		{
@@ -685,6 +616,19 @@ class Ajax
 			];
 		}
 
+		/**
+		 * Serverside translation call
+		 *
+		 **/
+		function translate($vars)
+		{
+			global $clq; $adm = $clq->resolve('Admin');
+			return [
+				'content' => $adm->getTranslation($vars),
+				'callBack' => ""
+			];				
+		}
+
 		function postform($vars)
 		{
 			global $clq; $db = $clq->resolve('Db');
@@ -693,6 +637,15 @@ class Ajax
 				'callBack' => ""
 			];
 		}	
+
+	/** Records Management    
+	 * 
+	 * postvalue() - 
+	 * viewrecord() - 
+	 * ()
+	 * deleterecord()
+	 *
+	 **************************************** Records Management ******************************************************/	
 
 		function postvalue($vars)
 		{
@@ -721,18 +674,109 @@ class Ajax
 			];	
 		}
 
+	/** File Management    
+	 * 
+	 * createfile() - 
+	 * openfile() - 
+	 * writefile()
+	 * deletefile()
+	 * renamefile()
+	 *
+	 **************************************** Files Management *******************************************************/	
+
 		/**
-		 * Delete records from the Archive table before a certain date
-		 * @param - array - usual parameters
-		 **/
-		function deletebefore($vars)
-		{
-			global $clq; $db = $clq->resolve('Db');
+		 * Create a file and return true or false
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - Message
+		 **/	
+		function createfile($vars)
+		{	
+			global $clq;
+			$fl = $clq->resolve('Files');
 			return [
-				'content' => $db->deleteBefore($vars),
+				'content' => ['flag' => 'Ok', 'data' => Y::creatFile($vars['rq']['filepath'])],
 				'callBack' => ""
-			];	
+			];			
 		}
+
+		/**
+		 * Open and read a file
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - File contents
+		 **/	
+		function openfile($vars)
+		{	
+			global $clq;
+			$fl = $clq->resolve('Files');
+			$tomlmap = Y::readFile($vars['rq']['filepath']);
+			// $tomlmap = preg_replace("/\t/", " ", $tomlmap); // tabs with spaces
+	        // $tomlmap = preg_replace("/\s+/", " ", $tomlmap); // Multiple spaces with single space
+			$tomlmap = preg_replace("/\r\n/", "\n", $tomlmap); // Carriage return and newline (not respected by CodeEditor display) with just Newline
+
+			return [
+				'content' => ['flag' => 'Ok', 'data' => $tomlmap],
+				'callBack' => ""
+			];
+		}
+
+		/**
+		 * Create a file if it doesn't already exists and write content to it
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - Message
+		 **/	
+		function writefile($vars)
+		{	
+			global $clq;
+			$fl = $clq->resolve('Files');
+			return [
+				'content' => ['flag' => 'Ok', 'data' => Y::writeFile($vars['rq']['filepath'], $vars['rq']['content'])],
+				'callBack' => ""
+			];
+		}
+
+		/**
+		 * Delete an existing file
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - Message
+		 **/	
+		function deletefile($vars)
+		{	
+			global $clq;
+			$fl = $clq->resolve('Files');
+			return [
+				'content' => ['flag' => 'Ok', 'data' => Y::deleteFile($vars['rq']['filepath'])],
+				'callBack' => ""
+			];
+		}
+
+		/**
+		 * Rename an existing file
+		 *
+		 * @param - array - Variables from Construct
+		 * @return - string - Message
+		 **/	
+		function renamefile($vars)
+		{	
+			global $clq;
+			$fl = $clq->resolve('Files');
+			return [
+				'content' => ['flag' => 'Ok', 'data' => Y::renameFile($vars['rq']['oldfilepath'], $vars['rq']['newfilepath'])],
+				'callBack' => ""
+			];
+		}
+
+	/** Models  
+	 * 
+	 * modeleditor() - 
+	 * modelwrite() - 
+	 * modelview()
+	 * modeldelete()
+	 *
+	 **************************************** Models ***************************************************************/	
 
 		/**
 		 * 
@@ -794,14 +838,15 @@ class Ajax
 			];		
 		}
 
-		function gethelp($vars)
-		{
-			global $clq; $vw = $clq->resolve('View');
-			return [
-				'content' => $vw->displayHelp($vars),
-				'callBack' => ""
-			];			
-		}
+	/** Text editor content and codeeditor  
+	 * 
+	 * viewcontent() - 
+	 * editcontent() - 
+	 * editcode()
+	 * savecontent()
+	 * savecode()
+	 *
+	 **************************************** Text and Code editor ******************************************************/	
 
 		function viewcontent($vars)
 		{
@@ -846,6 +891,16 @@ class Ajax
 				'callBack' => ""
 			];			
 		}
+
+	/** Reports  
+	 * 
+	 * previewreport() - 
+	 * updatereport() - 
+	 * listreports()
+	 * getreport()
+	 * printreport()
+	 *
+	 **************************************** Reports ***************************************************************/	
 
 		function previewreport($vars)
 		{
@@ -892,14 +947,12 @@ class Ajax
 			];			
 		}
 
-		function displayimages($vars)
-		{
-			global $clq; $rpt = $clq->resolve('Report');
-			return [
-				'content' => $rpt->displayImages($vars),
-				'callBack' => ""
-			];			
-		}
+	/** Business Directory  
+	 * 
+	 * listcompanies() - 
+	 * 
+	 *
+	 **************************************** User Management ***************************************************************/	
 
 		function listcompanies($vars)
 		{
@@ -909,6 +962,100 @@ class Ajax
 				'callBack' => ""
 			];			
 		}	
+
+	/** User Management  
+	 * 
+	 * login() - administration login
+	 * logout() - administration logout
+	 * 
+	 * getuserlogin() - display user login form from component template
+	 * getuserregister() - display registration form from component template
+	 * postuser() - post user registration form
+	 * 
+	 * viewuser()
+	 * deleteuser()
+	 **************************************** User Management ***************************************************************/	
+
+		function login($vars)
+		{
+			// table == dbuser, tabletype == "", $rq == username, password
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			return [
+				'content' => $auth->login($vars['rq']),
+				'callBack' => ""
+			];				
+		}
+
+		/** Logout 
+		 * @param - Request string
+		 * @return - Template and initial data
+		 **/
+		function logout($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			return [
+				'content' => $auth->logout(),
+				'callBack' => ""
+			];	
+		}
+
+		/** Get Users in a table - not all users but distinguished by tabletype
+		 * @param - Request string
+		 * @return - Template content and initial data
+		 **/
+		function getusers($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			$result = [
+				'content' => $authex->displayUsers($vars),
+				'callBack' => ""
+			];
+			return $result;
+		}
+
+		/** Get Login form with Register and Forgot password buttons 
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function getuserlogin($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			$result = [
+				'content' => $authex->displayLogin($vars),
+				'callBack' => ""
+			];
+			return $result;
+		}		
+
+		function getuserregister($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			$result = [
+				'content' => $authex->displayRegister($vars),
+				'callBack' => ""
+			];
+			return $result;
+		}	
+
+		function postuser($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			$result = [
+				'content' => $authex->userRegister($vars),
+				'callBack' => ""
+			];
+			return $result;			
+		}
 
 		/** Change Password
 		 * @param - array of variables
@@ -978,6 +1125,46 @@ class Ajax
 		}
 
 		/**
+		 * View User
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function viewuser($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->userProfile($vars),
+				'callBack' => ""
+			];
+		}
+
+		/**
+		 * Delete User from dbusers after validation is completed
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function deleteuser($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->doDeleteUser($vars),
+				'callBack' => ""
+			];
+		}
+
+	/** Creator Records  
+	 * 
+	 * getrecorddata()
+	 * getcreatorform()
+	 * postcreatormform() 
+	 *
+	 **************************************** User Management ***************************************************************/	
+
+		/**
 		 * Get recordset in grid format for the Record Creator generic grid
 		 *
 		 **/
@@ -1016,6 +1203,13 @@ class Ajax
 			];	
 		}	
 
+	/** Contenteditable  
+	 * 
+	 * updateuserstring()
+	 * updateusertext()
+	 *
+	 **************************************** Contenteditable *************************************************************/	
+
 		/** Update website user strings using contenteditable
 		 * @param - array usual variables
 		 **/
@@ -1036,6 +1230,84 @@ class Ajax
 			global $clq; $db = $clq->resolve('Db');
 			return [
 				'content' => $db->updateItemVal($vars),
+				'callBack' => ""
+			];	
+		}
+
+	/** Miscellaneous  
+	 * 
+	 * displayimages()
+	 * gethelp()
+	 * deletebefore() - delete log and archive records before a certain number of days
+	 * getcatvalue()
+	 * testemail()
+	 * - dotestmail()
+	 * get_status_message()
+	 *
+	 **************************************** Miscellaneous **************************************************************/
+
+		function displayimages($vars)
+		{
+			global $clq; $rpt = $clq->resolve('Report');
+			return [
+				'content' => $rpt->displayImages($vars),
+				'callBack' => ""
+			];			
+		}
+
+		function gethelp($vars)
+		{
+			global $clq; $vw = $clq->resolve('View');
+			return [
+				'content' => $vw->displayHelp($vars),
+				'callBack' => ""
+			];			
+		}
+
+		/**
+		 * Delete records from the Archive table before a certain date
+		 * @param - array - usual parameters
+		 **/
+		function deletebefore($vars)
+		{
+			global $clq; $db = $clq->resolve('Db');
+			return [
+				'content' => $db->deleteBefore($vars),
+				'callBack' => ""
+			];	
+		}
+
+		/**
+		 * Extend a category, client side
+		 * @param - array - usual parameters
+		 **/	 
+		function getcatvalue($vars)
+		{
+			$rq = $vars['rq'];
+			return [
+				'content' => ['flag' => 'Ok', 'msg' => Q::fList($rq['value'], $rq['listname'])],
+				'callBack' => ""
+			];		
+		}
+
+		// Display
+		function testemail($vars)
+		{
+			global $clq;
+			$web = $clq->resolve('Website');
+			return [
+				'content' => $web->diagnoseEmail($vars),
+				'callBack' => ""
+			];	
+		}
+
+		// Do
+		function dotestemail($vars)
+		{
+			global $clq; 
+			$mail = $clq->resolve('Genmail');
+			return [
+				'content' => $mail->diagnoseEmail($vars),
 				'callBack' => ""
 			];	
 		}

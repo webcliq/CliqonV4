@@ -2149,8 +2149,8 @@
              * @param - object - any data
              * @return - Response as JSON 
              **/
-            var clqAjax = function(urlstr, dta)
-            {
+             var clqAjax = function(urlstr, dta)
+             {
                 aja().method('GET').url(urlstr).cache(false).timeout(2500).type('json').data(dta)
                 .on('40x', function(response) { error('Page not Found - '+urlstr+':'+response)})
                 .on('500', function(response) { error('Server Error - '+urlstr+':'+response)})
@@ -2169,18 +2169,18 @@
 
                     } else { error('Response was not JSON object - '+urlstr+':'+response.msg); }
                 }).go();               
-            }  
+             }  
 
             var success = function(text) { return msg({type: 'success', buttons: false, text: text});  }  
 
             var error = function(text) { return msg({type: 'warning', buttons: false, text: text}); }  
             
-            /**
-             * Noty Alert box
+            /** Noty Alert box
+             * 
              * @param - object - Usroptions that overwrite defaults
              **/
-            var msg = function(usroptions) 
-            {
+             var msg = function(usroptions) 
+             {
                 // usroptions = array
                 var tpl = `
                     <div class="noty_message minh3">
@@ -2212,14 +2212,14 @@
                 options = array_replace(options, usroptions);
                 var $noty = noty(options);
                 return $noty;
-            }
+             }
 
-            /**
+            /** jsPanel  
              * JSPanel Window - supports HTML content direct, HTML content from existing Div, Content by Ajax and iFrame
              * @param - object - Usroptions that overwrite defaults
              **/
-            var win = function(usroptions)
-            {
+             var win = function(usroptions)
+             {
                 cfg.dp++;
                 var thisid = 'jsPanel-'+cfg.dp;
         
@@ -2314,7 +2314,7 @@
                 options = array_replace(options, usroptions);
                 $.jsPanel({config: options});  
                 $('#'+thisid).css('z-index', 10000+cfg.dp);
-            }  
+             }  
 
             var popup = function(options) 
             {
