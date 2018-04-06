@@ -39,7 +39,7 @@ class AdminController
 			'idioms' => $this->cfg['site']['idioms']
 		];	
 
-		if(!isset($_SESSION['UserName']) and empty($_SESSION['UserName'])) {
+		if(!isset($_SESSION['UserName']) and empty($_SESSION['UserName']) or $_SESSION['UserName'] == 'cliqonguest') {
 
 			$cms = $clq->resolve('Cms');	
 			$this->page = 'login';
