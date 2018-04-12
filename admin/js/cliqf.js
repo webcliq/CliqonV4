@@ -35,8 +35,10 @@
          * vueForm()
          * - formMounted()
          * - frmBtn()
-         * 
-         * 
+         * addOption()
+         * deleteButton()
+         * - deleteRecords()
+         *
          *************************************************************************************/	
 
             /** Create or Edit a Record
@@ -1388,7 +1390,7 @@
 				                                    switch(params.displaytype) {
 				                                    	
 				                                    	case "datagrid": cfg.dg.reload(); break;
-				                                    	case "datatable": Cliq.loadTableData(); break;
+				                                    	case "blogarticle": case "datatable": Cliq.loadTableData(); break;
 				                                    	default: reLoad(); break;
 				                                    };	                                    
 				                                                        
@@ -1422,7 +1424,6 @@
 	     * resetPassword(msg)
 	     * passwordStrength(pwd)
 	     * changeUserStatusButton(recid)
-	     * changeStatus(msg) - not sure this is used, consider deprecated
 	     *
 	     ************************************************************************************************/
 
@@ -1526,43 +1527,12 @@
                 });
              }
 
-	     	/** Change general status
-	     	 *
-	     	 **/ 
-             var changeStatus = function(msg)
-             {
-                var options = $.parseJSON(msg);
-                var $noty = Cliq.msg(options); // returns $noty
-
-                $('.closenoty').on('click', function(e) {
-                    $noty.close();
-                });
-
-                $('.submitnoty').on('click', function(e) {
-                    e.preventDefault();
-                    var sts = $('input[name="c_status"]').val();
-                    var uid = $('input[name="id"]').val();
-                    cfg.action = "dochangeuserstatus";
-                    var frmData = new FormData();
-                    frmData.append('c_status', sts);
-                    frmData.append('id', uid);
-                    var urlstr = '/api/'+jlcd+'/'+cfg.action+'/'+cfg.table+'/'+cfg.tabletype+'/';
-                    $.ajax({
-                        url: urlstr, data: frmData,
-                        cache: false, contentType: false, processData: false,
-                        type: 'POST', async: false, timeout: 25000,
-                        success: handleResponse, error: handleError, complete: function() {
-                            $noty.close();
-                        }
-                    });  
-                }); 
-             }
-
         /** Form Support Functions 
          * modInput()
          * getFormData()
          * handleResponse()
          * handleError()
+         * changeStatus(msg)
          *
          *************************************************************************************/	
 
@@ -1813,6 +1783,38 @@
 				Cliq.error(JSON.stringify(response.msg));
 				return false;
          	 }
+
+	     	/** Change general status
+	     	 *
+	     	 **/ 
+             var changeStatus = function(msg)
+             {
+                var options = $.parseJSON(msg);
+                var $noty = Cliq.msg(options); // returns $noty
+
+                $('.closenoty').on('click', function(e) {
+                    $noty.close();
+                });
+
+                $('.submitnoty').on('click', function(e) {
+                    e.preventDefault();
+                    var sts = $('input[name="c_status"]').val();
+                    var uid = $('input[name="id"]').val();
+                    cfg.action = "dochangestatus";
+                    var frmData = new FormData();
+                    frmData.append('c_status', sts);
+                    frmData.append('id', uid);
+                    var urlstr = '/ajax/'+jlcd+'/'+cfg.action+'/'+cfg.table+'/'+cfg.tabletype+'/';
+                    $.ajax({
+                        url: urlstr, data: frmData,
+                        cache: false, contentType: false, processData: false,
+                        type: 'POST', async: false, timeout: 25000,
+                        success: handleResponse, error: handleError, complete: function() {
+                            $noty.close();
+                        }
+                    });  
+                }); 
+             }
 
         /** Import - Export Routines
          *

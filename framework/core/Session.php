@@ -14,7 +14,7 @@ class Session {
 	public function __construct() {
 		
 		// Set handler to overide SESSION
-		session_set_save_handler(
+		@session_set_save_handler(
 			array($this, "_open"),
 			array($this, "_close"),
 			array($this, "_read"),
@@ -22,7 +22,6 @@ class Session {
 			array($this, "_destroy"),
 			array($this, "_gc")
 		);
-
 	}
 
 	function _open()

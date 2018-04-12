@@ -23,6 +23,7 @@ class Db
         // Make table if not exists
         $tablename = "dbindex";
 	}
+
     /** Cliqon ORM Helpers to write records to the database
      *
      * postForm()
@@ -597,6 +598,7 @@ class Db
 							case "array": $result = $val; break;
 							case "object": $result = Q::object_to_array($val); break;
 							case "string":
+								$val = urldecode($val);
 								// If it is a badly formatted string
 								$qrepl = ['\\', '"{', '}"'];
 								$qwith = ['', '{', '}'];
@@ -1047,8 +1049,8 @@ class Db
          * @param - array - Usual $arguments
          * @return - array - Ok flag and data or error
          **/
-		public static function updateItemVal($vars)
-		{
+		 public static function updateItemVal($vars)
+		 {
 	        try {
 
 				if(!A::getAuth("write", $vars['table'], $vars['tabletype'], '')) {
@@ -1105,13 +1107,14 @@ class Db
 					'msg' => $e->getMessage() 
 				]; 
 			}	
-		}
+		 }
 
     /** Data Retrieval
      *
      * getGridData()
      * getListData()  
-     * getTableData()        
+     * getTableData()   
+     * - getPagedData()     
      * getTreeData()
      * getCardData()
      * getCalendarData()
@@ -1177,7 +1180,7 @@ class Db
 				'query' => $r['sql']
 			];						
 			return $result;         
-		 }        
+		 }          
 
 		/** Get paged data
 		 *
@@ -1344,7 +1347,8 @@ class Db
 								$vars['table'], // table from which record is derived
 								$rs[$r]['id'] // row id
 							);
-						} 
+						};
+						$rows[$r]['id'] = $rs[$r]['id'];
 					};	
 
 				}; 	

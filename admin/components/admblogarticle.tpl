@@ -71,12 +71,11 @@
 
 	                            <!-- Rows are returned -->
 	                            <tr v-else v-for="(row, rowid) in rows" v-bind:data-id="row.id">
-	                            	<td scope="row"><input type="checkbox" class="form-control mb0 mt5" v-bind:data-id="row.id"></td>
+	                            	<td scope="row"><input type="checkbox" class="form-control mb0 mt5" v-bind:data-id="row.id" v-bind:data-uname="row.c_username" v-bind:data-email="row.c_email" ></td>
 	                                <td 
 	                                	v-for="(col, colid) in cols" 
 	                                	v-html="row[colid]"
 	                                	v-bind:data-id="colid"  
-	                                	v-bind:data-recid="row.id"  
 	                                	v-if="col.class != 'undefined'" v-bind:class="col.class"  
 	                                	v-if="col.params != 'undefined'" v-bind:data-params="col.params"  	
 	                                	v-if="col.action != 'undefined'" v-on:click="rowbutton($event, row)" v-bind:data-action="col.action" 
@@ -86,8 +85,7 @@
 	                                		v-for="(icn, action) in rowicons" 
 	                                		v-bind:class="'fa fa-fw bluec pointer fa-'+icn.icon" 
 	                                		v-bind:data-action="action" 
-	                                		v-on:click="rowbutton($event, row)"
-	                                		v-bind:data-recid="row.id" 
+	                                		v-on:click="rowbutton($event, row)" 
 	                                		v-bind:title="icn.title" 
 	                                		v-bind:data-formid="icn.formid"
 	                                	></i>

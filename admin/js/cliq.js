@@ -205,7 +205,7 @@
                         // Row Buttons
                         rowbutton: function(event, row) {
                             var dta = $(event.target).data();
-                            return rowicon(event, row.id, dta.action, dta);
+                            return rowicon(event, dta.recid, dta.action, dta);
                         },
 
                         // Sort or Order buttons
@@ -622,10 +622,17 @@
 
                     case "savedreportsbutton":
                         Cliqr.displayReports();
-                    break;                    
+                    break;     
+
+                    case "cancel":
+                    case "addarticle":
+                    case "editarticle":
+                    case "viewarticle":
+                        return Cliqb.actionButton(dta);
+                    break;               
 
                     // Ends
-                    default: success(action); break;
+                    default: success(dta.action); break;
                 }
              };
 
@@ -700,6 +707,9 @@
 
                     // Displays popup window with contents of c_document, usually JSON, in a formatted and easily readable style
                     case "viewcontent": return Cliqv.viewButton(recid); break;
+
+                    // Blog - uses pageform
+                    case "editarticle": case "viewarticle": Cliqb.actionButton(dta); break;
 
                     // Responds to clicks to change c_status for a recordset row, 
                     default: return actionButton(dta); break;

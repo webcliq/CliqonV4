@@ -53,21 +53,16 @@ class Admin
 
 				// Buttons required by this method which will be printed to the right of Breadcrumb row
 	            $args = array(
-	                'filename' => $rq['action'],         // If file, name of file without extension (.cfg)
+	                'filename' => $rq['action'],        // If file, name of file without extension (.cfg)
 	                'subdir' => 'admin/config/',    	// If file, name of subdirectory
-	                'type' => 'page',            	// If database, value of c_type
-	                'reference' => $rq['action'],        // If database, value of c_reference
+	                'type' => 'service',            		// If database, value of c_type
+	                'reference' => $rq['action'],       // If database, value of c_reference
 	                'key' => ''
 	            );
 	            $pcfg = C::cfgRead($args);
 			    $topbuttons = Q::topButtons($pcfg, $vars, 'page');
 
-				// Javascript required by this method
-				$js = ""; $clq->set('js', $js);
-
-				// Name of the Admin Component template which will be loaded from /admin/components/
-				$tpl = $rq['action'].".tpl"; // This component uses Vue
-				
+			    $js = "";
 				// Template variables these are used and converted by the template
 				$thisvars = [
 					'table' => $table,
@@ -75,7 +70,22 @@ class Admin
 					'topbuttons' => $topbuttons,
 					// Set the Javascript into the system to be used at the base of admscript.tpl
 					'xtrascripts' => ""
-				];			
+				];		
+
+				// Name of the Admin Component template which will be loaded from /admin/components/
+				$tpl = 'adm'.$rq['action'].".tpl"; // This component uses Vue	
+
+			    if(array_key_exists('class', $rq)) {
+			    	$method = $rq['action'];
+			    	$class = $clq->resolve($rq['class']);
+			    	$set = $class->$method($vars);
+			    	$js = $set['js'];
+			    	$tpl = $set['tpl'];
+			    	$thisvars = $set['thisvars'];
+			    }
+
+				// Javascript required by this method
+				$clq->set('js', $js);
 
 				// Test
 				$test = [
@@ -543,6 +553,7 @@ class Admin
 	 * datacard()
 	 * calendar()
 	 * gallery()
+	 * blogarticle()
 	 *
 	 ********************************************************************************************************/
 
@@ -1302,6 +1313,118 @@ class Admin
 				L::cLog($err);
 				return ['flag' => 'NotOk', 'html' => $e->getMessage(), 'data' => []];
 	        } 			
+		 }
+
+		/** Blog articles (variation on a Datatable)
+		 * Provides template and data for a Blog layout
+		 * @param - array - variables
+		 * @return - array(html, data)
+		 * @internal 
+		 **/
+		 public function blogarticle(array $vars)
+		 {
+			$method = self::THISCLASS.'->'.__FUNCTION__.'()';
+			try {
+
+				global $clq;
+			    $rq = $vars['rq'];
+				$idiom = $vars['idiom'];
+				$table = $vars['table'];
+				$tabletype = $vars['tabletype'];
+					
+				$model = $clq->resolve('Model'); 
+				$dtcfg = $model->stdModel('blogarticle', $table, $tabletype);   
+
+				// Expand and Adjust
+				$advsearch = "";
+
+				// Order columns by order
+				foreach($dtcfg['columns'] as $key => $config) {
+					if(array_key_exists('visible', $config) and $config['visible'] == 'false') {
+						unset($dtcfg['columns'][$key]);
+						if(!array_key_exists('order', $config)) {
+						$dtcfg['columns'][$key]['order'] = 'z';
+					}}
+				};
+				$dtcfg['columns'] = Q::array_orderby($dtcfg['columns'], 'order', SORT_ASC);		
+
+				foreach($dtcfg['columns'] as $fid => $prop) {
+					$dtcfg['columns'][$fid]['title'] = Q::cStr($prop['title']);
+					array_key_exists('titleTooltip', $prop) ? $dtcfg['columns'][$fid]['titleTooltip'] = Q::cStr($prop['titleTooltip']) : null ;
+				};
+
+				// Top Buttons
+			    $topbuttons = Q::topButtons($dtcfg, $vars, 'blogarticle');
+		    	unset($dtcfg['topbuttons']);	
+
+		    	// Row icons
+				foreach($dtcfg['rowicons'] as $i => $icn) {
+					array_key_exists('title', $icn) ? $dtcfg['rowicons'][$i]['title'] = Q::cStr($icn['title']) : $dtcfg['rowicons'][$i]['title'] = "" ;
+					array_key_exists('formid', $icn) ? $dtcfg['rowicons'][$i]['formid'] = $icn['formid'] : $dtcfg['rowicons'][$i]['formid'] = "pageform" ;
+				};
+
+				// Format pager select
+				// pageselect = '5,10,15,20,25'
+				$dtcfg['pagerselect'] = [];           
+                $pageselect = explode(',', $dtcfg['pageselect']);
+				foreach($pageselect as $n => $v) {
+					$v = trim($v);
+					$dtcfg['pagerselect'][] = ['value' => $v, 'text' => $v];
+				};
+
+				// Name of the Admin Component template which will be loaded from /admin/components/
+				$tpl = "admdatatable.tpl"; // This component uses Vue
+				
+				// Template variables these are used and converted by the template
+				$thisvars = [
+					'table' => $table,
+					'tabletype' => $tabletype,
+					'topbuttons' => $topbuttons,
+					'tblopts' => $dtcfg,
+					'xtrascripts' => ""
+				];	
+
+				unset($dtcfg['id']);
+				unset($dtcfg['tableclass']);
+
+				// Set the Javascript into the system to be used at the base of admscript.tpl, otherwise known as pagescripts
+			    $js = "
+			        Cliq.set('table', '".$table."');
+			        Cliq.set('tabletype', '".$tabletype."');
+			        Cliq.set('displaytype', 'blogarticle');
+			        Cliq.set('formtype', 'pageform');
+   					Cliq.set('idioms', ".object_encode(self::$idioms).");
+			        Cliq.set('langcd', '".$idiom."');
+			        Cliq.set('lcd', '".$idiom."'); 
+					Cliq.set('gmapsapi', '".$clq->get('gmapsapi')."');
+					Cliq.set('bingkey', '".$clq->get('bingkey')."');
+
+			    	Cliq.datatable(".F::jsonEncode($dtcfg).");
+			    ";
+			    
+			    $clq->set('js', $js);
+
+				// Test
+				$test = [
+					'method' => $method,
+					'vars' => $vars
+				];
+
+				// Set to comment when completed
+				// L::cLog($test);  
+				
+				// If not returned already 				
+				return self::publishTpl($tpl, $thisvars);
+
+	        } catch(Exception $e) {
+				$err = [
+					'method' => $method,
+					'errmsg' => $e->getMessage(),
+					'vars' => $vars,
+				];
+				L::cLog($err);
+				return $e->getMessage();
+	        } 
 		 }
 
 	/** Administrative pages that deal with Import and Export 
@@ -3745,5 +3868,4 @@ class Admin
 		 *
 		 **/
 		 
-
 } // Class Ends

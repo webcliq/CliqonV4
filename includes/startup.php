@@ -28,7 +28,7 @@ $clq->set('rootdir', "/");
 $config = $clq->resolve('Config');
 $cfg = $config->cfgReadFile('config/config.cfg');
 $clq->set('cfg', $cfg); global $clq;
-date_default_timezone_set ($cfg['site']['timezone']);
+date_default_timezone_set($cfg['site']['timezone']);
 
 // Database - Redbean R::static or PDO - ODBC with DSN 
 loadFile('includes/database.php');

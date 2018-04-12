@@ -2400,6 +2400,7 @@ class Cliq
                         'data-table' =>  $table,
                         'data-tabletype' => $tabletype,
                         'data-type' => $type,
+                        'data-recid' => 0,
                         'data-idiom' => $vars['idiom'], 
                         'data-formid' => $frmid,
                         'data-formtype' => $frmtp
