@@ -25,7 +25,7 @@
 
 			<hr class="style1" />
 
-			<button type="button" id="submitbutton" class="btn btn-primary">@(Q::cStr('105:Submit'))</button>
+			<button type="submit" id="submitbutton" class="btn btn-primary">@(Q::cStr('105:Submit'))</button>
 		</div>
 	</div>
 
@@ -94,7 +94,7 @@
 							<!-- d_date -->
 							<div class="form-group col-6 left ml-15">
 								<label for="d_date">@(Q::cStr('183:Date'))</label>
-								<input type="date" class="form-control datepicker" id="d_date" v-model="d_date">	
+								<input type="text" class="form-control datepicker" id="d_date" v-model="d_date">	
 							</div>
 
 							<!-- d_author -->

@@ -61,7 +61,7 @@ class Blog extends Db
                 $rs = D::extractAndMergeRecordset($rawset);
 
                 for($r = 0; $r < count($rs); $r++) {
-                    $rs[$r]['d_date'] = Q::fDate($rs[$r]['d_date']);
+                    $rs[$r]['d_date'] = Q::dbDate($rs[$r]['d_date']);
                     $rs[$r]['d_author'] = Q::fList($rs[$r]['d_author'], 'operators');
                 }          
 

@@ -9,7 +9,7 @@ var jwt = "@raw($jwt)"; // This is now essential
 
 // basket.clear(true);
 basket
-.remove('cliqd') // "","" comma separated list
+.remove('blog') // "","" comma separated list
 .require(
 
 	// Libraries that need to loaded in various places, therefore cannot JIT script load
@@ -21,6 +21,7 @@ basket
 	{url: jspath+"prettyprint.js"},
     {url: jspath+"dropzone.js"},
     {url: jspath+"gijgo.min.js"},
+	{url: viewpath+"js/pikaday.js"},
     {url: jspath+"trumbowyg.min.js"},
 	{url: jspath+"codemirror/lib/codemirror.js"},
 	{url: jspath+"codemirror/addon/display/panel.js"},
@@ -35,7 +36,8 @@ basket
     // Apps
     {url: viewpath+"js/admin.js"},
     {url: viewpath+"js/cliq.js"},
-	{url: viewpath+"js/cliqd.js", key: "cliqd", skipCache: true},
+	{url: viewpath+"js/cliqd.js"},
+	{url: viewpath+"js/cliqb.js", key: "blog", skipCache: true},
 	{url: viewpath+"js/cliqv.js"},
 	{url: viewpath+"js/cliqr.js"},
 	{url: viewpath+"js/cliqm.js"},

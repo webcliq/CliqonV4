@@ -107,6 +107,7 @@ var Cliqb = (function($) {
                 }
 			},
 			mounted: function() {
+				var that = this;
 				// HTML5 Text Types
 					$('input[type="text"], input[type="email"], input[type="url"]').each(function() {
 		           		
@@ -120,11 +121,18 @@ var Cliqb = (function($) {
 						$('.isunique').on('blur', function() {
 							modInput(fldid, 'isunique', '');	
 						});
+
 					});	
 
+				// Date
+					$('.datepicker').pikaday({
+						firstDay: 1
+					});
+
 				// Tags 
+					var tags = explode(',', this.$data.c_options);
 					$('.tagit').tagit({
-						availableTags: false,
+						availableTags: tags,
 						singleField: true,
 						tagLimit: 10						
 					});	
@@ -141,9 +149,9 @@ var Cliqb = (function($) {
                         skin: 'cliqon',
 	                    content_style: 'html {padding: 10px 20px; min-height: 400px;}',
 						plugins: [
-							'advlist code codemirror anchor autosave charmap colorpicker contextmenu hr image imagetools insertdatetime lists link nonbreaking paste print preview searchreplace table template textcolor textpattern visualblocks visualchars'
+							'advlist code codemirror anchor autosave charmap colorpicker contextmenu hr image imagetools insertdatetime lists link nonbreaking paste preview searchreplace table template textcolor textpattern visualblocks visualchars'
 						], // wordcount
-						toolbar1: 'savebutton translate | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor | print preview | code',
+						toolbar1: 'savebutton translate | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor | preview | code',
 						// templates: '/dir/templates.php' - URL return JSON output
 						image_advtab: true,
 						external_filemanager_path: jspath + 'tinymce/plugins/filemanager/',
@@ -274,19 +282,26 @@ var Cliqb = (function($) {
 		// Get any tinymce Editors if exist and update the Vue instance with Tiny editor content
 			var tinyeditors = tinymce.EditorManager.editors;
 			if(count(tinyeditors) > 0) {
+				var vals = {};
+				var fldname = '';
 				$.each(tinyeditors, function(i, teditor) {
 					var name = trim(teditor.id, '_te'); // works fine
-					var val = tinymce.get(teditor.id).getContent();
-					// rawurlencode() ??
-					Vue.set(bcfg.df, teditor.id, rawurlencode(val));
+					// d_text_en
+					var val = tinymce.get(teditor.id).getContent();		
+					var t = explode('_', name);
+					if(fldname != t[0]+'_'+t[1]) {fldname = t[0]+'_'+t[1];};
+					var k = t[2];
+					vals[k] = val;
 				});	
+				Vue.set(bcfg.df, fldname, vals);
 			};
 
 		// If Tagit
 			$('.tagit').each(function() {
 				var fldid = $(this).attr('id');
 				var tags = $("#"+fldid).tagit("assignedTags");
-				Vue.set(bcfg.df, fldid, tags);
+				var strtags = implode(',', tags);
+				Vue.set(bcfg.df, fldid, strtags);
 			});     
        	
  		// validation here	if required
@@ -297,7 +312,7 @@ var Cliqb = (function($) {
 
  			Vue.set(bcfg.df, 'd_title', json_encode(bcfg.df.d_title));
 			Vue.set(bcfg.df, 'd_description', json_encode(bcfg.df.d_description));
-			Vue.set(bcfg.df, 'd_text', json_encode(bcfg.df.d_text));
+			Vue.set(bcfg.df, 'd_text', rawurlencode(json_encode(bcfg.df.d_text)));
 
 		// Now get Data from the Vue Instance
 			var postData = bcfg.df.$data;	

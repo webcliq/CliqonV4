@@ -600,8 +600,8 @@ class Db
 							case "string":
 								$val = urldecode($val);
 								// If it is a badly formatted string
-								$qrepl = ['\\', '"{', '}"'];
-								$qwith = ['', '{', '}'];
+								$qrepl = ['"{', '}"'];
+								$qwith = ['{', '}'];
 								$val = str_replace($qrepl, $qwith, $val);
 								// Now convert the JSON string to an array
 								$result = json_decode($val, true);
