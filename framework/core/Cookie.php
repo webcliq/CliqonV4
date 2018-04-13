@@ -18,7 +18,7 @@ class Cookie
      */	
 	public static function zset($ref, $data)
 	{
-		setcookie($ref, $data, time() + (7200), "/");
+		@setcookie($ref, $data, time() + (7200), "/");
 	}
 
 	public static function zget($ref)

@@ -50,11 +50,11 @@ class Blog extends Db
                 $content = Q::publishTpl($tpl, $thisvars, "views/components", "cache/".$idiom);
 
                 if($rq['search'] != 'false') {
-                    $sql = "SELECT * FROM dbitem WHERE c_type = ? AND c_options LIKE ? ORDER BY c_reference";
-                    $rawset = R::getAll($sql, ['blog', '%'.$rq['search'].'%']);          
+                    $sql = "SELECT * FROM dbitem WHERE c_type = ? AND c_status = ? AND c_options LIKE ? ORDER BY c_reference";
+                    $rawset = R::getAll($sql, ['blog', 'published', '%'.$rq['search'].'%']);          
                 } else {
-                    $sql = "SELECT * FROM dbitem WHERE c_type = ? ORDER BY c_reference";
-                    $rawset = R::getAll($sql, ['blog']);                    
+                    $sql = "SELECT * FROM dbitem WHERE c_type = ? AND c_status = ? ORDER BY c_reference";
+                    $rawset = R::getAll($sql, ['blog', 'published']);                    
                 }
 
                 $db = $clq->resolve('Db');
