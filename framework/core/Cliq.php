@@ -127,7 +127,7 @@ class Cliq
 	        try {
 	            
 	            global $clq;
-	            $lcd = $clq->get('idiom');
+	            $lcd = Z::zget('Langcd');
 	            $method = "cStr()";
 
 	            if(1 !== preg_match('~[0-9]~', $str)){
@@ -209,7 +209,7 @@ class Cliq
             try {
                 
                 global $clq;
-                $lcd = $clq->get('idiom');
+                $lcd = Z::zget('Langcd');
 
                 if(1 !== preg_match('~[0-9]~', $str)){
                     return 'e: '.$str;
@@ -270,7 +270,7 @@ class Cliq
         public static function cCfg($ref) // site
         { 
             global $clq;
-            $lcd = $clq->get('idiom');
+            $lcd = Z::zget('Langcd');
             L::cLog($clq->get('cfg'));
             $result = self::qStr("config", "cCfg()", $ref, true, 'dbitem');
             if($result) {
@@ -337,7 +337,7 @@ class Cliq
             try {
 
                 global $clq;
-                $lcd = $clq->get('idiom');
+                $lcd = Z::zget('Langcd');
                 $method = "cList()";
 
                 $qa = [
@@ -478,7 +478,7 @@ class Cliq
                 if($idm == false) {
                     $fn = $table.'-'.$type.'-'.$ref.'.txt';
                 } else { // True
-                    $lcd = $clq->get('lcd');
+                    $lcd = Z::zget('Langcd');
                     $fn = $table.'-'.$type.'-'.$ref.'_'.$lcd.'.txt';
                 }
 
@@ -636,7 +636,7 @@ class Cliq
             try {
 
                 global $clq;
-                $lcd = $clq->get('idiom');
+                $lcd = Z::zget('Langcd');
 
                 $sql = "SELECT ".$qa['docfield']." FROM ".$qa['table']." WHERE c_type = ? AND c_reference = ?";
                 $record = R::getCell($sql, [$qa['tabletype'], $qa['reference']]);
@@ -716,7 +716,7 @@ class Cliq
             try {
 
                 global $clq;
-                $lcd = $clq->get('idiom');
+                $lcd = Z::zget('Langcd');
 
                 $sql = "SELECT ".$qa['docfield']." FROM ".$qa['table']." WHERE c_type = ? AND c_reference = ?";
                 $record = R::getCell($sql, [$qa['tabletype'], $qa['reference']]);
@@ -1003,13 +1003,13 @@ class Cliq
             if(array_key_exists('UserName', $_SESSION) and $_SESSION['UserName'] != "") {
 
                 global $clq;
-                $idm = $clq->get('idiom');
+                $lcd = Z::zget('Langcd');
                 $key = explode(':', $str);
 
                 return '<span 
                     class="contenteditable" 
                     id="id_'.$key[0].'" 
-                    data-url="/ajax/'.$idm.'/updateuserstring/dbitem/string/" 
+                    data-url="/ajax/'.$lcd.'/updateuserstring/dbitem/string/" 
                     data-type="textarea" 
                     data-ok-button="&#10004;" 
                     data-cancel-button="&#10008;" 
@@ -1032,12 +1032,12 @@ class Cliq
             if($_SESSION['UserName']) {
 
                 global $clq;
-                $idm = $clq->get('idiom');
+                $lcd = Z::zget('Langcd');
 
                 return '<span 
                     class="contenteditable" 
                     id="'.$str.'" 
-                    data-url="/ajax/'.$idm.'/updateusertext/dbitem/text/" 
+                    data-url="/ajax/'.$lcd.'/updateusertext/dbitem/text/" 
                     data-type="textarea" 
                     data-ok-button="&#10004;" 
                     data-cancel-button="&#10008;" 
@@ -1932,13 +1932,13 @@ class Cliq
         public static function fTitleSummary($row, $f = 'd_title', $prop = [])
         {
             global $clq;
-            $idm = $clq->get('idiom');
+            $lcd = Z::zget('Langcd');
             array_key_exists('summary', $prop) ? $s = $prop['summary']: $s = 'd_description';
             return H::span($prop, 
                 // Title
-                H::span(['class' => 'bold'], $row[$f][$idm].': '),
+                H::span(['class' => 'bold'], $row[$f][$lcd].': '),
                 // Summary
-                H::span(['class' => ''], $row[$s][$idm])
+                H::span(['class' => ''], $row[$s][$lcd])
             );
         }
 
@@ -1953,7 +1953,7 @@ class Cliq
         public static function fImageUrl($row, $f = 'd_image', $prop = [])
         {
             global $clq;
-            $idm = $clq->get('idiom');         
+            $idm = Z::zget('Langcd');        
             array_key_exists('url', $prop) ? $u = $prop['url']: $u = 'd_url';
             $prop['title'] = $row['d_title'][$idm];
             $prop['alt'] = $row['d_title'][$idm];

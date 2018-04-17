@@ -1194,7 +1194,7 @@ class Db
 
 				global $clq;
 				// Set process variables
-				$sql = ""; $total = 0; $offset = 0; $limit = 0; $rawrs = []; $rows = []; $dcfg = []; $search = []; $fid = "field"; $rq = $vars['rq']; 
+				$sql = ""; $total = 0; $offset = 0; $limit = 0; $rawrs = []; $rows = []; $dcfg = []; $search = []; $fid = "field"; $rq = $vars['rq']; $lcd = Z::zget('Langcd');
 
 				// Authorise
 				if(!A::getAuth("read", $vars['table'], $vars['tabletype'], '')) {
@@ -2863,7 +2863,7 @@ class Db
                 $tabletype = $vars['tabletype'];
                 $querystr = $vars['rq']['query'];
                 $operator = $vars['rq']['operator'];
-                $lcd = $clq->get('idiom');
+                $lcd = Z::zget('Langcd');
                 $method = 'findRecords()';
 
                 // Create database query to get database records if they exist            
@@ -2930,7 +2930,7 @@ class Db
                 $tabletype = $vars['tabletype'];
                 $querystr = $vars['rq']['query'];
                 $operator = $vars['rq']['operator'];
-                $lcd = F::get('idiom');
+                $lcd = Z::zget('Langcd');
                 $method = 'findRecords()';
 
                 // Create database query to get database records if they exist            

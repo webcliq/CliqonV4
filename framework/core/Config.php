@@ -274,7 +274,7 @@ class Config
 
         // Cliqon string replace
         $qrepl = ['{common.lcd}', '{lcd}'];  
-        $lcd = $clq->get('lcd');     
+        $lcd = Z::zget('Langcd');    
         $qwith = [$lcd];        
         $string = str_replace($qrepl, $qwith, $string);
 
