@@ -159,11 +159,11 @@
 
                   <p class="inline-field">
                       <label class="label">@raw($istr[29]):</label>
-                      <input type="text" class="field" name="idiomarray" id="idiomarray" style="width:500px;" value="en|English,es|Español,de|Deutsch"  tabindex=10 />
+                      <input type="text" class="field" name="idiomarray" id="idiomarray" style="width:500px;" value="en|English,es|Español"  tabindex=10 />
                   </p>
                   <p class="inline-field">
                       <label class="label">@raw($istr[30]):</label>
-                      <input type="text" class="field" name="idiomflags" id="idiomflags" style="width:500px;" value="en|en.gif,es|es.gif,de|de.gif"  tabindex=12 />
+                      <input type="text" class="field" name="idiomflags" id="idiomflags" style="width:500px;" value="en|en.gif,es|es.gif"  tabindex=12 />
                   </p>
                   <p class="inline-field">
                       <label class="label">@raw($istr[47]):</label>

@@ -7,7 +7,6 @@ class PageController extends Controller
 {
 	public $thisclass = "PageController";
 	private $cfg;
-	private $idiom;
 	private $page;
 	private $screen;
 	private $action;
@@ -17,14 +16,7 @@ class PageController extends Controller
 	{
 		global $clq;
 		$this->cfg = $clq->get('cfg');
-		// We can decide to set the default idiom statically from the config file	
-		if($this->cfg['site']['setdefaultidiom'] == 'static') {
-			$this->idiom = $this->cfg['site']['defaultidiom'];
-		} else if($this->cfg['site']['setdefaultidiom'] == 'dynamic') {
-			// Or get it dynamically
-			$this->idiom = F::getDefLanguage();
-		}
-		$clq->set('idiom', $this->idiom);
+		$clq->set('idiom', $idiom);
 		$clq->set('client', F::parseClient());	
 		$clq->set('lcd', $idiom);
 		Z::zset('Langcd', $idiom);
@@ -32,7 +24,6 @@ class PageController extends Controller
 		$this->action = $action;
 		$this->subaction = $subaction;
 		$cms = $clq->resolve('Cms');
-		$mnu = $clq->resolve('Menu');
 		$rq = $this->inputs();
 		$extn = $this->cfg['site']['extension'];
 
@@ -56,7 +47,7 @@ class PageController extends Controller
 			'cmscontent' => $cms->content($idiom, $this->screen, $this->action, $this->subaction, $rq),
 			'cfg' => $this->cfg,
 			'languageoptions' => $cms->idiomOptions($idiom),
-			'idiom' => $this->idiom,
+			'idiom' => $idiom,
 			'jwt' => F::encode($token, $this->cfg['site']['secret']),
 			'scripts' => $clq->get('js'),
 			'rq' => $rq

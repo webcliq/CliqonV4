@@ -49,12 +49,12 @@ class Blog extends Db
                 $tpl = "blog.".$extn;
                 $content = Q::publishTpl($tpl, $thisvars, "views/components", "cache/".$idiom);
 
-                if($rq['search'] != 'false') {
-                    $sql = "SELECT * FROM dbitem WHERE c_type = ? AND c_status = ? AND c_options LIKE ? ORDER BY c_reference";
-                    $rawset = R::getAll($sql, ['blog', 'published', '%'.$rq['search'].'%']);          
-                } else {
+                if(array_key_exists('search', $rq)) {
                     $sql = "SELECT * FROM dbitem WHERE c_type = ? AND c_status = ? ORDER BY c_reference";
-                    $rawset = R::getAll($sql, ['blog', 'published']);                    
+                    $rawset = R::getAll($sql, ['blog', 'published']); 
+                } else {
+                    $sql = "SELECT * FROM dbitem WHERE c_type = ? AND c_status = ? AND ".$rq['field']." LIKE ? ORDER BY c_reference";
+                    $rawset = R::getAll($sql, ['blog', 'published', '%'.$rq['value'].'%']);                      
                 }
 
                 $db = $clq->resolve('Db');
@@ -69,12 +69,18 @@ class Blog extends Db
                     throw new Exception("No recordsetas an array: ".$rs);
                 } 
 
+                // This holds the extra data for Categories and Tagcloud etc.
+                $xtra = [
+                    'catlist' => Q::cList('documenttypes'),
+                    'tagcloud' => $this->tagCloud()
+                ];
+
                 $js = "
                     console.log('Blog data loaded');
                 "; 
 
                 $clq->set('js', $js);       
-                return ['flag' => 'Ok', 'msg' => $content, 'data' => $rs];
+                return ['flag' => 'Ok', 'msg' => $content, 'data' => $rs, 'xtra' => $xtra];
 
             } catch(Exception $e) {
                 $err = [
@@ -85,6 +91,29 @@ class Blog extends Db
                 L::cLog($err);
                 return ['flag' => 'NotOk', 'msg' => $e->getMessage()];
             } 
+         }
+
+         function tagCloud()
+         {
+            // <span :id="n" :class="'wrd tagcloud'+tag.wrd.num"><a href="#" v-bind:data-word="tag.wrd.value" class="tagbutton">{{tag.wrd.value}}</a></span> 
+            global $clq;
+            $sql = "SELECT c_options FROM dbitem WHERE c_type = ? ";
+            $rs = R::getAll($sql, ['blog']); 
+            $words = [];
+            for($r = 0; $r < count($rs); $r++) {
+                $wrd = explode(',', $rs[$r]['c_options']);
+                foreach($wrd as $w => $val) {
+                    if(array_key_exists($val, $words)) {
+                        $words[$val]++;
+                    } else {
+                        if($val != '') {
+                            $words[$val] = 1;
+                        }
+                    }
+                }
+                
+            }
+            return $words;
          }
 
     /** Administration

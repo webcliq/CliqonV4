@@ -24,7 +24,7 @@ final class CmsController extends Controller
 		try {
 			
 			global $clq; 
-			$ajax = $clq->resolve('Ajax');
+			$cms = $clq->resolve('Cms');
 			$lcd = $clq->set('idiom', $idiom);
 			$clq->set('lcd', $idiom);
 			$rq = $this->inputs();
@@ -34,14 +34,14 @@ final class CmsController extends Controller
 				$_SESSION['UserLevel'] = "20:20:20";
 			}; 
 
-			method_exists($ajax, $action) ? $method = $action : $method = "ajaxdefault";
+			method_exists($cms, $action) ? $method = $action : $method = "ajaxdefault";
 			$vars = [
 				'idiom' => $idiom,
 				'table' => $table,
 				'tabletype' => $tabletype,
 				'rq' => $rq,
 			];
-			$result = $ajax->$method($vars);
+			$result = $cms->$method($vars);
 
 			// Development
 			$msg = [

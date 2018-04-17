@@ -21,8 +21,7 @@ class DefaultController
 			$this->idiom = F::getDefLanguage();
 		}
 		$clq->set('idiom', $this->idiom);
-		$clq->set('client', F::parseClient());
-		$clq->set('js', '');
+		$clq->set('client', F::parseClient());	
 		$clq->set('lcd', $this->idiom);
 		Z::zset('Langcd', $this->idiom);
 		$this->page = "index";
@@ -33,6 +32,19 @@ class DefaultController
 		// Load Template Engine - $vars only apply to outside template!!
 		$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."views"), $clq->get('basedir')."cache/".$this->idiom);		
 		$template = $this->page.'.'.$extn;
+		$js = "
+			App.loadNews(false);
+
+		    sidenav.init('left', {
+		        container : '#sideNavi',
+		        defaultitem : '.side-navi-item-default',
+		        item : '.side-navi-item',
+		        data : '.side-navi-data',
+		        tab : '.side-navi-tab',
+		        active : '.active'
+		    });
+		";
+		$clq->set('js', $js);
 		$vars = [
 			'protocol' => $clq->get('protocol'),
 			'rootpath' => $clq->get('rootpath'),
