@@ -18,6 +18,8 @@ require_once $basedir.'includes/functions.php';
 loadFile('framework/Registry.php');
 $clq = Registry::singleton();
 
+$clq->resolve('Cookie');
+
 // Set System variables here
 $clq->set('protocol', $protocol); // http:// or https://
 $clq->set('rootpath', $rootpath); // protocol + domain.com/
@@ -34,12 +36,13 @@ date_default_timezone_set($cfg['site']['timezone']);
 loadFile('includes/database.php');
 
 // Main Framework handlers
-$clq->resolve('Cookie');
+
 $clq->resolve('Framework');
 $clq->resolve('Cliq');
 $clq->resolve('Html');
 $clq->resolve('Form');
 $clq->resolve('Log');
+
 // Setup Session with Security
 $clq->resolve('Session');
 session_start();
