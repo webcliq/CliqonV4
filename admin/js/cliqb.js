@@ -105,7 +105,14 @@ var Cliqb = (function($) {
                     e.stopImmediatePropagation();
                     this.d_image = '';
                 }
+            },
+            //
+            watch: {
+            	c_options: function(val) {
+            		this.$data.c_options = val;
+            	}
 			},
+			//
 			mounted: function() {
 				var that = this;
 				// HTML5 Text Types
@@ -126,15 +133,32 @@ var Cliqb = (function($) {
 
 				// Date
 					$('.datepicker').pikaday({
-						firstDay: 1
+						firstDay: 1,
+						toString(date, format) {
+					        const day = date.getDate();
+					        const month = date.getMonth() + 1;
+					        const year = date.getFullYear();
+					        that.$data.d_date = year+'-'+month+'-'+day;
+					        return `${day}/${month}/${year}`;
+						}
 					});
 
 				// Tags 
 					var tags = explode(',', this.$data.c_options);
+					
 					$('.tagit').tagit({
 						availableTags: tags,
 						singleField: true,
-						tagLimit: 10						
+						tagLimit: 10,
+						placeholder: 'tag',
+						afterTagAdded: function(event, ui) {
+							var fldid = event.target.id;
+        					that.$data[fldid] = implode(',', $('#'+fldid).tagit("assignedTags"));
+    					},
+						afterTagRemoved: function(event, ui) {
+							var fldid = event.target.id;
+        					that.$data[fldid] = implode(',', $('#'+fldid).tagit("assignedTags"));
+    					}					
 					});	
 
             	// TinyMCE Editor
@@ -295,14 +319,6 @@ var Cliqb = (function($) {
 				});	
 				Vue.set(bcfg.df, fldname, vals);
 			};
-
-		// If Tagit
-			$('.tagit').each(function() {
-				var fldid = $(this).attr('id');
-				var tags = $("#"+fldid).tagit("assignedTags");
-				var strtags = implode(',', tags);
-				Vue.set(bcfg.df, fldid, strtags);
-			});     
        	
  		// validation here	if required
 

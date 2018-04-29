@@ -206,7 +206,7 @@
              * @param - 
              * @return - 
              **/
-			 var formMounted = function(cliqcfg)
+			 var formMounted = function(cliqcfg,)
 			 {
 				cfg = cliqcfg;
 				var id = 'dataform'; 
@@ -340,9 +340,20 @@
 
 				// Tags 
 					$('.tagit').tagit({
-						availableTags: false,
+						availableTags: tags,
 						singleField: true,
-						tagLimit: 10						
+						tagLimit: 10,
+						placeholder: 'tag',
+						afterTagAdded: function(event, ui) {
+							var fldid = event.target.id;
+							var tags = implode(',', $('#'+fldid).tagit("assignedTags"));
+							Vue.set(cfg.df, fldid, tags);
+    					},
+						afterTagRemoved: function(event, ui) {
+							var fldid = event.target.id;
+							var tags = implode(',', $('#'+fldid).tagit("assignedTags"));
+							Vue.set(cfg.df, fldid, tags);
+    					}					
 					});	
 
 				// Repeater
@@ -405,6 +416,20 @@
          					locale: jlcd+'-'+jlcd		
 						});
 					})
+
+				/*
+				// Date
+					$('.datepicker').pikaday({
+						firstDay: 1,
+						toString(date, format) {
+					        const day = date.getDate();
+					        const month = date.getMonth() + 1;
+					        const year = date.getFullYear();
+					        that.$data.d_date = year+'-'+month+'-'+day;
+					        return `${day}/${month}/${year}`;
+						}
+					});
+				*/
 	
 				// Autocomplete - In PHP
 
@@ -1619,13 +1644,6 @@
 		           		// rawurlencode() ??
 		           		Vue.set(cfg.df, fldid, te);	
 		           	});	
-
-				// If Tagit
-					$('.tagit').each(function() {
-						var fldid = $(this).attr('id');
-						var tags = $("#"+fldid).tagit("assignedTags");
-						Vue.set(cfg.df, fldid, tags);
-					});
 	           	
 				// JSONeditors if exist - only one JSON Editor if exist and update the Vue instance with Jsoneditor content
 					$('#'+id+' div[data-type=jsoneditor]').each(function() {

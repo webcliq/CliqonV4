@@ -54,7 +54,9 @@
 						<!-- c_reference -->
 						<div class="form-group">
 							<label for="c_reference" class="required">@(Q::cStr('5:Reference'))</label>
-							<input type="text" class="form-control col-2 nextref" id="c_reference" v-model="c_reference" required>
+							<!-- If - Else to stop Reference being updated  -->
+							<input v-if="$data.id == 0" type="text" class="form-control col-2 nextref" id="c_reference" v-model="c_reference" required>
+							<input v-else type="text" class="form-control col-2" v-model="c_reference" readonly>
 						</div>
 
 						<!-- c_options -->
