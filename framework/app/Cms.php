@@ -93,13 +93,6 @@ class Cms
 				$tpl = $action.".".$extn; // Default, may be overwritten
 				// Only needs a routine below if cannot be dealt with completely by the template
 				switch($action) {
-					// case "welcome": break;
-					case "software": 
-						$result = self::software($rq);
-						$thisvars['tabs'] = $result['vars']; 
-						$js = $result['js']; 
-					break;
-
 					case "list": // List is reserved PHP word
 						$result = self::listing($idiom, $subaction, $rq);
 						$thisvars = $result['vars'];
@@ -124,7 +117,7 @@ class Cms
 
 	/** Widgets for Listing pages
 	 *
-	 * list() - master calling page
+	 * listing() - master calling page
 	 * news()
 	 * weblinks()
 	 * documents()
@@ -170,9 +163,10 @@ class Cms
 		 {
 			global $clq;
 			$config = $clq->resolve('Config');
-			$ncfg = C::cfgReadFile('views/config/weblink.cfg');
+			$ncfg = C::cfgReadFile('views/config/weblinks.cfg');
 			$thisvars = [
 				'ncfg' => $ncfg
+
 			];
 			$js = "
 				console.log('".$ncfg['loadingmsg']."');
@@ -213,8 +207,9 @@ class Cms
 			global $clq;
 			$config = $clq->resolve('Config');
 			$ncfg = C::cfgReadFile('views/config/library.cfg');
+			
 			$thisvars = [
-
+				'ncfg' => $ncfg
 			];
 			$js = "
 				console.log('".$ncfg['loadingmsg']."');
@@ -351,6 +346,358 @@ class Cms
 		{
 			return [
 				'content' => self::getListingData($vars),
+				'callBack' => ""
+			];
+		}
+
+		function isunique($vars)
+		{
+			global $clq; $db = $clq->resolve('Db');
+			return [
+				'content' => $db->isUnique($vars),
+				'callBack' => ""
+			];
+		}
+
+	/** Blog  
+	 * 
+	 * getblog() - 
+	 * getblogdata()
+	 * getblogpageform()
+	 * getblogview()
+	 *
+	 **************************************** Blog Methods *******************************************************************/	
+
+		function getblog($vars)
+		{
+			global $clq; $blog = $clq->resolve('Blog');
+			return [
+				'content' => $blog->displayBlog($vars),
+				'callBack' => ""
+			];			
+		}	
+
+		function getblogdata($vars)
+		{
+			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
+			return [
+				'content' => $blog->getBlogData($vars),
+				'callBack' => ""
+			];		
+		}
+
+		function getblogpageform($vars)
+		{
+			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
+			return [
+				'content' => $blog->getBlogForm($vars),
+				'callBack' => ""
+			];		
+		}
+
+		function getblogview($vars)
+		{
+			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
+			return [
+				'content' => $blog->blogView($vars),
+				'callBack' => ""
+			];					
+		}
+
+	/** Publish various pages for the Blog system
+	 * 
+	 * getweblinks()
+	 * getlibrary()
+	 * getdocument()
+	 *
+	 * @parms - array - usual variables
+	 * @return - array of HTML from rendered template and other datas
+	 *****************************************************************************************************/
+
+		function getweblinks($vars)
+		{
+            $method = self::THISCLASS.'->'.__FUNCTION__.'()';
+            try {
+
+                global $clq;
+                $rq = $vars['rq'];
+                $idiom = $vars['idiom'];
+                $table = $vars['table'];
+                $tabletype = $vars['tabletype'];
+                $this->cfg = $clq->get('cfg');
+                $extn = $this->cfg['site']['extension'];
+                $thisvars = ['rq' => $rq, 'idiom' => $idiom, 'idioms' => $clq->get('idioms'), 'viewpath' => $clq->get('rootpath').'views/'];
+                $tpl = $rq['template'].".".$extn;
+                $content = Q::publishTpl($tpl, $thisvars, "views/components", "cache/".$idiom);
+
+                $sql = "SELECT * FROM ".$table." WHERE c_type = ? ORDER BY c_reference";
+                $rawset = R::getAll($sql, [$tabletype]); 
+
+                $db = $clq->resolve('Db');
+                $rs = D::extractAndMergeRecordset($rawset);
+
+                for($r = 0; $r < count($rs); $r++) {
+                    $rs[$r]['d_date'] = Q::dbDate($rs[$r]['d_date']);
+                }          
+
+                if(!is_array($rs)) {
+                    throw new Exception("No recordset as an array: ".$rs);
+                } 
+
+                $js = "
+                    console.log('Blog data loaded');
+                "; 
+
+                $clq->set('js', $js);       
+
+				return [
+					'content' => ['flag' => 'Ok', 'msg' => $content, 'data' => $rs],
+					'callBack' => ""
+				];	                
+
+            } catch(Exception $e) {
+                $err = [
+                    'method' => $method,
+                    'errmsg' => $e->getMessage(),
+                    'vars' => $vars,
+                ];
+                L::cLog($err);
+				return [
+					'content' => ['flag' => 'NotOk', 'msg' => $e->getMessage()],
+					'callBack' => ""
+				];	
+            } 
+		}	
+
+		function getlibrary($vars)
+		{
+			global $clq;
+
+
+			return [
+				'content' => $content,
+				'callBack' => ""
+			];		
+		}		
+
+	/** User Management  
+	 * 
+	 * login() - administration login
+	 * logout() - administration logout
+	 * 
+	 * getuserlogin() - display user login form from component template
+	 * getuserregister() - display registration form from component template
+	 * postuser() - post user registration form
+	 * 
+	 * viewuser()
+	 * deleteuser()
+	 **************************************** User Management ***************************************************************/	
+
+		function login($vars)
+		{
+			// table == dbuser, tabletype == "", $rq == username, password
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			return [
+				'content' => $auth->login($vars['rq']),
+				'callBack' => ""
+			];				
+		}
+
+		/** Logout 
+		 * @param - Request string
+		 * @return - Template and initial data
+		 **/
+		function logout($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			return [
+				'content' => $auth->logout(),
+				'callBack' => ""
+			];	
+		}
+
+		/** Get Users in a table - not all users but distinguished by tabletype
+		 * @param - Request string
+		 * @return - Template content and initial data
+		 **/
+		function getusers($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			$result = [
+				'content' => $authex->displayUsers($vars),
+				'callBack' => ""
+			];
+			return $result;
+		}
+
+		/** Get Login form with Register and Forgot password buttons 
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function getuserlogin($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			$result = [
+				'content' => $authex->displayLogin($vars),
+				'callBack' => ""
+			];
+			return $result;
+		}		
+
+		function getuserregister($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			$result = [
+				'content' => $authex->displayRegister($vars),
+				'callBack' => ""
+			];
+			return $result;
+		}	
+
+		function postuser($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			$result = [
+				'content' => $authex->userRegister($vars),
+				'callBack' => ""
+			];
+			return $result;			
+		}
+
+		/** Change Password
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function changepassword($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->changeUserPassword($vars),
+				'callBack' => ""
+			];
+		}
+
+		/** Reset or Lost Password
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function forgottenpassword($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->forgotPassword($vars),
+				'callBack' => ""
+			];
+		}
+
+		/** Reset password after request to reset
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function resetpassword($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->identifyUser($vars),
+				'callBack' => ""
+			];
+		}
+
+		/** Do Change Password
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function dochangepassword($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			return [
+				'content' => $auth->changeUserPassword($vars),
+				'callBack' => ""
+			];
+		}		
+
+		/** Deactivate User and Resend Activation to email address
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function senduseractivation($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->sendUserActivate($vars),
+				'callBack' => ""
+			];
+		}	
+
+		function changeuserstatus($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->changeUserElement($vars),
+				'callBack' => ""
+			];
+		}
+
+		function dochangeuserstatus($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->doChangeStatus($vars),
+				'callBack' => ""
+			];
+		}
+
+		/**
+		 * View User
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function viewuser($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->userProfile($vars),
+				'callBack' => ""
+			];
+		}
+
+		/**
+		 * Delete User from dbusers after validation is completed
+		 * @param - array of variables
+		 * @return - array of message and content
+		 **/
+		function deleteuser($vars)
+		{
+			global $clq;
+			$auth = $clq->resolve('Auth');
+			$authex = $clq->resolve('Authextended');
+			return [
+				'content' => $authex->doDeleteUser($vars),
 				'callBack' => ""
 			];
 		}

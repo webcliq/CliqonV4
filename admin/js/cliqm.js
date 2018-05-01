@@ -171,13 +171,19 @@
 		{
 			wLoad('/ajax/'+jlcd+'/logout/');
 		}
+
+        function miscLink(e, btn) 
+        {
+            Cliq.msg({text: rel, buttons: false});
+        }       
 		
         // explicitly return public methods when this object is instantiated
         return {
             // outside: inside
             footerLink: ftrLink,
             menuLink: mnuLink,
-            otherLink: otherLink
+            otherLink: otherLink,
+            miscLink: miscLink
         };   
 
     })(jQuery); 

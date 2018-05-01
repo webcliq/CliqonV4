@@ -947,51 +947,6 @@ class Ajax
 			];			
 		}
 
-	/** Blog  
-	 * 
-	 * getblog() - 
-	 * getblogdata()
-	 * getblogpageform()
-	 * getblogview()
-	 *
-	 **************************************** Blog Methods *******************************************************************/	
-
-		function getblog($vars)
-		{
-			global $clq; $blog = $clq->resolve('Blog');
-			return [
-				'content' => $blog->displayBlog($vars),
-				'callBack' => ""
-			];			
-		}	
-
-		function getblogdata($vars)
-		{
-			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
-			return [
-				'content' => $blog->getBlogData($vars),
-				'callBack' => ""
-			];		
-		}
-
-		function getblogpageform($vars)
-		{
-			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
-			return [
-				'content' => $blog->getBlogForm($vars),
-				'callBack' => ""
-			];		
-		}
-
-		function getblogview($vars)
-		{
-			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
-			return [
-				'content' => $blog->blogView($vars),
-				'callBack' => ""
-			];					
-		}
-
 	/** Business Directory  
 	 * 
 	 * listcompanies() - 
@@ -1277,6 +1232,51 @@ class Ajax
 				'content' => $db->updateItemVal($vars),
 				'callBack' => ""
 			];	
+		}
+
+	/** Blog  
+	 * 
+	 * getblog() - 
+	 * getblogdata()
+	 * getblogpageform()
+	 * getblogview()
+	 *
+	 **************************************** Blog Methods *******************************************************************/	
+
+		function getblog($vars)
+		{
+			global $clq; $blog = $clq->resolve('Blog');
+			return [
+				'content' => $blog->displayBlog($vars),
+				'callBack' => ""
+			];			
+		}	
+
+		function getblogdata($vars)
+		{
+			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
+			return [
+				'content' => $blog->getBlogData($vars),
+				'callBack' => ""
+			];		
+		}
+
+		function getblogpageform($vars)
+		{
+			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
+			return [
+				'content' => $blog->getBlogForm($vars),
+				'callBack' => ""
+			];		
+		}
+
+		function getblogview($vars)
+		{
+			global $clq; $db = $clq->resolve('Db'); $blog = $clq->resolve('Blog');
+			return [
+				'content' => $blog->blogView($vars),
+				'callBack' => ""
+			];					
 		}
 
 	/** Miscellaneous  

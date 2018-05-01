@@ -2,7 +2,7 @@
 /**
  * Auth Extended Class
  *
- * All matters relating to adding Users by a Form system
+ * All matters relating to adding Users who are visitors to the site and not necessarily Administrators
  *
  * @category   Web application framework
  * @package    Cliqon
@@ -196,11 +196,15 @@ class Authextended extends Auth {
      *
      * valueExists()
      * userRegister()
+     * sendUserActivate()     
      * userActivate()
-     * resendActivation()
      *
      * forgotPassword()
      * identifyUser()
+     *
+     *
+     *
+     *
      *
      ***************************************************************************************************/
 
@@ -310,8 +314,8 @@ class Authextended extends Auth {
                     $args = [
                         'subject' => Q::cStr('492:User Registration'),
                         'msg' => $msg,
-                        'addemail' => $rq['c_email'],
-                        'addname' => $rq['c_username']
+                        'mailtoaddress' => $rq['c_email'],
+                        'mailtoname' => $rq['c_username']
                     ];
                     $sendmail->sendMail($args);
                     $msg = Q::cStr('497:Look for an email in your inbox with instructions to activate your Membership');
@@ -345,6 +349,75 @@ class Authextended extends Auth {
             } 
          }
 
+        /** Send or Resend User Activation  
+         *
+         * @param - array - arguments
+         * @return - array containing Msg etc.
+         **/
+         function sendUserActivate($vars)  
+         {
+            $method = self::THISCLASS.'->'.__FUNCTION__."()";
+            try {
+
+                global $clq;
+                $rq = $vars['rq'];
+                $recid = $rq['recid'];
+                $sql = "SELECT * FROM dbuser WHERE id = ?";
+                $rawrow = R::getRow($sql, [$recid]);
+                $db = $clq->resolve('Db');
+                $row = D::extractAndMergeRow($rawrow);
+
+                // Generate an email here
+                $mail = $clq->resolve('PHPMailer');            // Passing `true` enables exceptions
+                $sendmail = $clq->resolve('Genmail');
+
+                $msg = Q::cStr('492:User Registration');
+                $protocol = $clq->get('protocol');
+                $url = $protocol.$this->cfg['site']['website'].'/cms/'.$clq->get('idiom').'/activate/?newuser='.$row['c_username'];
+                $msg .= H::p([], H::a(['href' => $url], $url));
+                $msg .= H::p([], '{accountaddress}');
+                $args = [
+                    'subject' => Q::cStr('492:User Registration'),
+                    'msg' => $msg,
+                    'mailtoaddress' => $row['c_email'],
+                    'mailtoname' => $row['c_username']
+                ];
+                $sendmail->sendMail($args);    
+
+                $updb = R::load('dbuser', $recid);
+
+                // Store record
+                $updb->c_status = 'inactive';
+                $updb->c_lastmodified = Q::lastMod();
+                $updb->c_whomodified = 'admin';
+                $result = R::store($updb);
+
+                // Return the result to the browser
+                if(is_numeric($result) and $result > 0) {
+                    return [
+                        'flag' => "Ok",
+                        'msg' => Q::cStr('497:Look for an email in your inbox with instructions to activate your Membership')
+                    ];
+                } else {
+                    return [
+                        'flag' => "NotOk",
+                        'msg' => Q::cStr('495:Record was not successfully written to database').': '.$result  
+                    ];
+                }
+            
+            } catch (Exception $e) {
+                $err = [
+                    'errmsg' => $e->getMessage(),
+                    'method' => $method,
+                ];
+                L::cLog($err);
+                return [
+                    'flag' => "NotOk",
+                    'html' => $err
+                ]; 
+            }                 
+         } 
+
         /** Activate user registration 
          * clq.red/page/en/activate/dbuser//?newuser=markrichards
          * @param - array - arguments
@@ -352,9 +425,9 @@ class Authextended extends Auth {
          **/
          function userActivate($rq)
          {
+            $method = self::THISCLASS.'->'.__FUNCTION__."()";
             try {
 
-                $method = self::THISCLASS.'->'.__FUNCTION__."()";
                 global $clq;
 
                 $bean = R::findOne('dbuser', 'c_username = ?', [$rq['newuser']]);
@@ -388,16 +461,6 @@ class Authextended extends Auth {
             }                 
          }  
 
-        /** Resend User Activation
-         *
-         * @param - array - arguments
-         * @return - array containing Msg etc.
-         **/
-         function resendActivation($vars)  
-         {
-
-         }    
-
         /** Member has forgotten password 
          * Ask for valid email address and send link to reactivate
          * @param - array - usual variables
@@ -408,38 +471,33 @@ class Authextended extends Auth {
             try {
 
                 $method = self::THISCLASS.'->'.__FUNCTION__."()";
-                global $clq; $vue = []; $html = ""; $rq = $vars['rq'];
+                global $clq; $vue = []; $html = "";
 
                 $html .= H::fieldset(
-                    H::legend([], Q::cStr('61:Forgot Password')),
-                    // Hidden
-                    H::input(['type' => 'hidden', 'v-model' => 'c_type']),
-                    H::input(['type' => 'hidden', 'v-model' => 'c_group']),
+                    H::legend([], Q::cStr('90:Change Password')),
 
-                    H::p([], Q::uStr('74:Instructions')),
+                    H::p([], Q::cStr('559:Instructions')),
                     // User email - c_email, first field and check available
                     H::div(['class' => 'form-group'],
-                        H::label(['for' => 'c_email'], Q::uStr('39:Email address')),
-                        H::input(['type' => 'email', 'v-model' => 'c_email', 'class' => 'form-control', 'aria-describedby' => 'c_email_help', 'placeholder' => Q::uStr('72:yourname@yourdomain.com'), 'required' => 'true', 'autofocus' => 'true', 'id' => 'c_email']),
-                        H::span(['class' => 'small orangec', 'id' => 'c_email_help'], Q::uStr('68:Enter your email address'))
+                        H::label(['for' => 'c_email'], Q::cStr('95:Email address')),
+                        H::input(['type' => 'email', 'v-model' => 'row.c_email', 'class' => 'form-control', 'aria-describedby' => 'c_email_help', 'placeholder' => Q::cStr('9999:yourname@yourdomain.com'), 'required' => 'true', 'autofocus' => 'true', 'id' => 'c_email']),
+                        H::span(['class' => 'small orangec', 'id' => 'c_email_help'], Q::cStr('575:Enter your email address'))
                     ),
                     // Username - c_username, display email as default, check if available
                     H::div(['class' => 'form-group'],
-                        H::label(['for' => 'c_username'], Q::uStr('62:User name')),
-                        H::input(['type' => 'text', 'v-model' => 'c_username', 'class' => 'form-control', 'aria-describedby' => 'c_username_help', 'placeholder' => Q::uStr('62:User name'), 'required' => 'true', 'id' => 'c_username']),
-                        H::span(['class' => 'small orangec', 'id' => 'c_username_help'], Q::uStr('73:Please enter your user name'))
+                        H::label(['for' => 'c_username'], Q::cStr('1:User name')),
+                        H::input(['type' => 'text', 'v-model' => 'row.c_username', 'class' => 'form-control', 'aria-describedby' => 'c_username_help', 'placeholder' => Q::cStr('1:User name'), 'required' => 'true', 'id' => 'c_username']),
+                        H::span(['class' => 'small orangec', 'id' => 'c_username_help'], Q::cStr('529:Please enter your user name'))
                     ),
                     H::div(['class' => 'form-group'],
-                        H::button(['type' => 'button', 'v-on:click' => 'submitbutton', 'class' => 'btn btn-primary', 'data-action' => ''], Q::uStr('65:Submit')),
-                        H::button(['type' => 'button', 'v-on:click' => 'resetbutton', 'class' => 'btn btn-danger', 'data-action' => ''], Q::uStr('67:Reset'))
+                        H::button(['type' => 'button', 'v-on:click' => 'submitbutton', 'class' => 'btn btn-primary', 'data-action' => ''], Q::cStr('105:Submit')),
+                        H::button(['type' => 'button', 'v-on:click' => 'resetbutton', 'class' => 'btn btn-danger', 'data-action' => ''], Q::cStr('122:Reset'))
                     )
                     // H::div(['class' => 'form-group'],'{{$data}}')
                 );
                 $formdata = [
-                    'c_type' => $rq['c_type'],
-                    'c_group' => $rq['c_group'],
-                    'c_email' => 'conkascom@outlook.com',
-                    'c_username' => 'markrichards'
+                    'c_email' => 'fredo@esporles.net',
+                    'c_username' => 'fredo'
                 ];
 
                 $vue['el'] = "#dataform";
@@ -447,8 +505,7 @@ class Authextended extends Auth {
                 return [
                     'flag' => "Ok",
                     'html' => H::form(['id' => 'dataform', 'class' => '', 'name' => 'dataform', 'action' => '', 'method' => 'POST'], $html),
-                    'data' => object_encode($vue),
-                    'mounted' => ''
+                    'data' => $vue
                 ];
             
             } catch (Exception $e) {
@@ -464,7 +521,7 @@ class Authextended extends Auth {
             }          
          }
 
-        /** Member has responded to forgotten password form
+        /** Member has responded to forgotten password form  
          * Check if we can identify the user, if so, let them change their password
          * @param - array - usual variables
          * @return - string - HTML for a message to be displayed in a Noty popup, so they can change their password
@@ -472,15 +529,15 @@ class Authextended extends Auth {
          function identifyUser(array $vars)
          {
 
+            $method = self::THISCLASS.'->'.__FUNCTION__."()"; 
             try {
 
-                $method = self::THISCLASS.'->'.__FUNCTION__."()";
                 global $clq; $html = ""; $rq = $vars['rq'];
 
                 if(array_key_exists('id', $rq)) {
                     $id = $rq['id'];
                 } else {
-                    $bean = R::findOne($vars['table'], 'WHERE c_type = ? AND c_email = ? AND c_username = ?', [$rq['c_type'], $rq['c_email'], $rq['c_username']]);
+                    $bean = R::findOne($vars['table'], 'WHERE c_email = ? AND c_username = ?', [$rq['c_email'], $rq['c_username']]);
                     is_object($bean) ? $id = $bean->id : $id = 0;                    
                 }
 
@@ -535,7 +592,7 @@ class Authextended extends Auth {
 
                 return [
                     'flag' => "Ok",
-                    'msg' => object_encode($response)
+                    'msg' => $response
                 ];
 
             } catch (Exception $e) {
@@ -550,8 +607,9 @@ class Authextended extends Auth {
                 ]; 
             }  
          }
+           
 
-        /** Delete User
+        /** Delete User  
          * Delete User from Database
          * @param - array - usual variables
          * @return - string - HTML for a form
@@ -591,7 +649,7 @@ class Authextended extends Auth {
             }             
          }
 
-        /** View User
+        /** View User  
          * Display a User Profile
          * @param - array - usual variables
          * @return - string - HTML for a form
@@ -631,7 +689,7 @@ class Authextended extends Auth {
             }          
          }
 
-        /** 
+        /** Display Change Status formlet  
          * Create data for Change Status popup
          * @param - array - usual variables
          * @return - string - HTML for a form
@@ -717,7 +775,7 @@ class Authextended extends Auth {
             }                 
          }
 
-        /** 
+        /** Do the change of Status  
          * Undertake the change of Status
          * @param - array - usual variables
          * @return - string - HTML for a form

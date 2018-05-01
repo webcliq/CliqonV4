@@ -25,7 +25,7 @@ class Auth {
 	}
 
     /** User Management - CRUD
-     * creatUserRecord()
+     * creatUser()
      * updateUserRecord()
      * deleteUserRecord()
      * changeUserPassword()
@@ -35,14 +35,14 @@ class Auth {
      *
      *************************************  Basic User Management  *************************************************/
 
-        /**
-         * Create new user record via registration or direct input
+        /** Create User  
+         * Create new user record via registration or direct input - when does this get used??
          * user status is inactive
          * @var array post
          * @return string Ok or notOk plus message
          **/
-        function createUserRecord($rq) 
-        {
+         function createUser($rq) 
+         {
 
             try {
 
@@ -60,6 +60,7 @@ class Auth {
                     'd_langcd' => self::setDefault('langcd', 'en', $rq),
                     'd_avatar' => self::setDefault('avatar', '', $rq),
                     'd_comments' => self::setDefault('comments', 'No comments', $rq),
+                    // ididtype
                 ];            
 
                 $result = $this->db->insert($this->tblname, [
@@ -75,6 +76,14 @@ class Auth {
                     'c_notes' => self::setDefault('notes', 'No additional notes', $rq),
                 ]);
 
+
+
+                $updb = R::dispense('dbuser');
+                foreach($userarray as $key => $val) {
+                    $updb->$key = $val;
+                }
+                $result = R::store($updb);
+
                 if(is_numeric($result)) {
                     return "Ok";
                 } else {
@@ -84,15 +93,14 @@ class Auth {
             } catch(Exception $e) {
                 return "NotOk: ".$e->getMessage();
             }   
-        }
+         }
 
-        /**
-         * Update User
+        /** Update User  
          * @var array post
          * @return string Ok or notOk plus message
          **/
-        function updateUserRecord($rq) 
-        {
+         function updateUserRecord($rq) 
+         {
             
             try {
 
@@ -129,15 +137,15 @@ class Auth {
             } catch(Exception $e) {
                 return "NotOk: ".$e->getMessage();
             }
-        }
+         }
 
-        /**
+        /** Delete user  
          * Delete User from system
          * @var array post
          * @return string Ok or notOk plus message
          **/
-        function deleteUserRecord($rq) 
-        {
+         function deleteUserRecord($rq) 
+         {
 
             try {
 
@@ -154,15 +162,14 @@ class Auth {
             } catch(Exception $e) {
                 return "NotOk: ".$e->getMessage();
             }           
-        }
+         }
 
-        /**
-         * Change User Password
+        /** Change User Password  
          * @var array Request
          * @return string Ok or notOk plus message
          **/
-        function changeUserPassword($vars) 
-        {
+         function changeUserPassword($vars) 
+         {
             try {
 
                 $method = self::THISCLASS.'->'.__FUNCTION__."()";
@@ -200,15 +207,15 @@ class Auth {
                     'html' => $err
                 ]; 
             }  
-        }
+         }
 
-        /**
+        /** Change user element  
          * Change Single Element of User Record such as Group or Status
          * @var array $vars
          * @return string Ok or notOk plus message
          **/
-        function changeUserElement($vars)
-        {
+         function changeUserElement($vars)
+         {
             try {
 
                 $method = self::THISCLASS.'->'.__FUNCTION__."()";
@@ -245,10 +252,10 @@ class Auth {
                     'html' => $err
                 ]; 
             }      
-        }
+         }
 
-        private function setDefault($name, $default, $rq)
-        {
+         private function setDefault($name, $default, $rq)
+         {
             if($default == '') {
                 return $rq[$name];
             } else {
@@ -258,58 +265,7 @@ class Auth {
                     return $default;
                 }
             }
-        }
-
-        /** Create active user
-         * @param - array of user form details
-         *
-         **/
-        function createUser($usr)
-        {
-           try {
-                
-                $hasher = new PasswordHash(8, false);
-                $pwd = $hasher->HashPassword($usr['password']);
-
-                // c_document -> $doc fields first
-                $doc = [
-                    'd_firstname' => self::setDefault('firstname', '', $usr),                
-                    'd_midname' => self::setDefault('midname', '', $usr),
-                    'd_lastname' => self::setDefault('lastname', '', $usr),
-                    'd_langcd' => self::setDefault('langcd', 'en', $usr),
-                    'd_avatar' => self::setDefault('avatar', '', $usr),
-                    'd_comments' => self::setDefault('comments', 'No comments', $usr),
-                ];            
-
-                $userarray = [
-                    'c_group' => self::setDefault('group', 'admin', $usr),
-                    'c_username' => self::setDefault('username', '', $usr),
-                    'c_password' => $pwd,
-                    'c_level' => self::setDefault('level', '60:60:60', $usr),
-                    'c_status' => self::setDefault('status', 'active', $usr),
-                    'c_document' => json_encode($doc),
-                    'c_email' => self::setDefault('email', '', $usr),
-                    'c_lastmodified' => Q::lastMod(),
-                    'c_whomodified' => 'installer',
-                    'c_notes' => self::setDefault('notes', 'No additional notes', $usr),
-                ];
-
-                $updb = R::dispense('dbuser');
-                foreach($userarray as $key => $val) {
-                    $updb->$key = $val;
-                }
-                $result = R::store($updb);
-
-                if(is_numeric($result)) {
-                    return "Ok";
-                } else {
-                    return "NotOk";
-                }
-
-            } catch(Exception $e) {
-                return $e->getMessage();
-            }   
-        }
+         }
 
     /** User Access
      * doLogin()
@@ -330,6 +286,7 @@ class Auth {
 
                 global $clq;
                 $check = false;
+                $cfg = $clq->get('cfg');
 
                 //if session isnt active but a cookie exists load the user back up.
                 if (((isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === false) || !isset($_SESSION['loggedin'])) && isset($_COOKIE['loggedin'])  && $_COOKIE['loggedin'] == 1) {
@@ -361,7 +318,8 @@ class Auth {
                         $check = $hasher->CheckPassword($rq['password'], $row['c_password']); // Input, Database         
                     } else {
 
-                        $users = $clq->get('cfg')['site']['users'];
+                        // Temporary login
+                        $users = $cfg['site']['users'];
                         foreach($users as $id => $user) {
                             // Does User exist in Config file ??
                             if($rq['username'] == $user['c_username']) {

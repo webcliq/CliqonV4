@@ -47,4 +47,15 @@
     <link href="@($viewpath)css/style.css" rel="stylesheet">
     <script type="text/javascript" src="@($includepath)js/basket.js"></script>
 
-
+    <style>
+    .circle-text {
+    display: table-cell;
+    height: 40px; /*change this and the width for the size of your initial circle*/
+    width: 40px;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 50%;
+    background: #000;
+    font: 30px arial; /*change this for font-size and font-family*/
+    }
+    </style>

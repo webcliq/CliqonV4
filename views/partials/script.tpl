@@ -25,6 +25,12 @@ basket
     // Quark
     // for(t=document.querySelectorAll`*`,i=t.length;i--;)for(s=t[i].classList,c=s.length;c--;)z=s[c].split`-`,u=z[1],t[i].style[z[0]]=~~u?u+'px':u;
 
+    $('.languagebutton').on('click', function(e) {
+        var idm = $(this).data('idiom');
+        var urlstr = '/page/'+idm+'/index/';
+        uLoad(urlstr);
+    })
+
 }, function (error) {
     // There was an error fetching the script
     console.log(error);
