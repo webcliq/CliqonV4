@@ -339,22 +339,29 @@
 					});
 
 				// Tags 
-					$('.tagit').tagit({
-						availableTags: tags,
-						singleField: true,
-						tagLimit: 10,
-						placeholder: 'tag',
-						afterTagAdded: function(event, ui) {
-							var fldid = event.target.id;
-							var tags = implode(',', $('#'+fldid).tagit("assignedTags"));
-							Vue.set(cfg.df, fldid, tags);
-    					},
-						afterTagRemoved: function(event, ui) {
-							var fldid = event.target.id;
-							var tags = implode(',', $('#'+fldid).tagit("assignedTags"));
-							Vue.set(cfg.df, fldid, tags);
-    					}					
-					});	
+					$('.tagit').each(function() {
+		           		
+		           		var fldid = $(this).attr('id');
+		           		var thisfld = $('#'+fldid);
+		           		var thisfldtags = explode(',', cfg.df.$data[fldid]);
+
+						$(thisfld).tagit({
+							availableTags: thisfldtags,
+							singleField: true,
+							tagLimit: 10,
+							placeholder: 'tag',
+							afterTagAdded: function(event, ui) {
+								var fldid = event.target.id;
+								var tags = implode(',', $('#'+fldid).tagit("assignedTags"));
+								Vue.set(cfg.df, fldid, tags);
+	    					},
+							afterTagRemoved: function(event, ui) {
+								var fldid = event.target.id;
+								var tags = implode(',', $('#'+fldid).tagit("assignedTags"));
+								Vue.set(cfg.df, fldid, tags);
+	    					}					
+						});	
+					});
 
 				// Repeater
 		        	$('#dataform').repeater({
