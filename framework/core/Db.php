@@ -2489,7 +2489,12 @@ class Db
 	        		$tablist .= H::li(['class' => 'nav-item'],
 	        			H::a(['class' => 'nav-link', 'id' => $lcdcode.'-tab', 'data-toggle' => 'tab', 'href' => '#'.$lcdcode.'-content', 'role' => 'tab', 'aria-controls' => $lcdname], $lcdname)
 	        		);
-	        		$tabcontent .= H::div(['class' => 'tab-pane fade minh29', 'id' => $lcdcode.'-content', 'role' => 'tabpanel', 'aria-labelledby' => $lcdname], $row['d_text'][$lcdcode]);
+	        		if( is_array($row['d_text']) and array_key_exists($lcdcode, $row['d_text']) ) {
+						$txt = $row['d_text'][$lcdcode];
+	        		} else {
+						$txt = "Default";
+	        		};
+	        		$tabcontent .= H::div(['class' => 'tab-pane fade minh29', 'id' => $lcdcode.'-content', 'role' => 'tabpanel', 'aria-labelledby' => $lcdname], $txt);
 	        	};
 
 	        	// Header Record

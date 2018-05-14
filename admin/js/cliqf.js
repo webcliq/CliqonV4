@@ -1042,7 +1042,7 @@
 										}
 									}); 
 									
-									tinyEditor(cfg, '.rte');	
+									tinyEditor(data, cfg, '.rte');	
                                 }
                             };
                             var contentEditor = Cliq.win(opts);  
@@ -1055,7 +1055,7 @@
 	         * @param - object pass the local cfg
 	         * @param - string element
 	         **/
-	         var tinyEditor = function(cfg, ele)
+	         var tinyEditor = function(data, cfg, ele)
 	         {
                 var tinypath = jspath+'tinymce';
 				tinymce.baseURL = tinypath;
@@ -1104,7 +1104,7 @@
                                 
                                 var tinyeditors = tinymce.EditorManager.editors;
                                 var frmData = new FormData();
-                                frmData.set('recid', recid);
+                                frmData.set('recid', cfg.recid);
                                 frmData.set('fldname', 'd_text');
                                 $.each(tinyeditors, function(i, teditor) {
                                     var fld = trim(teditor.id, '_te'); // works fine
@@ -1149,7 +1149,7 @@
 
 						// Translate
                         editor.addButton('translate', {
-                            icon: 'globe',
+                            icon: 'moon',
                             // image: '',
                             tooltip: 'Translate Record',
                             onclick: function (e) {
