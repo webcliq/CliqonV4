@@ -15,8 +15,16 @@ final class AppController
 		$this->app = $app;	
 
 		if(isset($_SESSION['UserName']) and !empty($_SESSION['UserName'])) {
-			// echo $clq->get('basedir')."apps/".$app."/".$rq;
-			header("Location: ".$clq->get('rootdir')."apps/".$app."/index.php".$rq);
+			switch($app) {
+				case "adminer":
+					header("Location: https://adminer.cliqon.net/");
+				break;
+
+				default:
+					header("Location: ".$clq->get('rootdir')."apps/".$app."/index.php".$rq);
+				break;
+			}
+			
 		} else {
 			die();
 		}

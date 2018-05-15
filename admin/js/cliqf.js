@@ -116,6 +116,7 @@
              * @internal - sets cfg.df
              **/
 	         var vueForm = function() {       		 		
+        		
         		cfg.df = new Vue({
                     el:cfg.data.el,
                     data:cfg.data.data,
@@ -195,7 +196,7 @@
 
                     },
                     mounted: function() {
-                        formMounted(cfg);
+                        formMounted(cfg, this);
                     }
                 });
 	         }
@@ -206,10 +207,11 @@
              * @param - 
              * @return - 
              **/
-			 var formMounted = function(cliqcfg,)
+			 var formMounted = function(cliqcfg, thisvue)
 			 {
 				cfg = cliqcfg;
 				var id = 'dataform'; 
+				cfg.df = thisvue;
 
 				// Execute any code that had to be sent with the page
 				$.globalEval(cfg.data.mounted);
@@ -646,7 +648,7 @@
 
                             	// Exclude fields
                             	case "token": case "c_level":
-                            		$tbl += "";
+                            		tbl += "";
                             	break;
 
                             	default:

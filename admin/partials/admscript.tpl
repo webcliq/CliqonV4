@@ -9,7 +9,7 @@ var jwt = "@raw($jwt)"; // This is now essential
 
 // basket.clear(true);
 basket
-.remove('blog') // "","" comma separated list
+.remove('cliqf') // "","" comma separated list
 .require(
 
 	// Libraries that need to loaded in various places, therefore cannot JIT script load
@@ -37,11 +37,11 @@ basket
     {url: viewpath+"js/admin.js"},
     {url: viewpath+"js/cliq.js"},
 	{url: viewpath+"js/cliqd.js"},
-	{url: viewpath+"js/cliqb.js", key: "blog", skipCache: true},
+	{url: viewpath+"js/cliqb.js"},
 	{url: viewpath+"js/cliqv.js"},
 	{url: viewpath+"js/cliqr.js"},
 	{url: viewpath+"js/cliqm.js"},
-	{url: viewpath+"js/cliqf.js"}
+	{url: viewpath+"js/cliqf.js", key: "cliqf", skipCache: true}
 
 ).then(function(msg) {
 
