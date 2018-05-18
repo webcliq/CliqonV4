@@ -12,14 +12,9 @@ class DefaultController
 	{
 
 		global $clq;
-		$this->cfg = $clq->get('cfg');	
-		// We can decide to set the default idiom statically from the config file	
-		if($this->cfg['site']['setdefaultidiom'] == 'static') {
-			$this->idiom = $this->cfg['site']['defaultidiom'];
-		} else if($this->cfg['site']['setdefaultidiom'] == 'dynamic') {
-			// Or get it dynamically
-			$this->idiom = F::getDefLanguage();
-		}
+		$this->cfg = $clq->get('cfg');
+		$this->idiom = F::getDefLanguage();
+
 		$clq->set('idiom', $this->idiom);
 		$clq->set('client', F::parseClient());	
 		$clq->set('lcd', $this->idiom);
@@ -32,18 +27,7 @@ class DefaultController
 		// Load Template Engine - $vars only apply to outside template!!
 		$tpl = new Engine(new FilesystemLoader($clq->get('basedir')."views"), $clq->get('basedir')."cache/".$this->idiom);		
 		$template = $this->page.'.'.$extn;
-		$js = "
-			App.loadNews(false);
-
-		    sidenav.init('left', {
-		        container : '#sideNavi',
-		        defaultitem : '.side-navi-item-default',
-		        item : '.side-navi-item',
-		        data : '.side-navi-data',
-		        tab : '.side-navi-tab',
-		        active : '.active'
-		    });
-		";
+		$js = "";
 		$clq->set('js', $js);
 		$vars = [
 			'protocol' => $clq->get('protocol'),

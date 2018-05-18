@@ -270,8 +270,6 @@ class Cliq
         public static function cCfg($ref) // site
         { 
             global $clq;
-            $lcd = Z::zget('Langcd');
-            L::cLog($clq->get('cfg'));
             $result = self::qStr("config", "cCfg()", $ref, true, 'dbitem');
             if($result) {
                 return $result;
@@ -471,7 +469,7 @@ class Cliq
                     'docfield' => $doc,
                     'field' => $fld,            // d_text
                     'reference' => $ref,
-                    'idiom' => $idm,            // true, false
+                    'idm' => $idm,            // true, false
                     'subfield' => false
                 ];
 
@@ -649,7 +647,12 @@ class Cliq
 
                 $fldval = $doc[$qa['field']];
 
-                if($qa['idiom'] == true) {
+                if($qa['idm'] == true) {
+
+                    // Stops initial blank page
+                    if($lcd == 0) {
+                        $lcd = F::getDefLanguage();
+                    };
                     $vals = $fldval[$lcd];
 
                     // Possible that $val is still an array

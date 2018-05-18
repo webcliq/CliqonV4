@@ -60,12 +60,28 @@ class Framework
 		 **/
 		 public static function getDefLanguage() 
 		 {
-			if(isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
-				return self::parseDefaultLanguage($_SERVER["HTTP_ACCEPT_LANGUAGE"]);
-				
+			$lcd = "en"; // Set a default
+			// Rely on browser to give us language
+			if(self::$cfg['site']['setdefaultidiom'] == 'dynamic') {
+				// Get it dynamically
+				if(isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
+					$lcd = self::parseDefaultLanguage($_SERVER["HTTP_ACCEPT_LANGUAGE"]);
+				} else {
+					$lcd = self::parseDefaultLanguage(NULL);
+				}
+			// We can decide to set the default idiom statically from the config file		
+			} else if(self::$cfg['site']['setdefaultidiom'] == 'static') {
+				// Use language in Config File - do this if there is possibility that browsers that do not appear in list of supported languages will exist
+				$lcd = self::$cfg['site']['defaultidiom'];
 			} else {
-				return self::parseDefaultLanguage(NULL);
-			}
+				// Unless there is a better way
+				if(isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
+					$lcd = self::parseDefaultLanguage($_SERVER["HTTP_ACCEPT_LANGUAGE"]);
+				} else {
+					$lcd = self::parseDefaultLanguage(NULL);
+				}
+			};
+			return $lcd;
 		 }
 
 		 /** Helper for above 
